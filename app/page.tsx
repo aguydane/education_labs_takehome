@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 const App = dynamic(() => import("@/components/App"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-screen items-center justify-center bg-bg text-sm text-ink-2" data-testid="loading">
+    <div className="flex h-dvh items-center justify-center bg-bg text-sm text-ink-2" data-testid="loading">
       Loading Helm…
     </div>
   ),

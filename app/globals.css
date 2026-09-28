@@ -20,13 +20,18 @@
   --ok: #2f7a4f;
   --ok-soft: #dcefe3;
 
-  /* concept states */
-  --st-noticed: #8a949a;
+  /*
+    Concept states. Each state gets its own hue so they read apart at a
+    glance: noticed is a hollow gray ring, chosen is teal, practicing is
+    violet, durable is green, delegated is a warm gray with a strike,
+    dormant is a faint hollow ring.
+  */
+  --st-noticed: #7d878d;
   --st-chosen: #1f6f73;
-  --st-practicing: #2c8f95;
+  --st-practicing: #6d5bd0;
   --st-durable: #2f7a4f;
-  --st-delegated: #b6bcbf;
-  --st-dormant: #d4d8da;
+  --st-delegated: #8a7f74;
+  --st-dormant: #c4cacc;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,12 +50,12 @@
     --ok: #7fcf9c;
     --ok-soft: #1c3627;
 
-    --st-noticed: #6f7a80;
+    --st-noticed: #8b959b;
     --st-chosen: #5cc3c8;
-    --st-practicing: #7fd6da;
+    --st-practicing: #a99cf5;
     --st-durable: #7fcf9c;
-    --st-delegated: #454e52;
-    --st-dormant: #2f3739;
+    --st-delegated: #857a6f;
+    --st-dormant: #3a4244;
   }
 }
 
@@ -78,9 +83,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+  The app is a fixed-height shell with its own scroll regions; the document
+  itself never scrolls. `clip` (not `hidden`) also blocks programmatic
+  scrolling, so a focused element below the fold can't drag the page.
+*/
 html,
 body {
   height: 100%;
+  overflow: clip;
 }
 
 body {

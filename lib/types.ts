@@ -57,10 +57,19 @@ export type Evidence = {
   ts: string;
 };
 
+export type RelationKind = "prereq" | "related" | "cooccur";
+
+/**
+ * An edge on the map. "cooccur" edges are written by harvest whenever two
+ * concepts come up in the same exchange (weight = how many exchanges);
+ * "related" and "prereq" edges are drawn by the learner from the concept
+ * detail pane. Stored on the `from` concept; the graph dedupes pairs.
+ */
 export type Relation = {
   to: string;
-  kind: "prereq" | "related" | "cooccur";
+  kind: RelationKind;
   weight: number;
+  source?: "harvest" | "learner";
 };
 
 export type PracticeEntry = {

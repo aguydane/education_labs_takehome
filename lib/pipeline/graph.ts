@@ -21,6 +21,8 @@ export type GraphEdge = {
   target: string;
   kind: "prereq" | "related" | "cooccur";
   weight: number;
+  /** "harvest" for co-occurrence, "learner" for hand-drawn edges. */
+  origin: "harvest" | "learner";
 };
 
 export type Graph = { nodes: GraphNode[]; edges: GraphEdge[] };
@@ -51,7 +53,7 @@ export function deriveGraph(state: LearnerState, now = nowIso()): Graph {
       const key = [c.id, r.to].sort().join("|") + "|" + r.kind;
       if (seen.has(key)) continue;
       seen.add(key);
-      edges.push({ source: c.id, target: r.to, kind: r.kind, weight: r.weight });
+      edges.push({ source: c.id, target: r.to, kind: r.kind, weight: r.weight, origin: r.source ?? "harvest" });
     }
   }
   return { nodes, edges };

@@ -45,6 +45,7 @@ import {
   judgeRecognition as judgeRecognitionFn,
   type RecognitionDecision,
 } from "./pipeline/recognize";
+import { addRelation as addRelationFn, removeRelation as removeRelationFn } from "./pipeline/relations";
 import {
   dismissNudge as dismissNudgeFn,
   finishLongTask,
@@ -58,6 +59,7 @@ import type {
   Exchange,
   LearnerState,
   PersonaId,
+  RelationKind,
   Rung,
   StudioEntry,
 } from "./types";
@@ -122,6 +124,10 @@ export type LearnerActions = {
   sendStudio: (text: string) => Promise<void>;
   changeRung: (direction: "more-help" | "let-me-try") => Promise<void>;
   leaveStudio: (closingStatement?: string) => void;
+
+  /** Edges the learner draws or removes on the map. */
+  addRelation: (from: string, to: string, kind: "related" | "prereq") => void;
+  removeRelation: (a: string, b: string, kind: RelationKind) => void;
 
   /** Nudges and layout. */
   dismissNudge: (nudgeId: string) => void;
@@ -578,6 +584,14 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     setStore(new BrowserStore(loadSeed(personaId)));
   }, [personaId]);
 
+  const addRelation = useCallback(
+    (from: string, to: string, kind: "related" | "prereq") => update((s) => addRelationFn(s, from, to, kind)),
+    [update],
+  );
+  const removeRelation = useCallback(
+    (a: string, b: string, kind: RelationKind) => update((s) => removeRelationFn(s, a, b, kind)),
+    [update],
+  );
   const dismissNudge = useCallback((nudgeId: string) => update((s) => dismissNudgeFn(s, nudgeId)), [update]);
   const toggleGraph = useCallback(
     () => update((s) => ({ ...s, ui: { ...s.ui, graphCollapsed: !s.ui.graphCollapsed } })),
@@ -605,6 +619,8 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       sendStudio,
       changeRung,
       leaveStudio,
+      addRelation,
+      removeRelation,
       dismissNudge,
       toggleGraph,
     }),
@@ -627,6 +643,8 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       sendStudio,
       changeRung,
       leaveStudio,
+      addRelation,
+      removeRelation,
       dismissNudge,
       toggleGraph,
     ],

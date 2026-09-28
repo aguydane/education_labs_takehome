@@ -213,7 +213,7 @@ export function applyHarvest(
         ...c,
         relations: rel
           ? c.relations.map((r) => (r === rel ? { ...r, weight: r.weight + 1 } : r))
-          : [...c.relations, { to: b, kind: "cooccur", weight: 1 }],
+          : [...c.relations, { to: b, kind: "cooccur", weight: 1, source: "harvest" }],
       };
     }
   }

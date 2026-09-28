@@ -21,7 +21,7 @@ function Shell() {
   const inStudio = state.ui.mode === "studio";
 
   return (
-    <div className="flex h-screen flex-col bg-bg text-ink">
+    <div className="flex h-dvh flex-col overflow-clip bg-bg text-ink">
       <Header />
       <div className="flex min-h-0 flex-1">
         <main className="relative flex min-w-0 flex-1 flex-col" data-testid="main-region">
