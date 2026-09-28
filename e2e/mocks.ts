@@ -48,9 +48,11 @@ export async function mockClaudeRoutes(page: Page) {
   await page.route("**/api/summarize", (route) => json(route, { summary: MOCK.summary }));
 
   await page.route("**/api/studio", (route) => {
+    // The route adds the session-start user turn itself, so any user message
+    // in the body means the learner has spoken.
     const body = route.request().postDataJSON() as { messages: { role: string }[] };
-    const userTurns = (body.messages ?? []).filter((m) => m.role === "user").length;
-    return text(route, userTurns <= 1 ? MOCK.studioOpening : MOCK.studioReply);
+    const learnerSpoke = (body.messages ?? []).some((m) => m.role === "user");
+    return text(route, learnerSpoke ? MOCK.studioReply : MOCK.studioOpening);
   });
 
   await page.route("**/api/harvest", (route) => {
