@@ -132,6 +132,8 @@ export type LearnerContextValue = {
   state: LearnerState;
   personaId: PersonaId;
   busy: Busy;
+  /** Exchanges whose harvest call is in flight. */
+  harvestingIds: string[];
   beat: BeatUI | null;
   studio: StudioUI | null;
   /** Exchange currently streaming (assistant text is partial). */
@@ -176,9 +178,17 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
   const [store, setStore] = useState<BrowserStore>(() => new BrowserStore(loadSeed(readPersona())));
   const [busy, setBusy] = useState<Busy>({ chat: false, harvest: 0, recognize: 0, prune: false, summarize: false });
   const [beat, setBeat] = useState<BeatUI | null>(null);
-  const [studio, setStudio] = useState<StudioUI | null>(null);
+  // A Studio session that was open when the page last closed resumes as idle.
+  const [studio, setStudio] = useState<StudioUI | null>(() => {
+    const s = store.getState();
+    return s.ui.mode === "studio" && s.ui.activeStudioId
+      ? { sessionId: s.ui.activeStudioId, streaming: false, partial: "", entering: false }
+      : null;
+  });
   const [streamingExchangeId, setStreamingExchangeId] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // Bumped whenever a Studio session ends so an in-flight reply can't write into it.
+  const studioGenRef = useRef(0);
 
   // Dormancy is the only time-based transition; apply it on load.
   useEffect(() => {
@@ -201,10 +211,13 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
 
   // ---- Background steps -----------------------------------------------
 
+  const [harvestingIds, setHarvestingIds] = useState<string[]>([]);
+
   const runHarvest = useCallback(
     async (exchangeId: string, exchange: { user: string; assistant: string }) => {
       if (!store) return;
       bump("harvest", 1);
+      setHarvestingIds((ids) => [...ids, exchangeId]);
       try {
         const out = await api.harvest(store.getState().persona.id, exchange, store.conceptIndex());
         const result = toHarvestResult(out);
@@ -217,6 +230,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
         console.error("harvest failed", err);
       } finally {
         bump("harvest", -1);
+        setHarvestingIds((ids) => ids.filter((x) => x !== exchangeId));
       }
     },
     [store],
@@ -421,6 +435,8 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       const material = session.materialExchangeId
         ? s.exchanges.find((e) => e.id === session.materialExchangeId)
         : undefined;
+      const gen = studioGenRef.current;
+      const live = () => studioGenRef.current === gen;
       setStudio({ sessionId, streaming: true, partial: "", entering: false });
       try {
         const text = await api.studio(
@@ -429,11 +445,15 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
           session.rung,
           material ? { user: material.user, assistant: material.assistant, ts: material.ts } : undefined,
           session.messages,
-          (_d, full) => setStudio((st) => (st ? { ...st, partial: full } : st)),
+          (_d, full) => {
+            if (live()) setStudio((st) => (st ? { ...st, partial: full } : st));
+          },
         );
+        if (!live()) return;
         store.update((cur) => appendStudioMessage(cur, sessionId, { role: "assistant", content: text }));
         setStudio({ sessionId, streaming: false, partial: "", entering: false });
       } catch (err) {
+        if (!live()) return;
         const msg = err instanceof Error ? err.message : "studio failed";
         setStudio({ sessionId, streaming: false, partial: "", entering: false, error: msg });
       }
@@ -449,10 +469,13 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       if (opts.nudgeId) store.update((cur) => resolveNudge(cur, opts.nudgeId!));
 
       // The state-save ritual. Skipped when the work is literally running.
+      // Studio mode switches on immediately so the "saving where you were"
+      // moment is visible while the summary is written.
       let workSummary: string | undefined;
       if (opts.entry !== "opportunistic") {
         setBusy((b) => ({ ...b, summarize: true }));
         setStudio({ sessionId: "", streaming: false, partial: "", entering: true });
+        store.update((cur) => ({ ...cur, ui: { ...cur.ui, mode: "studio", activeStudioId: undefined } }));
         try {
           workSummary = (await api.summarize(s.exchanges)).summary;
         } catch (err) {
@@ -517,7 +540,8 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
   const leaveStudio = useCallback(
     (closingStatement?: string) => {
       if (!store) return;
-      const sid = studio?.sessionId ?? store.getState().ui.activeStudioId;
+      studioGenRef.current += 1;
+      const sid = studio?.sessionId || store.getState().ui.activeStudioId;
       if (sid) store.update((s) => endStudio(s, sid, closingStatement));
       else store.update((s) => ({ ...s, ui: { ...s.ui, mode: "work", activeStudioId: undefined } }));
       setStudio(null);
@@ -535,9 +559,15 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     }
     abortRef.current?.abort();
     setBeat(null);
-    setStudio(null);
+    const next = new BrowserStore(loadSeed(p));
+    const s = next.getState();
+    setStudio(
+      s.ui.mode === "studio" && s.ui.activeStudioId
+        ? { sessionId: s.ui.activeStudioId, streaming: false, partial: "", entering: false }
+        : null,
+    );
     setPersonaId(p);
-    setStore(new BrowserStore(loadSeed(p)));
+    setStore(next);
   }, []);
 
   const resetPersona = useCallback(() => {
@@ -603,7 +633,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <Ctx.Provider value={{ state, personaId, busy, beat, studio, streamingExchangeId, actions }}>
+    <Ctx.Provider value={{ state, personaId, busy, harvestingIds, beat, studio, streamingExchangeId, actions }}>
       {children}
     </Ctx.Provider>
   );
