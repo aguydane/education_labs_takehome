@@ -6,7 +6,7 @@ Written at the end of the overnight build, 2026-09-28. Read this first.
 
 **It's deployed and working end to end:** https://educationlabstakehome.vercel.app
 
-Both personas are seeded, every step of the loop runs against real Claude calls, the production build passes, and the 11-test Playwright suite is green. Everything is committed and pushed to `main` (8 commits). The local dev server was started from this session on http://localhost:3000; if it isn't running when you sit down, `nvm use && npm run dev` brings it back.
+Both personas are seeded, every step of the loop runs against real Claude calls, the production build passes, and the 11-test Playwright suite is green. Everything is committed and pushed to `main` (9 commits). The local dev server was started from this session on http://localhost:3000; if it isn't running when you sit down, `nvm use && npm run dev` brings it back.
 
 What I verified by hand in the browser, with real API calls (not mocks), on the seeded backend persona:
 
