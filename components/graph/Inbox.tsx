@@ -57,7 +57,7 @@ export default function Inbox({ onOpenConcept }: { onOpenConcept: (id: string) =
   };
 
   return (
-    <section data-testid="graph-inbox" className="shrink-0 border-b border-rule px-4 py-2.5">
+    <section data-testid="graph-inbox" className="border-b border-rule px-4 py-2.5">
       <h3 className="text-xs text-ink-2">Waiting for you · {items.length}</h3>
       <ul className="mt-1.5 space-y-2">
         {items.map((n) => {

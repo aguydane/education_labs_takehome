@@ -88,7 +88,6 @@ export default function GraphPanel() {
       </header>
 
       <CalendarStrip />
-      <Inbox onOpenConcept={setSelectedId} />
 
       <GraphCanvas
         graph={graph}
@@ -103,8 +102,10 @@ export default function GraphPanel() {
       />
       <Legend />
 
-      {/* The dock: sized to its content up to a cap, scrolling inside, so the map keeps the room. */}
+      {/* The dock: what's waiting, the active set, a pending proposal, and the selected concept.
+          Sized to its content up to a cap and scrolling inside, so the map keeps the room. */}
       <div className="relative max-h-[35%] shrink-0 overflow-y-auto border-t border-rule">
+        <Inbox onOpenConcept={setSelectedId} />
         <ActiveSetStrip selectedId={selected} onOpenConcept={setSelectedId} />
         {pending && pruneNudge ? (
           <PrunePanel

@@ -55,7 +55,7 @@ const STATE_RANK: Record<GraphNode["state"], number> = {
   practicing: 5,
 };
 
-export function radiusOf(n: GraphNode): number {
+function radiusOf(n: GraphNode): number {
   return 7 + 13 * Math.max(0, Math.min(1, n.weight));
 }
 
@@ -144,15 +144,17 @@ function GraphCanvas({
       const p = pos[n.id];
       return p ? [{ n, p, r: radiusOf(n) }] : [];
     });
-    const sides = placeLabels(
+    const spots = placeLabels(
       placedNodes.map(({ n, p, r }) => {
         const selected = n.id === selectedId;
         const recommended = n.recommended && !!proposal;
+        // Labels clear the node's outermost ring, not just its fill.
+        const outer = r + (n.active ? 4.5 : 0) + (recommended ? 4.5 : 0) + (selected ? 4.5 : 0);
         return {
           id: n.id,
           x: p.x,
           y: p.y,
-          r,
+          r: outer,
           text: n.state === "dormant" ? "" : truncate(n.name, LABEL_CHARS),
           priority: selected ? 0 : n.active ? 1 : recommended ? 2 : n.pinned ? 3 : 4 + (1 - n.weight),
           force: selected || n.active,
@@ -162,14 +164,8 @@ function GraphCanvas({
       h,
     );
     return placedNodes.map(({ n, p, r }) => {
-      const side = sides.get(n.id);
-      return {
-        n,
-        p,
-        r,
-        label: side ? truncate(n.name, LABEL_CHARS) : "",
-        labelLeft: side === "left",
-      };
+      const spot = spots.get(n.id);
+      return { n, p, r, label: spot ? truncate(n.name, LABEL_CHARS) : "", spot };
     });
   }, [ordered, pos, w, h, selectedId, proposal]);
 
@@ -310,13 +306,13 @@ function GraphCanvas({
 
         {/* Labels sit under every node, so a label can never cover another node's circle. */}
         <g>
-          {geometry.map(({ n, p, r, label, labelLeft }) =>
-            label ? (
+          {geometry.map(({ n, label, spot }) =>
+            label && spot ? (
               <text
                 key={n.id}
-                x={labelLeft ? p.x - r - 6 : p.x + r + 6}
-                y={p.y + 4}
-                textAnchor={labelLeft ? "end" : "start"}
+                x={spot.x}
+                y={spot.y}
+                textAnchor={spot.anchor}
                 className="text-xs"
                 fill={n.active || n.id === selectedId ? "var(--ink)" : "var(--ink-2)"}
                 fontWeight={n.active || n.id === selectedId ? 500 : 400}
@@ -470,7 +466,7 @@ function NodeTooltip({
 }) {
   const right = x + r + 12 + TOOLTIP_W <= w - 4;
   const left = right ? x + r + 12 : Math.max(4, x - r - 12 - TOOLTIP_W);
-  const top = Math.max(4, Math.min(y - 14, h - (reasoning ? 120 : 64)));
+  const top = Math.max(4, Math.min(y - 14, h - (reasoning ? 116 : 60)));
   return (
     <div
       role="tooltip"
@@ -489,7 +485,7 @@ function NodeTooltip({
           </>
         ) : null}
       </div>
-      {reasoning ? <p className="mt-1 text-ink-2">{reasoning}</p> : null}
+      {reasoning ? <p className="mt-1 line-clamp-3 text-ink-2">{reasoning}</p> : null}
     </div>
   );
 }
