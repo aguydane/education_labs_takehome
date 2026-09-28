@@ -23,3 +23,8 @@ out/
 
 # generated
 next-env.d.ts
+
+# local tooling
+.claude/launch.json
+test-results/
+playwright-report/
