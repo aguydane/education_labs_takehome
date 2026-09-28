@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+  Helm design tokens. Components use these through the Tailwind theme
+  (bg-panel, text-ink, border-rule, text-accent, …) so light and dark stay
+  consistent everywhere.
+*/
+:root {
+  --bg: #f6f7f5;
+  --panel: #ffffff;
+  --panel-2: #eef1ee;
+  --ink: #1b211f;
+  --ink-2: #5b6663;
+  --rule: #d8ddda;
+  --accent: #1f6f73;
+  --accent-ink: #145356;
+  --accent-soft: #dcecec;
+  --warn: #8a5a12;
+  --warn-soft: #f5ead6;
+  --ok: #2f7a4f;
+  --ok-soft: #dcefe3;
+
+  /* concept states */
+  --st-noticed: #8a949a;
+  --st-chosen: #1f6f73;
+  --st-practicing: #2c8f95;
+  --st-durable: #2f7a4f;
+  --st-delegated: #b6bcbf;
+  --st-dormant: #d4d8da;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101413;
+    --panel: #171c1b;
+    --panel-2: #1f2624;
+    --ink: #e9ecea;
+    --ink-2: #9aa5a1;
+    --rule: #2c3533;
+    --accent: #5cc3c8;
+    --accent-ink: #8fdadd;
+    --accent-soft: #1a3536;
+    --warn: #e0b46a;
+    --warn-soft: #3a2e17;
+    --ok: #7fcf9c;
+    --ok-soft: #1c3627;
+
+    --st-noticed: #6f7a80;
+    --st-chosen: #5cc3c8;
+    --st-practicing: #7fd6da;
+    --st-durable: #7fcf9c;
+    --st-delegated: #454e52;
+    --st-dormant: #2f3739;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-st-noticed: var(--st-noticed);
+  --color-st-chosen: var(--st-chosen);
+  --color-st-practicing: var(--st-practicing);
+  --color-st-durable: var(--st-durable);
+  --color-st-delegated: var(--st-delegated);
+  --color-st-dormant: var(--st-dormant);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@keyframes helm-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.helm-pulse {
+  animation: helm-pulse 1.6s ease-out 2;
+}
+
+/* Minimal markdown rendering for chat: keep it readable without a library. */
+.prose-helm p {
+  margin: 0.4rem 0;
+}
+.prose-helm pre {
+  background: var(--panel-2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  margin: 0.5rem 0;
+}
+.prose-helm code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.85em;
+}
+.prose-helm ul,
+.prose-helm ol {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.prose-helm ul {
+  list-style: disc;
+}
+.prose-helm ol {
+  list-style: decimal;
+}
+.prose-helm h1,
+.prose-helm h2,
+.prose-helm h3 {
+  font-weight: 600;
+  margin: 0.6rem 0 0.2rem;
+}

@@ -17,3 +17,9 @@ out/
 .DS_Store
 *.log
 *.tsbuildinfo
+*.pem
+/coverage
+/build
+
+# generated
+next-env.d.ts

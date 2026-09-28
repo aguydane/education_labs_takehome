@@ -1,0 +1,616 @@
+"use client";
+
+/**
+ * The integration brain. Everything the UI does goes through this context:
+ * it owns the BrowserStore, runs the Claude calls, and folds results into
+ * state through the pure pipeline functions. Components render state and
+ * call actions; they never call the API directly.
+ */
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { api } from "./api";
+import { applyHarvest, toHarvestResult } from "./pipeline/harvest";
+import {
+  adjustRung,
+  answerBeat as answerBeatFn,
+  appendStudioMessage,
+  endStudio,
+  pickMaterial,
+  recordBeat,
+  setStudioRung,
+  startStudio,
+} from "./pipeline/practice";
+import {
+  applyDormancy,
+  applyProposal,
+  judgeConcept as judgeConceptFn,
+  pinConcept as pinConceptFn,
+  setActiveSet as setActiveSetFn,
+  toProposal,
+  type ConceptJudgment,
+} from "./pipeline/prune";
+import {
+  activeConceptsOf,
+  applyRecognizeResult,
+  judgeRecognition as judgeRecognitionFn,
+  type RecognitionDecision,
+} from "./pipeline/recognize";
+import {
+  dismissNudge as dismissNudgeFn,
+  finishLongTask,
+  offerStudioForTask,
+  resolveNudge,
+  startLongTask,
+} from "./pipeline/triggers";
+import { loadSeed } from "./seeds";
+import { BrowserStore } from "./store/browser";
+import type {
+  Exchange,
+  LearnerState,
+  PersonaId,
+  Rung,
+  StudioEntry,
+} from "./types";
+import { id, nowIso } from "./util";
+
+// ---------------------------------------------------------------------------
+// Transient UI state (not persisted)
+// ---------------------------------------------------------------------------
+
+export type BeatUI = {
+  status: "streaming" | "ready" | "answered";
+  conceptId: string;
+  exchangeId: string;
+  content: string;
+  beatId?: string;
+  error?: string;
+};
+
+export type StudioUI = {
+  sessionId: string;
+  streaming: boolean;
+  partial: string;
+  entering: boolean;
+  error?: string;
+};
+
+export type Busy = {
+  chat: boolean;
+  harvest: number;
+  recognize: number;
+  prune: boolean;
+  summarize: boolean;
+};
+
+export type LearnerActions = {
+  switchPersona: (personaId: PersonaId) => void;
+  resetPersona: () => void;
+  update: (fn: (s: LearnerState) => LearnerState) => void;
+
+  /** Send a work message. Streams the reply, then harvests and recognizes in the background. */
+  sendWork: (text: string) => Promise<string | undefined>;
+  /** Kick off simulated long-horizon work through the chat. */
+  kickOffLongTask: (label?: string) => Promise<void>;
+  finishLongTask: () => void;
+
+  /** Beat: the in-work aside. */
+  startBeat: (conceptId: string, exchangeId: string, nudgeId?: string) => Promise<void>;
+  answerBeat: (answer: string) => void;
+  closeBeat: () => void;
+
+  /** Prune. */
+  requestPrune: () => Promise<void>;
+  chooseActiveSet: (conceptIds: string[]) => void;
+  judgeConcept: (conceptId: string, judgment: ConceptJudgment) => void;
+  pinConcept: (conceptId: string, pinned: boolean) => void;
+
+  /** Recognize. */
+  judgeRecognition: (recognitionId: string, decision: RecognitionDecision) => void;
+
+  /** Studio. */
+  enterStudio: (opts: { conceptId: string; entry: StudioEntry; nudgeId?: string }) => Promise<void>;
+  sendStudio: (text: string) => Promise<void>;
+  changeRung: (direction: "more-help" | "let-me-try") => Promise<void>;
+  leaveStudio: (closingStatement?: string) => void;
+
+  /** Nudges and layout. */
+  dismissNudge: (nudgeId: string) => void;
+  toggleGraph: () => void;
+};
+
+export type LearnerContextValue = {
+  state: LearnerState;
+  personaId: PersonaId;
+  busy: Busy;
+  beat: BeatUI | null;
+  studio: StudioUI | null;
+  /** Exchange currently streaming (assistant text is partial). */
+  streamingExchangeId: string | null;
+  actions: LearnerActions;
+};
+
+const Ctx = createContext<LearnerContextValue | null>(null);
+
+const PERSONA_KEY = "helm:persona";
+const HISTORY_EXCHANGES = 8;
+
+function readPersona(): PersonaId {
+  try {
+    const v = localStorage.getItem(PERSONA_KEY);
+    if (v === "backend" || v === "maritime") return v;
+  } catch {
+    // ignore
+  }
+  return "backend";
+}
+
+const LONG_TASK_PROMPTS: Record<PersonaId, { label: string; message: string }> = {
+  backend: {
+    label: "Backfill across all shards",
+    message:
+      "Go ahead and run the shipment_events backfill across all 12 shards with the batched approach we discussed, " +
+      "verify row counts per shard against the source, and report back when it's done. Don't wait on me.",
+  },
+  maritime: {
+    label: "Full summary-judgment draft",
+    message:
+      "Go ahead and draft the full motion for summary judgment on seaman status with the record cites from the " +
+      "deposition summaries, plus a proposed order. Full draft, not an outline. Report back when it's ready.",
+  },
+};
+
+export function LearnerProvider({ children }: { children: ReactNode }) {
+  // This provider is only ever rendered client-side (app/page.tsx loads it
+  // with ssr: false), so the store can be built during the first render.
+  const [personaId, setPersonaId] = useState<PersonaId>(() => readPersona());
+  const [store, setStore] = useState<BrowserStore>(() => new BrowserStore(loadSeed(readPersona())));
+  const [busy, setBusy] = useState<Busy>({ chat: false, harvest: 0, recognize: 0, prune: false, summarize: false });
+  const [beat, setBeat] = useState<BeatUI | null>(null);
+  const [studio, setStudio] = useState<StudioUI | null>(null);
+  const [streamingExchangeId, setStreamingExchangeId] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Dormancy is the only time-based transition; apply it on load.
+  useEffect(() => {
+    if (store) store.update((s) => applyDormancy(s));
+  }, [store]);
+
+  const subscribe = useCallback((cb: () => void) => store.subscribe(() => cb()), [store]);
+  const getSnapshot = useCallback(() => store.getState(), [store]);
+  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  const update = useCallback(
+    (fn: (s: LearnerState) => LearnerState) => {
+      store.update(fn);
+    },
+    [store],
+  );
+
+  const bump = (key: "harvest" | "recognize", delta: number) =>
+    setBusy((b) => ({ ...b, [key]: Math.max(0, b[key] + delta) }));
+
+  // ---- Background steps -----------------------------------------------
+
+  const runHarvest = useCallback(
+    async (exchangeId: string, exchange: { user: string; assistant: string }) => {
+      if (!store) return;
+      bump("harvest", 1);
+      try {
+        const out = await api.harvest(store.getState().persona.id, exchange, store.conceptIndex());
+        const result = toHarvestResult(out);
+        store.update((s) => {
+          let next = applyHarvest(s, exchangeId, result);
+          if (next.longTask?.exchangeId === exchangeId) next = offerStudioForTask(next, exchangeId);
+          return next;
+        });
+      } catch (err) {
+        console.error("harvest failed", err);
+      } finally {
+        bump("harvest", -1);
+      }
+    },
+    [store],
+  );
+
+  const runRecognize = useCallback(
+    async (exchangeId: string, message: string) => {
+      if (!store) return;
+      const s = store.getState();
+      const active = activeConceptsOf(s);
+      if (active.length === 0) return;
+      bump("recognize", 1);
+      try {
+        const out = await api.recognize(s.persona.id, message, active);
+        store.update((cur) => applyRecognizeResult(cur, exchangeId, out).state);
+      } catch (err) {
+        console.error("recognize failed", err);
+      } finally {
+        bump("recognize", -1);
+      }
+    },
+    [store],
+  );
+
+  // ---- Work chat ---------------------------------------------------------
+
+  const sendWork = useCallback(
+    async (text: string, opts?: { longTaskLabel?: string }): Promise<string | undefined> => {
+      if (!store || busy.chat) return undefined;
+      const trimmed = text.trim();
+      if (!trimmed) return undefined;
+      const s0 = store.getState();
+      const exchangeId = id("ex");
+      const exchange: Exchange = {
+        id: exchangeId,
+        personaId: s0.persona.id,
+        ts: nowIso(),
+        kind: "work",
+        user: trimmed,
+        assistant: "",
+        longTask: !!opts?.longTaskLabel,
+      };
+      store.appendExchange(exchange);
+      if (opts?.longTaskLabel) {
+        store.update((s) => startLongTask(s, exchangeId, opts.longTaskLabel!));
+      }
+      setBusy((b) => ({ ...b, chat: true }));
+      setStreamingExchangeId(exchangeId);
+
+      // Recognize runs on the learner's words alone; it doesn't need the reply.
+      void runRecognize(exchangeId, trimmed);
+
+      const history = s0.exchanges
+        .filter((e) => e.kind === "work" && e.assistant)
+        .slice(-HISTORY_EXCHANGES)
+        .flatMap((e) => [
+          { role: "user" as const, content: e.user },
+          { role: "assistant" as const, content: e.assistant },
+        ]);
+      const controller = new AbortController();
+      abortRef.current = controller;
+      let full = "";
+      try {
+        full = await api.chat(
+          s0.persona.id,
+          [...history, { role: "user", content: trimmed }],
+          (_delta, sofar) => {
+            full = sofar;
+            store.update((s) => ({
+              ...s,
+              exchanges: s.exchanges.map((e) => (e.id === exchangeId ? { ...e, assistant: sofar } : e)),
+            }));
+          },
+          controller.signal,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "request failed";
+        full = full || `[error: ${msg}]`;
+        store.update((s) => ({
+          ...s,
+          exchanges: s.exchanges.map((e) => (e.id === exchangeId ? { ...e, assistant: full } : e)),
+        }));
+      } finally {
+        setBusy((b) => ({ ...b, chat: false }));
+        setStreamingExchangeId(null);
+        abortRef.current = null;
+      }
+      if (full && !full.startsWith("[error")) {
+        void runHarvest(exchangeId, { user: trimmed, assistant: full });
+      }
+      return exchangeId;
+    },
+    [store, busy.chat, runHarvest, runRecognize],
+  );
+
+  const kickOffLongTask = useCallback(
+    async (label?: string) => {
+      if (!store) return;
+      const p = store.getState().persona.id;
+      const preset = LONG_TASK_PROMPTS[p];
+      await sendWork(preset.message, { longTaskLabel: label ?? preset.label });
+    },
+    [store, sendWork],
+  );
+
+  // ---- Beat ---------------------------------------------------------------
+
+  const startBeat = useCallback(
+    async (conceptId: string, exchangeId: string, nudgeId?: string) => {
+      if (!store) return;
+      const s = store.getState();
+      const concept = s.concepts[conceptId];
+      const exchange = s.exchanges.find((e) => e.id === exchangeId);
+      if (!concept || !exchange) return;
+      if (nudgeId) store.update((cur) => resolveNudge(cur, nudgeId));
+      setBeat({ status: "streaming", conceptId, exchangeId, content: "" });
+      try {
+        const content = await api.beat(s.persona.id, concept, exchange, (_d, full) =>
+          setBeat((b) => (b ? { ...b, content: full } : b)),
+        );
+        let beatId: string | undefined;
+        store.update((cur) => {
+          const r = recordBeat(cur, { conceptId, exchangeId, content });
+          beatId = r.beat.id;
+          return r.state;
+        });
+        setBeat((b) => (b ? { ...b, status: "ready", content, beatId } : b));
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "beat failed";
+        setBeat((b) => (b ? { ...b, status: "ready", error: msg } : b));
+      }
+    },
+    [store],
+  );
+
+  const answerBeat = useCallback(
+    (answer: string) => {
+      if (!store || !beat?.beatId) return;
+      store.update((s) => answerBeatFn(s, beat.beatId!, answer));
+      setBeat((b) => (b ? { ...b, status: "answered" } : b));
+    },
+    [store, beat],
+  );
+
+  const closeBeat = useCallback(() => setBeat(null), []);
+
+  // ---- Prune ---------------------------------------------------------------
+
+  const requestPrune = useCallback(async () => {
+    if (!store || busy.prune) return;
+    setBusy((b) => ({ ...b, prune: true }));
+    try {
+      const s = store.getState();
+      const out = await api.prune(s);
+      store.update((cur) => applyProposal(cur, toProposal(out, cur)));
+    } catch (err) {
+      console.error("prune failed", err);
+    } finally {
+      setBusy((b) => ({ ...b, prune: false }));
+    }
+  }, [store, busy.prune]);
+
+  const chooseActiveSet = useCallback(
+    (conceptIds: string[]) => {
+      if (!store) return;
+      store.update((s) => {
+        const next = setActiveSetFn(s, conceptIds);
+        // Accepting a set resolves the proposal nudge.
+        const nudge = next.nudges.find((n) => n.kind === "prune-proposal" && !n.dismissed);
+        return nudge ? resolveNudge(next, nudge.id) : next;
+      });
+    },
+    [store],
+  );
+
+  const judgeConcept = useCallback(
+    (conceptId: string, judgment: ConceptJudgment) => update((s) => judgeConceptFn(s, conceptId, judgment)),
+    [update],
+  );
+  const pinConcept = useCallback(
+    (conceptId: string, pinned: boolean) => update((s) => pinConceptFn(s, conceptId, pinned)),
+    [update],
+  );
+
+  // ---- Recognize -------------------------------------------------------
+
+  const judgeRecognition = useCallback(
+    (recognitionId: string, decision: RecognitionDecision) =>
+      update((s) => judgeRecognitionFn(s, recognitionId, decision)),
+    [update],
+  );
+
+  // ---- Studio ----------------------------------------------------------------
+
+  const streamStudioTurn = useCallback(
+    async (sessionId: string) => {
+      if (!store) return;
+      const s = store.getState();
+      const session = s.studioSessions.find((x) => x.id === sessionId);
+      if (!session) return;
+      const concept = s.concepts[session.conceptId];
+      const material = session.materialExchangeId
+        ? s.exchanges.find((e) => e.id === session.materialExchangeId)
+        : undefined;
+      setStudio({ sessionId, streaming: true, partial: "", entering: false });
+      try {
+        const text = await api.studio(
+          s.persona.id,
+          concept,
+          session.rung,
+          material ? { user: material.user, assistant: material.assistant, ts: material.ts } : undefined,
+          session.messages,
+          (_d, full) => setStudio((st) => (st ? { ...st, partial: full } : st)),
+        );
+        store.update((cur) => appendStudioMessage(cur, sessionId, { role: "assistant", content: text }));
+        setStudio({ sessionId, streaming: false, partial: "", entering: false });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "studio failed";
+        setStudio({ sessionId, streaming: false, partial: "", entering: false, error: msg });
+      }
+    },
+    [store],
+  );
+
+  const enterStudio = useCallback(
+    async (opts: { conceptId: string; entry: StudioEntry; nudgeId?: string }) => {
+      if (!store) return;
+      const s = store.getState();
+      if (!s.concepts[opts.conceptId]) return;
+      if (opts.nudgeId) store.update((cur) => resolveNudge(cur, opts.nudgeId!));
+
+      // The state-save ritual. Skipped when the work is literally running.
+      let workSummary: string | undefined;
+      if (opts.entry !== "opportunistic") {
+        setBusy((b) => ({ ...b, summarize: true }));
+        setStudio({ sessionId: "", streaming: false, partial: "", entering: true });
+        try {
+          workSummary = (await api.summarize(s.exchanges)).summary;
+        } catch (err) {
+          console.error("summarize failed", err);
+        } finally {
+          setBusy((b) => ({ ...b, summarize: false }));
+        }
+      } else if (s.longTask) {
+        workSummary = `${s.longTask.label} is running. Nothing is waiting on you.`;
+      }
+
+      let sessionId = "";
+      store.update((cur) => {
+        const r = startStudio(cur, {
+          conceptId: opts.conceptId,
+          entry: opts.entry,
+          materialExchangeId: pickMaterial(cur, opts.conceptId)?.id,
+          workSummary,
+        });
+        sessionId = r.session.id;
+        return r.state;
+      });
+      await streamStudioTurn(sessionId);
+    },
+    [store, streamStudioTurn],
+  );
+
+  const sendStudio = useCallback(
+    async (text: string) => {
+      if (!store || !studio || studio.streaming) return;
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      store.update((s) => appendStudioMessage(s, studio.sessionId, { role: "user", content: trimmed }));
+      await streamStudioTurn(studio.sessionId);
+    },
+    [store, studio, streamStudioTurn],
+  );
+
+  const changeRung = useCallback(
+    async (direction: "more-help" | "let-me-try") => {
+      if (!store || !studio || studio.streaming) return;
+      const s = store.getState();
+      const session = s.studioSessions.find((x) => x.id === studio.sessionId);
+      if (!session) return;
+      const rung: Rung = adjustRung(session.rung, direction);
+      if (rung === session.rung) return;
+      const note =
+        direction === "more-help"
+          ? `[Rung change: more help. Move to ${rung}.]`
+          : `[Rung change: let me try. Move to ${rung}.]`;
+      store.update((cur) =>
+        appendStudioMessage(setStudioRung(cur, studio.sessionId, rung), studio.sessionId, {
+          role: "user",
+          content: note,
+        }),
+      );
+      await streamStudioTurn(studio.sessionId);
+    },
+    [store, studio, streamStudioTurn],
+  );
+
+  const leaveStudio = useCallback(
+    (closingStatement?: string) => {
+      if (!store) return;
+      const sid = studio?.sessionId ?? store.getState().ui.activeStudioId;
+      if (sid) store.update((s) => endStudio(s, sid, closingStatement));
+      else store.update((s) => ({ ...s, ui: { ...s.ui, mode: "work", activeStudioId: undefined } }));
+      setStudio(null);
+    },
+    [store, studio],
+  );
+
+  // ---- Persona, nudges, layout ------------------------------------------
+
+  const switchPersona = useCallback((p: PersonaId) => {
+    try {
+      localStorage.setItem(PERSONA_KEY, p);
+    } catch {
+      // ignore
+    }
+    abortRef.current?.abort();
+    setBeat(null);
+    setStudio(null);
+    setPersonaId(p);
+    setStore(new BrowserStore(loadSeed(p)));
+  }, []);
+
+  const resetPersona = useCallback(() => {
+    BrowserStore.clear(personaId);
+    abortRef.current?.abort();
+    setBeat(null);
+    setStudio(null);
+    setStore(new BrowserStore(loadSeed(personaId)));
+  }, [personaId]);
+
+  const dismissNudge = useCallback((nudgeId: string) => update((s) => dismissNudgeFn(s, nudgeId)), [update]);
+  const toggleGraph = useCallback(
+    () => update((s) => ({ ...s, ui: { ...s.ui, graphCollapsed: !s.ui.graphCollapsed } })),
+    [update],
+  );
+  const finishTask = useCallback(() => update((s) => finishLongTask(s)), [update]);
+
+  const actions = useMemo<LearnerActions>(
+    () => ({
+      switchPersona,
+      resetPersona,
+      update,
+      sendWork: (text) => sendWork(text),
+      kickOffLongTask,
+      finishLongTask: finishTask,
+      startBeat,
+      answerBeat,
+      closeBeat,
+      requestPrune,
+      chooseActiveSet,
+      judgeConcept,
+      pinConcept,
+      judgeRecognition,
+      enterStudio,
+      sendStudio,
+      changeRung,
+      leaveStudio,
+      dismissNudge,
+      toggleGraph,
+    }),
+    [
+      switchPersona,
+      resetPersona,
+      update,
+      sendWork,
+      kickOffLongTask,
+      finishTask,
+      startBeat,
+      answerBeat,
+      closeBeat,
+      requestPrune,
+      chooseActiveSet,
+      judgeConcept,
+      pinConcept,
+      judgeRecognition,
+      enterStudio,
+      sendStudio,
+      changeRung,
+      leaveStudio,
+      dismissNudge,
+      toggleGraph,
+    ],
+  );
+
+  return (
+    <Ctx.Provider value={{ state, personaId, busy, beat, studio, streamingExchangeId, actions }}>
+      {children}
+    </Ctx.Provider>
+  );
+}
+
+export function useLearner(): LearnerContextValue {
+  const v = useContext(Ctx);
+  if (!v) throw new Error("useLearner must be used inside LearnerProvider");
+  return v;
+}
