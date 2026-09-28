@@ -1,0 +1,57 @@
+/* Motion for the concept map. Kept here so the panel owns its own styles. */
+
+/* The one-time ring when a concept gains a confirmed recognition. */
+.flash {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: graph-flash 1.8s ease-out 1 forwards;
+  pointer-events: none;
+}
+
+@keyframes graph-flash {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.node {
+  outline: none;
+}
+
+.focusRing {
+  opacity: 0;
+}
+
+.node:focus-visible .focusRing {
+  opacity: 1;
+}
+
+/* The concept detail eases in when a node is selected. */
+.sheet {
+  animation: graph-sheet-in 180ms ease-out;
+}
+
+@keyframes graph-sheet-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation-duration: 1ms;
+  }
+  .sheet {
+    animation: none;
+  }
+}

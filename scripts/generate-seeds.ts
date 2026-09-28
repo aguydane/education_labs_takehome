@@ -7,8 +7,9 @@
  * seeds/<persona>.json. The seed is what the system produces, not
  * hand-written output.
  *
- *   npx tsx scripts/generate-seeds.ts            # both personas
- *   npx tsx scripts/generate-seeds.ts maritime   # one persona
+ *   npx tsx scripts/generate-seeds.ts                 # both personas
+ *   npx tsx scripts/generate-seeds.ts maritime        # one persona
+ *   npx tsx scripts/generate-seeds.ts backend --reprune   # redo only the final proposal
  */
 
 import { config } from "dotenv";
@@ -20,7 +21,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { PERSONAS, PERSONA_IDS } from "@/lib/personas";
 import { applyHarvest, toHarvestResult } from "@/lib/pipeline/harvest";
 import { endStudio, pickMaterial, startStudio } from "@/lib/pipeline/practice";
-import { applyProposal, setActiveSet, toProposal } from "@/lib/pipeline/prune";
+import { applyProposal, pinConcept, setActiveSet, toProposal } from "@/lib/pipeline/prune";
 import { activeConceptsOf, applyRecognizeResult, judgeRecognition } from "@/lib/pipeline/recognize";
 import { createInitialState } from "@/lib/state";
 import { MemoryStore } from "@/lib/store/memory";
@@ -29,6 +30,16 @@ import type { Exchange, LearnerState, PersonaId } from "@/lib/types";
 const SCHEMA_VERSION = "seed-schema-1";
 /** Prune (and choose the first active set) after this many exchanges. */
 const PRUNE_AFTER = 7;
+
+/**
+ * The learner's curiosity pin at the first prune: the concept they said they
+ * care about (see persona.interests) goes into the active set even if the
+ * ranking put something else there. This is the learner's call in the story,
+ * exactly the way the pin works in the app.
+ */
+const PIN: Partial<Record<PersonaId, RegExp>> = {
+  maritime: /seaman status/i,
+};
 
 const CLOSING: Record<PersonaId, string> = {
   backend:
@@ -111,8 +122,18 @@ async function generate(pid: PersonaId) {
       const pruneOut = await pruneCall(store.getState(), at);
       store.update((s) => {
         const proposal = toProposal(pruneOut, s, at);
-        const ids = proposal.recommended.map((r) => r.conceptId);
-        return setActiveSet({ ...s, activeSet: { ...s.activeSet, lastProposal: proposal } }, ids);
+        let ids = proposal.recommended.map((r) => r.conceptId);
+        const pinRe = PIN[pid];
+        const pinned = pinRe
+          ? Object.values(s.concepts).find((c) => pinRe.test(c.name) && !ids.includes(c.id))
+          : undefined;
+        let next: LearnerState = { ...s, activeSet: { ...s.activeSet, lastProposal: proposal } };
+        if (pinned) {
+          next = pinConcept(next, pinned.id, true);
+          ids = [...ids.slice(0, s.activeSet.size - 1), pinned.id];
+          console.log(`  [${i}] learner pinned ${pinned.name}`);
+        }
+        return setActiveSet(next, ids);
       });
       const ids = store.getState().activeSet.conceptIds;
       console.log(`  [${i}] prune → active set: ${ids.map((id) => store.getState().concepts[id].name).join(", ")}`);
@@ -165,11 +186,29 @@ async function generate(pid: PersonaId) {
   console.log(`  wrote seeds/${pid}.json`);
 }
 
+/** Redo only the final prune on an existing seed (after a prompt change). */
+async function reprune(pid: PersonaId) {
+  const { pruneCall } = await import("@/lib/server/calls");
+  const state = JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState;
+  const now = new Date().toISOString();
+  const cleared: LearnerState = { ...state, nudges: state.nudges.filter((n) => n.kind !== "prune-proposal") };
+  const out = await pruneCall(cleared, now);
+  const next = applyProposal(cleared, toProposal(out, cleared, now));
+  writeFileSync(`seeds/${pid}.json`, JSON.stringify(next, null, 2));
+  console.log(`=== ${pid} repruned`);
+  console.log(`  recommended: ${next.activeSet.lastProposal?.recommended.map((r) => r.conceptId).join(", ")}`);
+  console.log(`  swaps: ${JSON.stringify(next.activeSet.lastProposal?.swaps)}`);
+  console.log(`  summary: ${next.activeSet.lastProposal?.summary}`);
+}
+
 async function main() {
-  const only = process.argv[2] as PersonaId | undefined;
+  const args = process.argv.slice(2);
+  const flagReprune = args.includes("--reprune");
+  const only = args.find((a) => !a.startsWith("--")) as PersonaId | undefined;
   for (const pid of PERSONA_IDS) {
     if (only && only !== pid) continue;
-    await generate(pid);
+    if (flagReprune) await reprune(pid);
+    else await generate(pid);
   }
 }
 

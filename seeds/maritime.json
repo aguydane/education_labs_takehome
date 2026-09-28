@@ -1,1 +1,2101 @@
-{ "placeholder": true }
+{
+  "version": 1,
+  "seedVersion": "7372e949c7",
+  "persona": {
+    "id": "maritime",
+    "name": "Eli Brandt",
+    "role": "Second-year associate, Halvorsen & Pike, Seattle admiralty firm",
+    "workPattern": "Defends vessel owners and P&I clubs in the North Pacific fishing fleet; most files come out of Dutch Harbor (Bering Sea crab and pollock boats, catcher-processors, tenders, and the shoreside plants in Unalaska). Jones Act and general maritime defense. Uses Claude for exposure memos, discovery requests, deposition summaries, and first drafts of motions. Often asks 'is this guy covered' style questions and takes the draft to a partner for review.",
+    "interests": [
+      "Seaman-status arguments, since they decide which body of law applies",
+      "Coverage questions that decide whether the club pays"
+    ],
+    "domainBrief": "Concept space: seaman status and the Chandris connection test (processor-vessel workers, shore-side stints in Dutch Harbor), unseaworthiness vs. Jones Act negligence, maintenance and cure and the McCorpen defense, the primary duty rule, the Limitation of Liability Act, Jones Act vs. LHWCA classification for dockside processing, P&I coverage triggers, and Ninth Circuit / Western District of Washington venue and choice-of-law wrinkles. Legal content is illustrative.",
+    "budgetPct": 20
+  },
+  "exchanges": [
+    {
+      "id": "ex_maritime_00",
+      "personaId": "maritime",
+      "ts": "2026-09-07T12:01:51.959Z",
+      "kind": "work",
+      "user": "Quick one — new file from the club this morning. Does this guy count as a seaman?\n\nTomas Reyes, processor on the F/T Northern Resolve (catcher-processor, pollock). Hired in January. Worked A-season aboard on the factory line, roughly Jan 18 – Apr 11. When the boat went into the yard in Dutch after A-season, the company moved him to the dock crew at their Unalaska facility starting Apr 14: loading and unloading, pallet work, some net mending. He rode the boat for a few days in May for a gear run. Hurt his back and shoulder on the dock June 28 when a pallet of frozen blocks came off a forklift. His lawyer is calling it a Jones Act case.\n\nPartner wants a gut check by end of day.",
+      "assistant": "Short answer: on these facts he has a credible seaman-status argument, and I'd expect him to clear the test more often than not. The reassignment to the dock is the best defense angle, but it's a fact fight.\n\n**The test.** Under *Chandris v. Latsis*, a Jones Act seaman must (1) have duties that contribute to the function of a vessel or the accomplishment of its mission, and (2) have a connection to a vessel (or identifiable fleet) in navigation that is substantial in both duration and nature.\n\n**Prong one** is a low bar. Processing fish aboard a catcher-processor contributes to the vessel's mission; the factory line *is* the mission. I wouldn't contest it for his time aboard.\n\n**Prong two, duration.** *Chandris* adopts a rule of thumb: a worker who spends less than about 30% of his time in the service of a vessel in navigation generally shouldn't qualify. Looking at his employment as a whole:\n\n- Employed Jan 18 – Jun 28: about 162 days.\n- Aboard: Jan 18 – Apr 11 (~84 days) plus the May gear run (~4) = ~88 days.\n- That's roughly 54%, comfortably over 30%.\n\n**Prong two, nature.** *Harbor Tug & Barge Co. v. Papai* asks whether the worker's duties take him to sea and expose him to its perils, rather than being essentially land-based. Three months on a factory trawler in the Bering Sea during A-season is about as sea-based as it gets.\n\n**The reassignment.** *Chandris* recognizes that when a worker's essential duties change, for example a seaman reassigned to a land-based job, the analysis can follow the new assignment. That's our best argument: at the moment of injury he was dock crew, on the dock, doing longshore-type work. But courts are wary of letting an employer defeat status by moving someone ashore between seasons, and ten weeks on the dock after a full season aboard could be framed as a temporary shore stint. It will turn on whether the move was a real change in his job or a gap-filler until the next trip.\n\n**If he's not a seaman,** his remedy for a dock injury while handling cargo is likely the LHWCA (and possibly Alaska workers' comp), which is a much better outcome for the client.\n\n**Gut check for the partner:** likely a seaman on the whole-employment numbers. The reassignment is a legitimate argument worth developing in discovery (the paperwork moving him to the dock, whether he was slated for B-season, who was paying him), but I wouldn't promise it.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "Jones Act seaman status test",
+            "matchesExistingId": null,
+            "summary": "The Chandris/Papai two-prong test for seaman status: duties contributing to a vessel's function or mission, and a connection to a vessel or fleet that is substantial in both duration and nature.",
+            "whyItMattersHere": "Determines whether the client falls under the Jones Act (favorable to plaintiff, different defense posture) versus LHWCA, and lets the learner check whether Claude applied the duration rule of thumb and the nature inquiry correctly to these specific dates and duties.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Does this guy count as a seaman? ... His lawyer is calling it a Jones Act case.",
+            "rubricHints": [
+              "Recalculates the 30% duration rule of thumb from the employment dates independently rather than trusting the assistant's arithmetic",
+              "Distinguishes prong one (contribution to vessel's mission) from prong two (duration and nature of connection) when framing the question",
+              "Flags whether the relevant period should be measured from date of hire, date of injury, or some other window"
+            ]
+          },
+          {
+            "name": "substantial connection duration calculation",
+            "matchesExistingId": null,
+            "summary": "The mechanics of computing the duration prong: what time window counts (total employment vs. period before injury), how to treat intermittent stints aboard, and the ~30% threshold from Chandris.",
+            "whyItMattersHere": "The whole gut-check turns on a specific percentage (54%) computed from a chosen date range; picking the wrong window (e.g., only counting time after the yard period, or excluding the May gear run) could flip the answer.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Asks whether the denominator should be total employment to date of injury or some other period",
+              "Checks whether short stints like the May gear run should count toward the numerator",
+              "Notices if the percentage is sensitive to excluding or including the yard period"
+            ]
+          },
+          {
+            "name": "reassignment/change-in-status doctrine",
+            "matchesExistingId": null,
+            "summary": "The line of cases under Chandris addressing what happens when a worker's job duties change during employment, and when courts will treat a reassignment as ending seaman status versus a temporary shore stint.",
+            "whyItMattersHere": "This is the defense's best argument in the memo, and the learner needs to be able to judge whether ten weeks of dock work between seasons is strong enough to argue reassignment or too easily characterized as a gap-filler, in order to direct discovery.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Identifies what discovery would strengthen a reassignment argument (permanent transfer paperwork, B-season staffing plans, pay records)",
+              "Distinguishes a genuine permanent reassignment from a seasonal layover pending the next trip"
+            ]
+          },
+          {
+            "name": "Jones Act vs. LHWCA remedy structure",
+            "matchesExistingId": null,
+            "summary": "The alternative compensation regime (Longshore and Harbor Workers' Compensation Act, possibly state workers' comp) that applies to maritime workers who don't qualify as seamen, and how its remedies compare to a Jones Act negligence claim.",
+            "whyItMattersHere": "Whether the client is a seaman changes the exposure profile the memo needs to convey to the partner; knowing why LHWCA is 'a much better outcome for the client' from the defense side requires understanding the remedy is capped/no-fault versus a negligence action with broader damages.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Explains to the partner why non-seaman status is favorable for the defense in terms of remedy scope, not just liability",
+              "Flags whether Alaska workers' comp or LHWCA would actually apply given where the injury occurred"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-07T12:01:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_01",
+      "personaId": "maritime",
+      "ts": "2026-09-07T19:13:51.959Z",
+      "kind": "work",
+      "user": "Different file, just inherited it from an associate who left. Deckhand on the F/V Aleutian Star, Derek Kowalski, hurt his back pulling pots during opilio season in late January. Suit's pending in W.D. Wash. and his deposition was taken last month. Client has been paying maintenance at $30/day. His lawyer just sent a letter demanding $85/day plus cure for a recommended back surgery, and threatening punitive damages. Do we have to pay this? The port captain mentioned he may have had back surgery before, not sure anyone ever followed up. What do I tell the client?",
+      "assistant": "Short version for the client: keep paying, adjust the rate on evidence, don't sit on the surgery request, and run down the prior-surgery issue now, because it may end the maintenance and cure claim entirely.\n\n**The obligation.** Maintenance and cure is owed to a seaman injured in the service of the vessel, regardless of fault. Maintenance is a daily living stipend (food and lodging comparable to what he had aboard); cure is reasonable medical care. Both run until maximum medical improvement. Hurting his back pulling pots mid-season is squarely within it.\n\n**The punitive threat is real.** Under *Atlantic Sounding Co. v. Townsend*, a willful or callous failure to pay maintenance and cure can support punitive damages and attorney's fees. The letter is building that record. Whatever we do has to look like a reasoned, prompt response, not a stall.\n\n**The rate.** $85/day is a demand. Maintenance should track his reasonable actual costs of food and lodging. $30/day is low for the Seattle area unless he's living with family rent-free. Ask counsel for documentation (lease, utilities, food), and if it supports a higher number, raise the rate going forward. Courts are far less sympathetic to an employer that never asked than to one that asked and adjusted.\n\n**The surgery request.** Cure covers surgery reasonably necessary to reach maximum medical improvement. Respond promptly: request the treating surgeon's records and schedule an independent medical exam before approving, and put a date on it. A short, documented review is defensible. An open-ended hold on surgery is how punitive damages claims get made.\n\n**The prior surgery: this is the *McCorpen* defense.** Under *McCorpen v. Central Gulf Steamship Corp.*, an employer can deny maintenance and cure if (1) the seaman intentionally misrepresented or concealed medical facts, (2) the concealed facts were material to the decision to hire him, and (3) there's a connection between the concealed condition and the injury now claimed. A prior back surgery left off a pre-employment medical form is the classic set-up.\n\n**Next steps:**\n1. Get the pre-employment medical questionnaire and any hiring physical from the client this week.\n2. Subpoena prior spine records (last ten years) if that hasn't been done, and check what his deposition says about prior injuries.\n3. Respond to counsel: payments continue under a reservation of rights that names the *McCorpen* issue; request expense documentation; IME being scheduled.\n\nIf the records show a concealed prior back surgery, we can move for partial summary judgment on maintenance and cure.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "maintenance and cure obligation",
+            "matchesExistingId": null,
+            "summary": "The no-fault duty owed to an injured seaman to pay daily living costs (maintenance) and medical treatment (cure) until maximum medical improvement, independent of negligence.",
+            "whyItMattersHere": "Determines whether the client must keep paying at all, and frames why the rate and surgery timing need documented, prompt responses rather than a stall.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Client has been paying maintenance at $30/day... Do we have to pay this?",
+            "rubricHints": [
+              "Recognizes that the obligation is owed regardless of fault and runs until MMI",
+              "Distinguishes maintenance (living costs) from cure (medical treatment) as separate components needing separate justification",
+              "Flags that stopping payment requires a specific legal basis, not just a demand dispute"
+            ]
+          },
+          {
+            "name": "McCorpen defense",
+            "matchesExistingId": null,
+            "summary": "The three-part test allowing an employer to deny maintenance and cure where a seaman intentionally concealed a material medical condition connected to the current injury.",
+            "whyItMattersHere": "This is the mechanism that could end the claim entirely if the prior back surgery was concealed, and it dictates the immediate discovery steps (pre-employment forms, prior spine records, deposition testimony).",
+            "impact": 5,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "The port captain mentioned he may have had back surgery before, not sure anyone ever followed up.",
+            "rubricHints": [
+              "States the three McCorpen elements (concealment, materiality to hiring, causal link to current injury) rather than treating prior surgery as automatically disqualifying",
+              "Identifies pre-employment medical questionnaire as the document that establishes concealment",
+              "Notes that partial summary judgment is the procedural vehicle once records confirm concealment"
+            ]
+          },
+          {
+            "name": "maintenance rate calculation",
+            "matchesExistingId": null,
+            "summary": "How the daily maintenance rate is set and adjusted: it should track the seaman's actual reasonable cost of food and lodging, supported by documentation, rather than a flat historical or demanded figure.",
+            "whyItMattersHere": "Needed to evaluate whether $30/day is defensibly low or $85/day is defensibly high, and to advise the client on requesting documentation before adjusting the rate.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Asks for lease/utility/food documentation before agreeing to a new rate",
+              "Distinguishes a demanded rate from a rate actually supported by cost evidence",
+              "Recommends adjusting prospectively on evidence rather than accepting the demand outright"
+            ]
+          },
+          {
+            "name": "punitive damages for willful nonpayment (Townsend doctrine)",
+            "matchesExistingId": null,
+            "summary": "Under Atlantic Sounding Co. v. Townsend, a willful or callous failure to pay maintenance and cure can expose the employer to punitive damages and attorney's fees, separate from the underlying Jones Act negligence claim.",
+            "whyItMattersHere": "Shapes the urgency and tone of the client's response: any delay or unexplained hold on the surgery request could itself become the basis for a punitive claim, regardless of the McCorpen issue's merits.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "threatening punitive damages",
+            "rubricHints": [
+              "Identifies that punitive exposure attaches to the manner of handling the claim, not just its ultimate correctness",
+              "Recommends documented, prompt responses (IME scheduling, reservation of rights) as a defense against a willfulness finding",
+              "Separates this exposure from the compensatory maintenance/cure dispute itself"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-07T19:13:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_02",
+      "personaId": "maritime",
+      "ts": "2026-09-09T04:49:51.959Z",
+      "kind": "work",
+      "user": "Need an exposure memo on the Harlan claim for the club by Tuesday. Facts:\n- Jesse Harlan, chief engineer on the tender F/V Unimak Pass (owner: Kiska Marine LLC), third season with them.\n- Aug 2025, B-season pollock, tendering for a Dutch Harbor plant, alongside a catcher boat north of Unimak Island. Deck crane boom dropped when the hydraulic hose on the luffing cylinder failed. Boom came down on Harlan's left foot and lower leg. Two surgeries, still not back to work.\n- Engine room log, Aug 3 (eleven days before), in Harlan's handwriting: \"weeping fitting on crane luff hose — monitor.\" No replacement logged.\n- Harlan says he emailed Kiska's port engineer in Seattle on Aug 4 asking for replacement hoses. Port engineer confirms the email, says parts were \"on order.\"\n- Suit filed in W.D. Wash. in August: Jones Act negligence, unseaworthiness, maintenance and cure. Demand is $1.8M.\nPartner wants liability, defenses, and a range.",
+      "assistant": "**MEMORANDUM (PRIVILEGED & CONFIDENTIAL / ATTORNEY WORK PRODUCT)**\n**Re:** *Harlan v. Kiska Marine LLC* (W.D. Wash.): Exposure Assessment\n\n**1. Summary.** Liability exposure is high on unseaworthiness and moderate-to-high on Jones Act negligence. Our best defense is Harlan's own role as the chief engineer responsible for the crane hydraulics, through comparative fault and potentially the primary duty rule. Estimated gross verdict range $650,000–$1.4M before any fault reduction.\n\n**2. Unseaworthiness.** The owner owes an absolute, non-delegable duty to furnish a vessel and equipment reasonably fit for their intended use. A hydraulic hose that fails under normal load is close to a textbook unseaworthy condition. Notice is irrelevant; the condition itself is the breach. Causation requires that the condition was a substantial factor, which a boom falling on him satisfies. Realistically, we should expect to lose this issue.\n\n**3. Jones Act negligence.** Kiska had notice through the Aug 3 log entry and the Aug 4 email to the port engineer. An eleven-day delay in replacing a leaking load-bearing hose, with no instruction to take the crane out of service, will look negligent to a jury. Jones Act causation is \"featherweight\": negligence that played any part, even the slightest, in producing the injury.\n\n**4. Defenses.**\n- *Comparative fault.* Harlan identified the defect, logged it as \"monitor,\" and kept operating (or allowed operation of) the crane. His fault reduces damages proportionally. A jury could plausibly assign him 25–50%.\n- *Primary duty rule.* A seaman cannot recover for injuries caused by his own breach of a duty he consciously assumed as a term of employment. As chief engineer, maintaining the crane hydraulics was his job. If the rule applies, it bars recovery on both the negligence and unseaworthiness claims. This is our strongest defense and should be developed through his job description, the maintenance logs, and his deposition.\n- *Maintenance and cure* is owed regardless of fault and should continue.\n\n**5. Damages.** Past and future medical (two surgeries, likely hardware removal); lost wages at chief-engineer rates (roughly $110–140K per year per crew-share records, to be confirmed); loss of earning capacity if he can't return to sea; pain and suffering. Gross range $650K–$1.4M.\n\n**6. Recommendation.** Reserve at $900K. Take Harlan's deposition early, focused on the scope of his duties, what he told the captain about the hose, and whether anyone instructed him to keep the crane in service. Re-evaluate settlement after that deposition.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "unseaworthiness doctrine",
+            "matchesExistingId": null,
+            "summary": "The owner's absolute, non-delegable duty to furnish a vessel and equipment reasonably fit for their intended use, breached by the condition itself regardless of notice or fault.",
+            "whyItMattersHere": "Determines whether the memo's claim that 'we should expect to lose this issue' is a sound read of the failed hydraulic hose, and lets Eli judge whether causation and notice were correctly distinguished from the negligence analysis.",
+            "impact": 5,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Distinguishes unseaworthiness (no notice required) from Jones Act negligence (notice matters) when critiquing the memo",
+              "Can identify whether a specific equipment failure is a 'textbook' unseaworthy condition or a closer call"
+            ]
+          },
+          {
+            "name": "primary duty rule",
+            "matchesExistingId": null,
+            "summary": "A doctrine barring a seaman from recovering for injuries caused by his own breach of a duty he consciously assumed as part of his job, potentially defeating both negligence and unseaworthiness claims.",
+            "whyItMattersHere": "This is flagged as the strongest defense in the memo; Eli needs to assess whether it plausibly applies to a chief engineer responsible for the very equipment that failed, and what deposition facts would strengthen or sink it.",
+            "impact": 5,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Asks what job-description or log evidence would establish the seaman 'consciously assumed' the maintenance duty",
+              "Distinguishes primary duty rule from ordinary comparative fault in terms of what each defense can bar"
+            ]
+          },
+          {
+            "name": "comparative fault apportionment in Jones Act cases",
+            "matchesExistingId": null,
+            "summary": "The reduction of a seaman's damages in proportion to his own fault, distinct from doctrines that bar recovery entirely, under the featherweight causation standard for Jones Act negligence.",
+            "whyItMattersHere": "Needed to evaluate the memo's 25-50% fault estimate and to understand how comparative fault and primary duty rule interact rather than duplicate each other in setting the exposure range.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Explains why comparative fault only reduces damages while primary duty rule can bar the claim outright",
+              "Can sanity-check a proposed fault percentage against specific facts like the 'monitor' log entry"
+            ]
+          },
+          {
+            "name": "exposure memo valuation range-setting",
+            "matchesExistingId": null,
+            "summary": "The practice of deriving a gross verdict range and settlement reserve from liability strength, defense viability, and damages components (medical, wages, earning capacity, pain and suffering).",
+            "whyItMattersHere": "Lets Eli check whether the memo's $650K-$1.4M range and $900K reserve are internally consistent with the liability and defense assessments, and what additional facts (wage records, deposition testimony) would move the number.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "Partner wants liability, defenses, and a range",
+            "rubricHints": [
+              "Ties specific damages line items (lost wages, hardware removal surgery) to a numeric range rather than accepting a round figure",
+              "Flags what discovery is still needed before the range can be trusted"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-09T04:49:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_03",
+      "personaId": "maritime",
+      "ts": "2026-09-12T07:13:51.959Z",
+      "kind": "work",
+      "user": "Partner read the draft Harlan memo and wants me to walk through the primary duty rule section at the 2:00 case meeting. Honest question before I embarrass myself: why does the primary duty rule even matter if he wasn't the master? I thought that was a captain thing. And how is it different from just arguing comparative fault?",
+      "assistant": "Both good questions, and the second is the one the partner will push on.\n\n**It isn't a captain-only rule.** It grew out of cases about masters and officers, which is why it's associated with captains, but the principle is about the duty, not the rank. The classic formulation, from the Second Circuit in *Walker v. Lykes Bros.*, is that a seaman can't recover from his employer for an injury caused by his own failure to perform a duty he consciously assumed as a term of his employment. A chief engineer specifically responsible for maintaining deck machinery fits that as well as a master does. The question is whether the task that went wrong was *his* job, not whether he commanded the vessel.\n\n**How it differs from comparative fault.** This is the heart of it:\n\n- Comparative fault *reduces* damages. If the jury finds Kiska 60% at fault and Harlan 40%, he recovers 60%. Under the Jones Act, even substantial fault by the seaman doesn't bar recovery.\n- The primary duty rule is a complete *bar*. The logic is that when the employer's only breach is the seaman's own failure to do his job, there's no separate employer negligence to compare. Holding the employer liable would effectively pay the seaman for his own breach of the employment contract.\n\nSo the rule matters because it turns \"reduced recovery\" into \"no recovery.\"\n\n**The limits, and why I overstated it in the memo.** Courts, including in the Ninth Circuit, apply the rule narrowly. It generally doesn't apply where:\n\n1. the injury came from a condition the seaman didn't create and wasn't in a position to correct,\n2. the seaman was following an order, or\n3. the employer failed to give him the means to perform the duty.\n\nNumber 3 is our problem. Harlan logged the weeping fitting and emailed the port engineer for replacement hoses the next day, and the parts were \"on order\" for eleven days. Plaintiff will say he did exactly what his duty required and the failure was Kiska's shoreside supply chain. On those facts a court is unlikely to let the rule bar the claim, and it has little force against unseaworthiness, which doesn't turn on fault at all.\n\n**For the meeting:** present primary duty as a secondary argument that probably won't survive the Aug 4 email, and put the weight on comparative fault: he knew the hose was weeping, marked it \"monitor,\" and didn't tag the crane out while waiting for parts. That's a real reduction argument, and the reserve should rest on it rather than on a complete bar.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "primary duty rule",
+            "matchesExistingId": "primary-duty-rule",
+            "summary": "A doctrine barring a seaman from recovering for injuries caused by his own breach of a duty he consciously assumed as part of his job, potentially defeating both negligence and unseaworthiness claims.",
+            "whyItMattersHere": "Determines whether the Harlan memo can rely on primary duty as a complete bar or must be recast as a weaker secondary argument, and lets Eli judge whether the exception for inadequate means (the Aug 4 email/parts delay) defeats it.",
+            "impact": 5,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "I thought that was a captain thing. And how is it different from just arguing comparative fault?",
+            "rubricHints": [
+              "Recognizes the rule applies by duty assumed, not rank, e.g. applying it to a chief engineer or bosun",
+              "Identifies the three narrow exceptions (uncorrectable condition, following orders, employer failed to supply means) and matches facts against them",
+              "Distinguishes a complete bar from a damages reduction when advising on reserve strategy"
+            ]
+          },
+          {
+            "name": "comparative fault apportionment in Jones Act cases",
+            "matchesExistingId": "comparative-fault-apportionment-in-jones-act-cas",
+            "summary": "The reduction of a seaman's damages in proportion to his own fault, distinct from doctrines that bar recovery entirely, under the featherweight causation standard for Jones Act negligence.",
+            "whyItMattersHere": "Is the fallback argument the partner will actually want emphasized at the case meeting once primary duty is shown to be weak on these facts, so Eli needs to frame Harlan's 'monitor' decision and failure to tag out the crane as a reduction argument rather than a bar.",
+            "impact": 4,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "how is it different from just arguing comparative fault?",
+            "rubricHints": [
+              "States that comparative fault reduces recovery proportionally rather than barring it entirely",
+              "Builds a specific percentage-fault narrative from case facts (weeping fitting, 'monitor' log, no tag-out) rather than treating fault as binary"
+            ]
+          },
+          {
+            "name": "unseaworthiness doctrine",
+            "matchesExistingId": "unseaworthiness-doctrine",
+            "summary": "The owner's absolute, non-delegable duty to furnish a vessel and equipment reasonably fit for their intended use, breached by the condition itself regardless of notice or fault.",
+            "whyItMattersHere": "The assistant notes primary duty 'has little force against unseaworthiness,' which matters for structuring the exposure memo since a no-fault theory survives even if the primary duty bar and comparative fault arguments both weaken the case.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Notes that unseaworthiness claims aren't defeated by primary duty or comparative negligence arguments in the same way",
+              "Separately evaluates the crane/hose condition under a no-fault standard from the negligence-based arguments"
+            ]
+          }
+        ],
+        "learningBid": true,
+        "bidConceptName": "primary duty rule",
+        "pausePoint": false,
+        "ts": "2026-09-12T07:13:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_04",
+      "personaId": "maritime",
+      "ts": "2026-09-13T00:01:51.959Z",
+      "kind": "work",
+      "user": "Harlan memo went to the club this morning with the primary duty section toned down. Thanks, that one's done.\n\nReyes: his lawyer filed in King County Superior Court yesterday. Jones Act negligence, unseaworthiness, maintenance and cure. Client would rather be in federal court. Can we remove it to the Western District? He's barely a seaman anyway.",
+      "assistant": "I'd advise against removing. Here's the reasoning.\n\n**Jones Act claims aren't removable.** The Jones Act incorporates FELA, and 28 U.S.C. § 1445(a) bars removal of FELA actions filed in state court. A properly pleaded Jones Act claim stays where the plaintiff filed it. The saving-to-suitors clause also lets him bring his general maritime claims (unseaworthiness, maintenance and cure) in state court, and courts are divided on whether those can be removed on admiralty jurisdiction alone. Even where they can, they'd usually be remanded alongside a non-removable Jones Act claim.\n\n**The exception: a fraudulently pleaded Jones Act claim.** A defendant can remove if it shows the Jones Act claim is baseless, meaning the plaintiff has no reasonable possibility of establishing seaman status. The court may look past the pleadings, but it resolves disputed facts and ambiguities in the plaintiff's favor. That's a very high bar.\n\nWe don't meet it on what we have. He spent the whole A-season, about three months, on the factory line of a catcher-processor in the Bering Sea. Whether the dock reassignment changed his status is exactly the kind of disputed fact a court resolves for the plaintiff at the removal stage. Expect a remand, and possibly a fee award under § 1447(c) if the court finds removal objectively unreasonable.\n\n**What we give up by staying in King County is less than it looks.**\n- The state court applies federal maritime law substantively, *Chandris* included.\n- A Jones Act plaintiff gets a jury in either forum.\n- We can move for summary judgment on seaman status under CR 56. If we win, the Jones Act and unseaworthiness claims fall away and what's left is a much smaller case.\n\n**Timing:** if the client wants to try removal anyway, the 30-day clock runs from service, not filing. Confirm the service date.\n\n**Recommendation:** answer in King County, get the payroll records, dock timesheets, and crew lists early, and build toward a seaman-status summary judgment motion. That's a better use of the fight than a removal we're likely to lose.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "removal jurisdiction and the Jones Act non-removal bar",
+            "matchesExistingId": null,
+            "summary": "The rule that Jones Act claims filed in state court cannot be removed to federal court under 28 U.S.C. § 1445(a), with a narrow exception for fraudulently pleaded seaman status, and the interaction with the saving-to-suitors clause for general maritime claims.",
+            "whyItMattersHere": "Lets you judge whether Claude's advice to not remove is legally sound and whether the fraudulent-pleading exception is worth pursuing given the facts on hand.",
+            "impact": 5,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "Can we remove it to the Western District? He's barely a seaman anyway.",
+            "rubricHints": [
+              "Recognizes that Jones Act claims are generally non-removable regardless of forum preference",
+              "Asks specifically about the fraudulent pleading exception standard rather than assuming removal is simply available",
+              "Notes the 30-day removal clock runs from service, not filing"
+            ]
+          },
+          {
+            "name": "reassignment/change-in-status doctrine",
+            "matchesExistingId": "reassignment-change-in-status-doctrine",
+            "summary": "How courts treat a change in a worker's duties during employment (e.g., moving from vessel work to dock work) in assessing whether seaman status persists.",
+            "whyItMattersHere": "Determines whether the dock reassignment fact pattern is strong enough to support a seaman-status summary judgment motion, the strategy the assistant recommends instead of removal.",
+            "impact": 4,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "He's barely a seaman anyway.",
+            "rubricHints": [
+              "Distinguishes a permanent reassignment ending seaman status from a temporary shore stint",
+              "Identifies what documentation (timesheets, crew lists) would resolve the reassignment question"
+            ]
+          },
+          {
+            "name": "state court adjudication of maritime claims",
+            "matchesExistingId": null,
+            "summary": "The principle that state courts hearing maritime claims under the saving-to-suitors clause apply the same substantive federal maritime law as federal courts, including Chandris seaman-status doctrine, and can host maritime summary judgment practice under state procedural rules.",
+            "whyItMattersHere": "Lets you evaluate the assistant's claim that staying in King County costs little, since the same law and jury rights apply there as in federal court.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Confirms that a state court forum doesn't change the substantive maritime law standard applied",
+              "Recognizes CR 56 as the state-court analog to federal summary judgment for a seaman-status motion"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": true,
+        "ts": "2026-09-13T00:01:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_05",
+      "personaId": "maritime",
+      "ts": "2026-09-13T09:37:51.959Z",
+      "kind": "work",
+      "user": "Club claims handler on Reyes asked me something I can't answer. If we win on seaman status, does the P&I entry still respond? The Northern Resolve is entered with the club, but from April 14 Reyes was on the payroll of Resolve Seafoods Shoreside LLC, not Northern Resolve LLC (the owner). Is this guy covered or not?",
+      "assistant": "Probably not by the club, if we win. The more important point is that you shouldn't be the one answering this for the club, and I'd raise that with the partner before replying.\n\n**How the P&I cover works here.** A P&I entry indemnifies the member (and any named co-assureds) for liabilities arising from the operation of the entered vessel. Crew injury cover is written around the member's liability to people employed on or in connection with that ship. Right now Reyes is suing Northern Resolve LLC, the member, as his Jones Act employer, so the club is handling it as a crew claim.\n\n**If he isn't a seaman,** the picture changes:\n- His employer on June 28 was Shoreside LLC. Unless Shoreside is named as a co-assured on the certificate of entry, it isn't the club's member at all.\n- The claim becomes a shoreside workplace injury, most likely under the LHWCA (injured on a dock while handling cargo) and possibly Alaska workers' comp concurrently. That's what a USL&H endorsement on Shoreside's comp policy, or a maritime employer's liability policy, is for.\n- Any remaining claim against Northern Resolve LLC as vessel owner, for example § 905(b) vessel negligence, would still be the member's liability and could come back to the club, but that's a narrower and more defensible claim.\n\n**The conflict.** The club appointed us to defend the member. Our best defense, \"he wasn't a seaman,\" is also the argument that moves the loss from the club to Shoreside's comp carrier. The member and the club want the same outcome there, so it isn't a problem yet. But if Shoreside or its carrier becomes a party, or the club asks us for a coverage opinion that cuts against the member, we're in conflict territory. Coverage advice to the club should come from coverage counsel.\n\n**Practical steps:**\n1. Tell the partner about the question before answering the handler.\n2. Pull the certificate of entry and the club rules to see who the co-assureds are.\n3. Make sure Shoreside's comp/USL&H carrier is on notice now. Late notice is an easy coverage defense to hand them.\n4. Keep this analysis out of anything that might be produced in discovery.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "P&I club coverage scope",
+            "matchesExistingId": null,
+            "summary": "How a Protection & Indemnity club entry indemnifies the named member for liabilities tied to the entered vessel's operation, and how co-assured status determines whether a related entity's liabilities are covered.",
+            "whyItMattersHere": "Lets Eli judge whether the club actually responds if Reyes turns out not to be a seaman, by checking who is named on the certificate of entry rather than assuming coverage follows the claim.",
+            "impact": 5,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "Asked 'does the P&I entry still respond' and framed the question around whether Shoreside LLC vs. Northern Resolve LLC is the entered member, showing awareness of the entity distinction but not resolving the coverage mechanics himself.",
+            "rubricHints": [
+              "Requests the certificate of entry and club rules to identify named co-assureds before answering the handler",
+              "Distinguishes 'member's liability' from 'claim against a related but unentered entity'",
+              "Flags that shoreside employer liability wouldn't be covered unless separately named"
+            ]
+          },
+          {
+            "name": "LHWCA coverage as seaman-status alternative",
+            "matchesExistingId": "jones-act-vs-lhwca-remedy-structure",
+            "summary": "When a worker fails the seaman status test, injury claims typically shift to LHWCA (or state workers' comp) against the actual shoreside employer, a different remedy and insurance track than a Jones Act claim against the vessel owner.",
+            "whyItMattersHere": "Explains why winning the seaman-status defense doesn't end Reyes's case but instead redirects it to Shoreside's comp carrier, which matters for advising the club correctly.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Notes that defeating seaman status likely triggers an LHWCA claim against Shoreside rather than eliminating the claim",
+              "Identifies the need for a USL&H endorsement check on Shoreside's policy"
+            ]
+          },
+          {
+            "name": "attorney conflict of interest in club-appointed defense",
+            "matchesExistingId": null,
+            "summary": "The tension that arises when defense counsel appointed by a P&I club to defend the member develops an argument (no seaman status) that benefits the member but may shift the loss away from the club, creating divergent interests between the client (member) and the party paying for defense (the club).",
+            "whyItMattersHere": "Determines whether Eli can answer the claims handler directly or must route the question through the partner and possibly coverage counsel, since the seaman-status defense he's building doubles as an argument against the club's own exposure.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Recognized the question came from the club handler and brought it to the assistant before answering, and asked 'is this guy covered or not' rather than issuing a coverage opinion himself.",
+            "rubricHints": [
+              "Escalates coverage questions from the club to the partner or coverage counsel instead of answering directly",
+              "Identifies the moment interests diverge: when Shoreside's carrier or the club seeks a coverage opinion adverse to the member",
+              "Keeps the seaman-status/coverage-shifting analysis out of discoverable material"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-13T09:37:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_06",
+      "personaId": "maritime",
+      "ts": "2026-09-14T04:49:51.959Z",
+      "kind": "work",
+      "user": "Kowalski update. Client found his pre-employment medical questionnaire, and the prior records came back on the subpoena. Question 14: \"Have you ever had a back or neck injury, or back surgery?\" He checked NO and signed it. The 2021 records show an L4-L5 microdiscectomy. Dr. Hsu did the IME last week but hasn't written up causation yet.\n\nHis lawyer says McCorpen doesn't apply because the new injury is an L3-L4 herniation, a different level. Why would that even matter? He lied on the form either way. Isn't the lie the whole point?",
+      "assistant": "It feels like the lie should be the whole point, but it isn't, and seeing why tells you how to win this.\n\n**What *McCorpen* is for.** Maintenance and cure is a no-fault obligation, historically justified by treating seamen as wards of admiralty. *McCorpen* isn't a penalty for dishonesty. It's a narrow exception: the employer shouldn't bear the cost of a medical risk it would have declined if the seaman had told the truth. That's why the defense has three elements, not one:\n\n1. **Intentional concealment.** The seaman knowingly withheld or misrepresented medical facts. This doesn't require proof he meant to defraud anyone; a knowing \"no\" to a clear, direct question usually does it. Question 14 is about as direct as it gets.\n2. **Materiality.** The concealed facts would have mattered to the hiring decision. A question on the employer's own form is strong evidence of that, and the port captain can confirm the Aleutian Star wouldn't have put a post-discectomy deckhand on a crab boat without clearance.\n3. **Connection.** The concealed condition is causally linked to the injury now claimed.\n\nThe lie gets you element one. Element three is what ties the lie to *this* claim. If he'd hidden a prior knee surgery and then hurt his back, the lie would be just as real, but the employer would be escaping liability for a risk that had nothing to do with it. The connection element prevents that.\n\n**So does L3-L4 vs. L4-L5 break the connection?** Probably not, if we build the record. Courts applying *McCorpen* generally don't require the identical injury; they ask whether the new injury is to the same body part or region and related to the prior condition. Adjacent-segment degeneration after lumbar surgery is a recognized phenomenon: altering one level can increase the load on its neighbors. If Dr. Hsu can say, to a reasonable degree of medical probability, that the 2021 L4-L5 surgery made the L3-L4 level more vulnerable, element three is met. Without that testimony, the \"different level\" argument has real traction.\n\n**Two reminders:**\n- *McCorpen* only defeats maintenance and cure. It doesn't bar his Jones Act or unseaworthiness claims, though the prior surgery still matters to causation and damages there.\n- Keep paying under reservation until we have a ruling, or at least Dr. Hsu's opinion in hand.\n\n**Next step:** ask Dr. Hsu to review the 2021 operative report and the 2026 MRI and give us a declaration focused specifically on the adjacent-segment link.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "McCorpen defense",
+            "matchesExistingId": "mccorpen-defense",
+            "summary": "Three-part test (intentional concealment, materiality, causal connection) allowing an employer to deny maintenance and cure where a seaman concealed a material pre-existing condition tied to the current injury.",
+            "whyItMattersHere": "Determines whether the L3-L4 vs. L4-L5 distinction actually defeats the defense, or whether it's a red herring the opposing lawyer is using to distract from the concealment issue.",
+            "impact": 5,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "He lied on the form either way. Isn't the lie the whole point? — treats concealment alone as dispositive, missing that connection is a separate element",
+            "rubricHints": [
+              "Recognizes that concealment alone satisfies only one of three elements",
+              "Asks whether an expert can establish the causal link between two different spinal levels rather than assuming the lie ends the analysis"
+            ]
+          },
+          {
+            "name": "medical causation linkage in McCorpen's connection element",
+            "matchesExistingId": null,
+            "summary": "How courts assess whether a concealed prior condition is causally/anatomically connected to a new injury, including doctrines like adjacent-segment degeneration that link different but related conditions.",
+            "whyItMattersHere": "Determines what Dr. Hsu's declaration needs to say to satisfy the connection element and rebut the 'different level' argument.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Specifies exactly what medical opinion is needed (same body region, probability standard) rather than assuming any medical link suffices",
+              "Distinguishes 'same injury' from 'related/adjacent condition' as the legal standard"
+            ]
+          },
+          {
+            "name": "maintenance and cure obligation",
+            "matchesExistingId": "maintenance-and-cure-obligation",
+            "summary": "The no-fault duty to pay a seaman's living and medical costs until maximum medical improvement, and the narrow scope of exceptions to it.",
+            "whyItMattersHere": "Clarifies that even if McCorpen succeeds, it only cuts off maintenance and cure and leaves Jones Act/unseaworthiness exposure intact, which affects the overall exposure memo.",
+            "impact": 3,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Kowalski update... Dr. Hsu did the IME last week but hasn't written up causation yet — tracking the claim procedurally shows working familiarity with the M&C process",
+            "rubricHints": [
+              "Notes that a successful McCorpen defense doesn't touch Jones Act negligence or unseaworthiness liability",
+              "Recommends continuing payment under reservation pending the ruling"
+            ]
+          }
+        ],
+        "learningBid": true,
+        "bidConceptName": "McCorpen defense",
+        "pausePoint": false,
+        "ts": "2026-09-14T04:49:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_07",
+      "personaId": "maritime",
+      "ts": "2026-09-16T02:25:51.959Z",
+      "kind": "work",
+      "user": "Kiska Marine is asking whether to file a limitation action on Harlan. His lawyer's first letter was April 6. It described the crane injury and said damages \"will substantially exceed $1.5 million.\" Surveyor puts the Unimak Pass's end-of-voyage value around $1.1M, no pending freight since she was running empty back to Dutch. Suit was filed in August. Is there a deadline problem, and is it worth doing?",
+      "assistant": "Yes, there's a deadline problem, and it's close.\n\n**The deadline.** The owner has to file a limitation complaint in federal court within six months after the claimant gives written notice of a claim. Courts, including in the Ninth Circuit, ask whether the writing reveals a reasonable possibility that the claim will exceed the vessel's value. A letter describing a crush injury requiring surgery and saying damages \"will substantially exceed $1.5 million,\" against a $1.1M vessel, clearly does. Six months from April 6 is October 6. Treat that as the outside date and leave the client time to arrange security.\n\n**The fund.** The vessel's value at the end of the voyage plus pending freight: about $1.1M on the survey, with no freight. Kiska would deposit that amount or post security, and claims would be enjoined and brought into the limitation proceeding.\n\n**Why it's weaker than it looks: privity or knowledge.** Limitation is available only if the negligence or unseaworthy condition was outside the owner's privity or knowledge. For a corporate owner, that means the knowledge of managing officers or employees with authority over the relevant operations. Harlan emailed Kiska's port engineer in Seattle about the weeping hose on Aug 4, and the port engineer acknowledged it and said parts were on order. A shoreside port engineer who controls maintenance and parts purchasing is very likely someone whose knowledge is imputed to Kiska. On these facts I'd expect limitation to be denied.\n\n**Other limits:**\n- Maintenance and cure isn't subject to limitation; it's a personal obligation of the employer.\n- With a single claimant, Harlan can file stipulations protecting Kiska's right to limit and ask to proceed in his chosen forum. His case is already in W.D. Wash., so the forum benefit to Kiska is small anyway.\n\n**Is it worth it?** I'd still recommend filing, as a protective measure. The cost is modest, the deadline makes it now-or-never, and if discovery shows the port engineer lacked real authority over the crane (say, the master held purchasing responsibility), the defense comes back to life. Not filing forfeits it permanently. The client should understand it's a cap we probably won't get, not a strategy to build around, and that filing may prompt plaintiff to depose the port engineer early.\n\n**Next step:** confirm when the April 6 letter was received, and whether any earlier writing (an email to Kiska, a claim notice through the club) could have started the clock sooner.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "Limitation of Liability Act procedure and deadline",
+            "matchesExistingId": null,
+            "summary": "The shipowner's right to cap liability at post-casualty vessel value plus pending freight, triggered by a six-month filing deadline that runs from when a claimant's writing reveals a reasonable possibility damages will exceed that value.",
+            "whyItMattersHere": "Lets you verify the October 6 deadline calculation and judge whether the April 6 letter actually started the clock, or whether an earlier writing did.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Asked specifically whether there's a deadline problem given the April 6 letter and August filing, showing awareness that timing and the damages statement matter.",
+            "rubricHints": [
+              "Identifies the trigger date as when a writing shows a 'reasonable possibility' of damages exceeding vessel value, not just the date of injury",
+              "Checks for any earlier notice (email, club claim) that could move the six-month clock sooner",
+              "Distinguishes the limitation fund (vessel value + pending freight) from the underlying damages claim"
+            ]
+          },
+          {
+            "name": "privity or knowledge defense to limitation",
+            "matchesExistingId": null,
+            "summary": "The rule that limitation is unavailable if the negligence or unseaworthy condition was within the owner's privity or knowledge, imputed through managing officers or employees with authority over the relevant operation.",
+            "whyItMattersHere": "Lets you assess whether the port engineer's knowledge of the weeping hose defeats limitation, and whether discovery into who actually controlled crane maintenance could revive the defense.",
+            "impact": 5,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "Did not raise privity/knowledge independently; asked only whether there's a deadline problem and whether filing is worth it, leaving the merits analysis to the assistant.",
+            "rubricHints": [
+              "Asks who had authority over crane maintenance versus hose maintenance before conceding privity is fatal",
+              "Frames a discovery request aimed at the master's versus port engineer's purchasing authority",
+              "Distinguishes corporate imputation of a shoreside employee's knowledge from imputation of the vessel's crew"
+            ]
+          },
+          {
+            "name": "limitation fund valuation (vessel value plus pending freight)",
+            "matchesExistingId": null,
+            "summary": "The fund an owner must post to obtain limitation, calculated as the vessel's value at the end of the voyage in which the casualty occurred plus any pending freight earned on that voyage.",
+            "whyItMattersHere": "Lets you check whether the surveyor's $1.1M figure and the 'no pending freight' fact were used correctly to size the security Kiska would have to post.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Confirms 'end of voyage' timing rather than pre-casualty or replacement value is the valuation point",
+              "Asks whether any freight was earned on the empty return leg before accepting zero pending freight"
+            ]
+          },
+          {
+            "name": "single-claimant stipulation practice in limitation actions",
+            "matchesExistingId": null,
+            "summary": "The mechanism by which a sole claimant can stipulate to protect the shipowner's right to limit while allowing the underlying suit to proceed in the claimant's chosen forum, avoiding a separate limitation proceeding.",
+            "whyItMattersHere": "Lets you weigh whether filing a limitation action actually gains Kiska a forum advantage here, since Harlan's case is already in W.D. Wash.",
+            "impact": 2,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Weighs forum benefit only when the underlying suit is in state court or a different federal district",
+              "Recognizes that stipulation protection can moot the need for a separate limitation filing when there's one claimant"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-16T02:25:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_08",
+      "personaId": "maritime",
+      "ts": "2026-09-19T07:13:51.959Z",
+      "kind": "work",
+      "user": "Partner approved the McCorpen strategy on Kowalski, and Dr. Hsu's declaration came in. He's solid on the adjacent-segment link. Go ahead and draft the full motion for partial summary judgment on maintenance and cure, W.D. Wash. format, with record cites to Kowalski Dep., the questionnaire (Ex. 4), the 2021 surgical records (Ex. 7), the port captain's declaration (Nilsen Decl.), and Hsu Decl. Take the time you need, I'm in depo prep the rest of the day.",
+      "assistant": "On it. Here's the structure I'm drafting to, so you can redirect before I'm deep in it. The full draft will be waiting when you're out of depo prep.\n\n**Defendant Aleutian Star Fisheries LLC's Motion for Partial Summary Judgment on Maintenance and Cure**\n\nI. **Relief Requested.** An order that Plaintiff is not entitled to maintenance and cure under *McCorpen*, and that Defendant's obligation ends as of the date of the order.\n\nII. **Statement of Facts**\n- A. The pre-employment medical questionnaire: Question 14, Plaintiff's \"No,\" signature and date (Ex. 4; Kowalski Dep. [__:__]).\n- B. The 2021 L4-L5 microdiscectomy (Ex. 7).\n- C. Plaintiff's testimony about the surgery and the questionnaire (Kowalski Dep. [__:__]).\n- D. The Aleutian Star's hiring practice for applicants with prior spinal surgery (Nilsen Decl. ¶¶ __).\n- E. The January 2026 injury and the L3-L4 diagnosis.\n- F. Dr. Hsu's adjacent-segment opinion (Hsu Decl. ¶¶ __).\n- G. Maintenance and cure paid to date under reservation of rights.\n\nIII. **Authority and Argument**\n- A. Summary judgment standard.\n- B. Maintenance and cure and the *McCorpen* defense, as applied by courts in this Circuit.\n- C. Element 1: Plaintiff knowingly concealed his surgery in response to a direct question.\n- D. Element 2: The concealment was material (Nilsen).\n- E. Element 3: The L3-L4 injury is connected to the concealed L4-L5 condition (Hsu). This section takes on the \"different level\" argument directly rather than waiting for the opposition.\n- F. Defendant is entitled to recoup maintenance and cure paid after the concealment.\n\nIV. **Conclusion**\n\nPlus the LCR 7 word-count certification and a proposed order.\n\n**What I'll leave bracketed:**\n- Deposition page:line cites. I'll draft from the testimony as you've described it and bracket every cite for you to fill in against the transcript. I won't guess page numbers.\n- Paid-to-date figures and the date payments began.\n- Anything governed by the assigned judge's chambers procedures (some W.D. Wash. judges have standing orders on summary judgment briefing). Worth checking before filing.\n\n**One judgment call to flag:** section III.F asks for recoupment of amounts already paid. Courts are mixed on it and some see it as overreaching. It's in the draft so the partner can decide, and it's easy to cut.\n\nStarting with the statement of facts now.",
+      "longTask": true,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "McCorpen defense",
+            "matchesExistingId": "mccorpen-defense",
+            "summary": "The three-part test allowing an employer to deny maintenance and cure where a seaman intentionally concealed a material medical condition connected to the current injury.",
+            "whyItMattersHere": "Lets the learner judge whether the motion's three-element structure (concealment, materiality, connection) is correctly mapped to the facts and evidence cited, and whether Hsu's adjacent-segment opinion actually satisfies the connection element.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Partner approved the McCorpen strategy on Kowalski, and Dr. Hsu's declaration came in. He's solid on the adjacent-segment link.",
+            "rubricHints": [
+              "Flags whether Hsu's declaration actually ties the L3-L4 injury to the concealed L4-L5 condition, not just discusses both",
+              "Checks that Ex. 4 and the deposition testimony jointly establish knowing concealment in response to a direct question",
+              "Notices whether materiality is supported independently of the medical connection"
+            ]
+          },
+          {
+            "name": "medical causation linkage in McCorpen's connection element",
+            "matchesExistingId": "medical-causation-linkage-in-mccorpen-s-connecti",
+            "summary": "How courts assess whether a concealed prior condition is causally/anatomically connected to a new injury, including doctrines like adjacent-segment degeneration.",
+            "whyItMattersHere": "Directly determines whether Dr. Hsu's declaration is strong enough to survive the 'different level' counterargument the draft flags as being addressed head-on in section III.E.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "He's solid on the adjacent-segment link.",
+            "rubricHints": [
+              "Distinguishes anatomically distinct levels (L4-L5 vs L3-L4) from a legally sufficient causal connection",
+              "Asks whether opposing expert could rebut the adjacent-segment theory with a different-level argument",
+              "Evaluates whether Hsu's opinion meets the connection standard used in this Circuit's McCorpen case law"
+            ]
+          },
+          {
+            "name": "recoupment of maintenance and cure payments",
+            "matchesExistingId": null,
+            "summary": "The disputed doctrine over whether an employer who successfully proves McCorpen concealment can recover maintenance and cure already paid, as opposed to merely terminating future payments.",
+            "whyItMattersHere": "Determines whether the learner should keep, narrow, or cut section III.F given that courts are split and some view recoupment as overreaching, a decision the assistant explicitly deferred to the partner.",
+            "impact": 4,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Cites case law on whether McCorpen supports recoupment versus only prospective denial",
+              "Weighs the strategic risk of including a legally contested claim in a motion otherwise built on solid facts",
+              "Decides whether to file the recoupment argument or hold it in reserve pending a stronger circuit split resolution"
+            ]
+          },
+          {
+            "name": "exposure memo valuation range-setting",
+            "matchesExistingId": "exposure-memo-valuation-range-setting",
+            "summary": "The practice of deriving a gross verdict range and settlement reserve from liability strength, defense viability, and damages components.",
+            "whyItMattersHere": "Once maintenance and cure exposure is eliminated via McCorpen, the learner needs to translate that change into an updated exposure range for the file, which this motion is a step toward.",
+            "impact": 2,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "",
+            "rubricHints": [
+              "Recalculates settlement reserve after McCorpen success eliminates maintenance and cure exposure",
+              "Separates the effect of McCorpen from any remaining Jones Act negligence or unseaworthiness exposure on Kowalski"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-19T07:13:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_09",
+      "personaId": "maritime",
+      "ts": "2026-09-21T09:37:51.959Z",
+      "kind": "work",
+      "user": "Partner signed off on the Kowalski MSJ with light edits. She cut the recoupment section, said it invites a fight we don't need. Thanks, filing that Friday.\n\nLast piece: can you draft the Nilsen declaration? Authenticates the questionnaire and says the Aleutian Star wouldn't have hired him if he'd disclosed the surgery. Keep it tight, facts only. Erik Nilsen, port captain, 14 years with the company.",
+      "assistant": "Here's a draft. Bracketed items need confirming with Mr. Nilsen before he signs.\n\n---\n\n**UNITED STATES DISTRICT COURT, WESTERN DISTRICT OF WASHINGTON AT SEATTLE**\n\nDEREK KOWALSKI, Plaintiff, v. ALEUTIAN STAR FISHERIES LLC, Defendant.\nCase No. [__]\n\n**DECLARATION OF ERIK NILSEN IN SUPPORT OF DEFENDANT'S MOTION FOR PARTIAL SUMMARY JUDGMENT**\n\nI, Erik Nilsen, declare as follows:\n\n1. I am the port captain for Aleutian Star Fisheries LLC, owner of the F/V Aleutian Star. I have worked for the company for fourteen years, [__] of them as port captain. I have personal knowledge of the facts stated here.\n\n2. As port captain, I am responsible for hiring deck crew for the Aleutian Star, including reviewing each applicant's pre-employment medical questionnaire.\n\n3. The company requires every applicant for a deck position to complete and sign a pre-employment medical questionnaire before being hired. Completed questionnaires are kept in each crew member's personnel file in the ordinary course of business.\n\n4. Attached as Exhibit 4 is a true and correct copy of the questionnaire Plaintiff completed and signed on [date], taken from his personnel file.\n\n5. Question 14 asks: \"Have you ever had a back or neck injury, or back surgery?\" Plaintiff checked \"No.\"\n\n6. Deckhand work on the Aleutian Star during opilio season involves [hauling, stacking, and launching crab pots weighing several hundred pounds each, in heavy weather, over extended shifts].\n\n7. Under the company's practice [and written policy, Ex. __], an applicant who discloses prior back surgery is not hired for a deck position unless a physician clears him for full duty after reviewing the surgical records.\n\n8. Had Plaintiff disclosed his 2021 back surgery, I would not have hired him for a deck position on the Aleutian Star without such a clearance.\n\nI declare under penalty of perjury under the laws of the United States of America that the foregoing is true and correct.\n\nExecuted on [date] at [city], [state].\n\n______________________\nErik Nilsen\n\n---\n\n**Two notes:**\n- Paragraph 7 carries the materiality element, and it's much stronger with a document behind it. If there's a written hiring policy, or a prior applicant who was held back pending clearance, attach it or describe it.\n- Make sure paragraph 8 matches what Nilsen would say in a deposition. \"Would not have hired without clearance\" is safer than \"would never have hired him,\" and it's what the practice in paragraph 7 supports.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "McCorpen defense",
+            "matchesExistingId": "mccorpen-defense",
+            "summary": "The three-part test allowing an employer to deny maintenance and cure where a seaman intentionally concealed a material medical condition connected to the current injury.",
+            "whyItMattersHere": "Lets the learner judge whether the Nilsen declaration's hiring-practice paragraphs actually establish the materiality element required for McCorpen, and whether the phrasing in paragraph 8 will hold up on cross-examination.",
+            "impact": 4,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Says the surgery was concealed and ties the declaration to whether the company 'wouldn't have hired him if he'd disclosed the surgery'; accepted partner's edit removing the recoupment section",
+            "rubricHints": [
+              "Flags that paragraph 7 needs documentary support to satisfy the materiality prong",
+              "Notices that 'would not have hired without clearance' is a defensible materiality statement while 'would never have hired him' overstates it"
+            ]
+          },
+          {
+            "name": "recoupment of maintenance and cure payments",
+            "matchesExistingId": "recoupment-of-maintenance-and-cure-payments",
+            "summary": "The disputed doctrine over whether an employer who successfully proves McCorpen concealment can recover maintenance and cure already paid, as opposed to merely terminating future payments.",
+            "whyItMattersHere": "Explains why the partner cut the recoupment section from the MSJ, letting the learner evaluate whether that strategic call (avoiding an unsettled, riskier argument) was sound rather than just accepting it on faith.",
+            "impact": 3,
+            "learnerConfidence": "unknown",
+            "evidenceFromUser": "Reported the partner's reasoning ('cut the recoupment section, said it invites a fight we don't need') without adding independent analysis of the doctrine",
+            "rubricHints": [
+              "Can explain why recoupment is a weaker, unsettled argument compared to prospective termination of maintenance and cure",
+              "Weighs whether raising recoupment risks an adverse ruling that undermines the stronger termination argument"
+            ]
+          },
+          {
+            "name": "declaration drafting for summary judgment",
+            "matchesExistingId": null,
+            "summary": "The practice of drafting a fact witness declaration to support specific elements of a summary judgment motion, using personal-knowledge statements, authenticated exhibits, and careful phrasing that will survive deposition testing.",
+            "whyItMattersHere": "Lets the learner check that each paragraph of the Nilsen declaration ties to a specific legal element (authentication, materiality, causation) rather than just reading as narrative, and catch overstated language before it becomes a deposition liability.",
+            "impact": 4,
+            "learnerConfidence": "low",
+            "evidenceFromUser": "Instructed the assistant to 'keep it tight, facts only' but did not specify which elements each paragraph needed to support",
+            "rubricHints": [
+              "Requests that each factual assertion map to an element of the McCorpen test or authentication requirement",
+              "Checks whether declaration language is deposition-safe rather than aspirational",
+              "Identifies bracketed items (policy exhibit, duration as port captain) that must be confirmed before filing"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": true,
+        "ts": "2026-09-21T09:37:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_10",
+      "personaId": "maritime",
+      "ts": "2026-09-26T04:49:51.959Z",
+      "kind": "work",
+      "user": "Back on Reyes. We have payroll, the dock timesheets, and the Northern Resolve's crew lists now. Run the Chandris analysis again, but on the right period this time: his assignment changed April 14 when he went to the dock crew, so measure the 30% from April 14 through the June 28 injury, not over his whole employment. Count the May 19–22 gear run to Akutan as vessel time but flag it separately, because they'll say that's exactly the sea-based exposure Papai cares about. Then tell me whether the reassignment is a real change in his essential duties or whether they can paint it as a temporary shore stint between seasons. The April 14 letter says \"dock crew until further notice,\" his payroll moved to Shoreside LLC, and he's not on the B-season crew list. Concede prong one for the A-season, don't spend time on it.",
+      "assistant": "Measured from April 14, the duration element isn't close. The whole fight is over whether the reassignment counts.\n\n**Duration, April 14 – June 28**\n\n| | Days |\n|---|---|\n| Total period (inclusive) | 76 |\n| Aboard the Northern Resolve (May 19–22, gear run to Akutan) | 4 |\n| Dock crew, Unalaska facility (timesheets) | 72 |\n\nVessel time is **4 of 76 days, about 5%.** Even counted generously (a travel day, a day loading gear alongside before departure), it doesn't approach 30%. If the court measures from April 14, he fails the duration element.\n\n**The gear run, flagged.** Plaintiff will use those four days to argue the dock job still took him to sea. Under *Papai* the question is whether his duties *regularly* exposed him to the perils of the sea. One four-day trip in eleven weeks is sporadic, and the timesheets show it as a discrete task (moving trawl gear), not part of a rotation. I'd address it head-on rather than let them frame it.\n\n**Is it a real change in essential duties?** *Chandris* says that when a maritime worker's basic assignment changes, his seaman status may change too, and the analysis follows the new assignment. A worker isn't a seaman forever because he once was.\n\n*Our evidence that the change was real:*\n- The April 14 letter: \"dock crew until further notice,\" not \"until B-season.\"\n- Payroll moved to a different entity, Shoreside LLC.\n- He's not on the B-season crew list, which was finalized in early June while he was still on the dock.\n- 72 days of timesheets showing land-based work under a shoreside supervisor.\n\n*Their best arguments:*\n- He was hired as a processor, and the fishery is seasonal. They'll say shore work between seasons is part of a fisherman's normal pattern, not a new job. Expect a declaration from Reyes that he was told he'd be back aboard.\n- The payroll switch looks like corporate bookkeeping rather than a change in what he did. We need to show it coincided with an actual change in duties and supervision.\n- \"Until further notice\" is open-ended in both directions.\n\n**Assessment:** on the documents, we have the better of it. The B-season crew list is the strongest single fact, because it shows the company made a crewing decision without him while the season was under way. The risk is testimony: if anyone told him the dock was temporary, it becomes a jury question. I'd depose his dock supervisor and whoever built the B-season crew list before we file.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "substantial connection duration calculation",
+            "matchesExistingId": "substantial-connection-duration-calculation",
+            "summary": "Computing the duration prong of seaman status by selecting the correct time window (e.g., post-reassignment period rather than total employment) and calculating the percentage of vessel-connected days within it.",
+            "whyItMattersHere": "Lets Eli check whether measuring from April 14 rather than total employment is the legally correct window, and whether the 5% figure is calculated on the right denominator and inclusive dates.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "measure the 30% from April 14 through the June 28 injury, not over his whole employment",
+            "rubricHints": [
+              "Specifies the correct start date for measuring duration after a mid-employment reassignment",
+              "Checks whether ambiguous days (travel, loading) are being counted consistently with case law, not just generously"
+            ]
+          },
+          {
+            "name": "reassignment/change-in-status doctrine",
+            "matchesExistingId": "reassignment-change-in-status-doctrine",
+            "summary": "The Chandris line of cases on whether a change in job duties during employment resets the seaman-status analysis to the new assignment, versus being treated as a temporary shore stint within a continuing seaman role.",
+            "whyItMattersHere": "Lets Eli judge whether the assistant's evidence marshaling (letter language, payroll entity, crew list) actually supports 'real change' under the doctrine's standard, rather than just being persuasive-sounding facts.",
+            "impact": 5,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "tell me whether the reassignment is a real change in his essential duties or whether they can paint it as a temporary shore stint between seasons",
+            "rubricHints": [
+              "Identifies what makes a reassignment 'real' under Chandris versus a seasonal lull argument",
+              "Anticipates the seasonal-industry counter-framing and requires evidence of actual duty/supervision change, not just paperwork"
+            ]
+          },
+          {
+            "name": "Jones Act seaman status test",
+            "matchesExistingId": "jones-act-seaman-status-test",
+            "summary": "The Papai prong asking whether a worker's duties regularly exposed him to the perils of the sea, versus a sporadic or discrete task.",
+            "whyItMattersHere": "Lets Eli evaluate whether framing the Akutan gear run as 'sporadic' and 'discrete' rather than part of a rotation is the right way to defuse the plaintiff's strongest fact.",
+            "impact": 4,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "Count the May 19–22 gear run to Akutan as vessel time but flag it separately, because they'll say that's exactly the sea-based exposure Papai cares about",
+            "rubricHints": [
+              "Distinguishes regular sea-based exposure from a one-off discrete task under Papai",
+              "Tests whether the gear run undermines the 'real change' argument even if it doesn't move the duration percentage"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-26T04:49:51.959Z"
+      }
+    },
+    {
+      "id": "ex_maritime_11",
+      "personaId": "maritime",
+      "ts": "2026-09-28T00:01:51.959Z",
+      "kind": "work",
+      "user": "Good, that's the analysis we'll use. Draft the seaman-status section of our SJ brief in Reyes (King County, CR 56). Structure:\n(1) the April 14 reassignment changed his essential duties to a land-based job, so under Chandris the duration element is measured from April 14;\n(2) on that measure it's 4 of 76 days aboard, about 5%, far below the 30% guideline;\n(3) the nature element fails independently under Papai: the dock work didn't expose him to the perils of the sea, and one gear run doesn't change that.\nConcede prong one for the A-season. Don't argue he was never a seaman; argue he stopped being one. And add a footnote that if he's not a seaman, a dock injury while handling product looks like LHWCA with possible concurrent Alaska comp. Don't commit to which, since the club and Shoreside's carrier are still sorting that out.",
+      "assistant": "**B. Plaintiff Was Not a Seaman on June 28, 2026, Because His Assignment Had Changed to Land-Based Work.**\n\nDefendant does not dispute that Plaintiff was a seaman during the 2026 A-season, when he worked on the processing line aboard the F/T Northern Resolve. The question is whether he was still one eleven weeks after the company reassigned him to its dock crew in Unalaska. He was not.\n\n**1. Under *Chandris*, a change in essential duties resets the analysis.**\n\nSeaman status requires a connection to a vessel in navigation that is substantial in both duration and nature. *Chandris, Inc. v. Latsis*. The inquiry looks at the worker's overall employment, but not indefinitely backward: the Supreme Court recognized that when a maritime worker's basic assignment changes, his seaman status may change as well, and the analysis is then measured by the new assignment. A seaman reassigned to a land-based job does not carry his former status ashore with him.\n\nPlaintiff's assignment changed on April 14, 2026. The company's letter of that date assigned him to \"dock crew until further notice.\" (Ex. __.) His payroll moved to Resolve Seafoods Shoreside LLC the same day. (Ex. __.) For the next seventy-two days he worked on the Unalaska dock under a shoreside supervisor, loading and unloading product and mending nets. (Timesheets, Ex. __; [Supervisor] Decl. ¶¶ __.) When the Northern Resolve's B-season crew list was finalized in early June, he was not on it. (Ex. __.) This was not a gap between trips. It was a new job.\n\n**2. Measured from April 14, Plaintiff fails the duration element.**\n\nFrom April 14 through his June 28 injury, Plaintiff spent four of seventy-six days aboard a vessel: the May 19–22 gear run to Akutan. (Timesheets, Ex. __; Crew List, Ex. __.) That is about five percent of his time, far below the thirty-percent guideline *Chandris* adopted for a substantial connection.\n\n**3. The nature element fails independently.**\n\n*Harbor Tug & Barge Co. v. Papai* asks whether a worker's duties take him to sea and regularly expose him to its perils, as opposed to being essentially land-based. His duties after April 14 were performed on a dock. The single gear run was a discrete, four-day errand, not a regular feature of his work, and it does not convert a land-based job into a sea-based one.[^1]\n\nBecause Plaintiff's connection to the Northern Resolve after April 14 was insubstantial in both duration and nature, he was not a seaman when he was injured, and his Jones Act and unseaworthiness claims fail as a matter of law.\n\n[^1]: Plaintiff is not without a remedy. An employee injured on a dock while handling product for shipment may be covered by the Longshore and Harbor Workers' Compensation Act, 33 U.S.C. § 901 et seq., and may also have a claim under Alaska's workers' compensation statute. Defendant takes no position here on which applies; the point is only that the Jones Act does not.\n\n---\n\n**Note:** the *Chandris* reassignment language is paraphrased. Pull the exact passage before filing; the section rests on it.",
+      "longTask": false,
+      "harvest": {
+        "concepts": [
+          {
+            "name": "reassignment/change-in-status doctrine",
+            "matchesExistingId": "reassignment-change-in-status-doctrine",
+            "summary": "Doctrine addressing when a mid-employment change in duties resets the seaman-status analysis to the new assignment rather than aggregating the whole employment history.",
+            "whyItMattersHere": "Lets Eli verify that measuring duration from April 14 rather than the whole employment period is the legally correct move, not just a favorable framing.",
+            "impact": 5,
+            "learnerConfidence": "high",
+            "evidenceFromUser": "Directed the exact structure: 'the April 14 reassignment changed his essential duties... duration element is measured from April 14' and 'Don't argue he was never a seaman; argue he stopped being one.'",
+            "rubricHints": [
+              "Specifies that duration should be measured from the reassignment date, not total employment",
+              "Distinguishes 'stopped being a seaman' theory from 'never was a seaman' theory and picks the correct one for the facts"
+            ]
+          },
+          {
+            "name": "substantial connection duration calculation",
+            "matchesExistingId": "substantial-connection-duration-calculation",
+            "summary": "Mechanics of computing the duration prong, including which time window counts and the ~30% Chandris threshold.",
+            "whyItMattersHere": "Lets Eli check that '4 of 76 days, about 5%' is the right numerator/denominator once the window is reset to April 14.",
+            "impact": 4,
+            "learnerConfidence": "high",
+            "evidenceFromUser": "'on that measure it's 4 of 76 days aboard, about 5%, far below the 30% guideline' — precise numbers supplied by the learner, not just accepted from the draft.",
+            "rubricHints": [
+              "Recomputes the duration percentage correctly when the window boundary changes",
+              "Flags when intermittent trips (like the gear run) should or shouldn't extend the window"
+            ]
+          },
+          {
+            "name": "Jones Act seaman status test",
+            "matchesExistingId": "jones-act-seaman-status-test",
+            "summary": "The Chandris/Papai two-prong test: duties contributing to vessel function and a substantial connection in duration and nature.",
+            "whyItMattersHere": "Lets Eli confirm the nature-element argument under Papai (dock work vs. perils of the sea) is doctrinally sound and independent of the duration argument.",
+            "impact": 4,
+            "learnerConfidence": "high",
+            "evidenceFromUser": "'the nature element fails independently under Papai: the dock work didn't expose him to the perils of the sea, and one gear run doesn't change that.'",
+            "rubricHints": [
+              "Argues nature and duration as independently sufficient grounds for failure",
+              "Distinguishes a single voyage/errand from a regular seagoing assignment"
+            ]
+          },
+          {
+            "name": "Jones Act vs. LHWCA remedy structure",
+            "matchesExistingId": "jones-act-vs-lhwca-remedy-structure",
+            "summary": "The alternative compensation regime applicable to maritime workers who don't qualify as seamen, and how it compares to Jones Act remedies.",
+            "whyItMattersHere": "Lets Eli calibrate the footnote so it flags the LHWCA/state-comp alternative without prematurely committing the client to one carrier's coverage theory.",
+            "impact": 3,
+            "learnerConfidence": "medium",
+            "evidenceFromUser": "'a dock injury while handling product looks like LHWCA with possible concurrent Alaska comp. Don't commit to which, since the club and Shoreside's carrier are still sorting that out.'",
+            "rubricHints": [
+              "Flags LHWCA vs. state comp as unresolved without conceding either applies",
+              "Explains why a footnote hedge protects the client from a later inconsistent-position argument"
+            ]
+          }
+        ],
+        "learningBid": false,
+        "bidConceptName": null,
+        "pausePoint": false,
+        "ts": "2026-09-28T00:01:51.959Z"
+      }
+    }
+  ],
+  "concepts": {
+    "jones-act-seaman-status-test": {
+      "id": "jones-act-seaman-status-test",
+      "personaId": "maritime",
+      "name": "Jones Act seaman status test",
+      "summary": "The Chandris/Papai two-prong test for seaman status: duties contributing to a vessel's function or mission, and a connection to a vessel or fleet that is substantial in both duration and nature.",
+      "whyItMatters": "Determines whether the client falls under the Jones Act (favorable to plaintiff, different defense posture) versus LHWCA, and lets the learner check whether Claude applied the duration rule of thumb and the nature inquiry correctly to these specific dates and duties.",
+      "state": "practicing",
+      "confidence": "high",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 2.123972768689723,
+      "timesSeen": 3,
+      "firstSeen": "2026-09-07T12:01:51.959Z",
+      "lastSeen": "2026-09-28T00:01:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_00",
+          "quote": "Does this guy count as a seaman? ... His lawyer is calling it a Jones Act case.",
+          "note": "Determines whether the client falls under the Jones Act (favorable to plaintiff, different defense posture) versus LHWCA, and lets the learner check whether Claude applied the duration rule of thumb and the nature inquiry correctly to these specific dates and duties.",
+          "ts": "2026-09-07T12:01:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_10",
+          "quote": "Count the May 19–22 gear run to Akutan as vessel time but flag it separately, because they'll say that's exactly the sea-based exposure Papai cares about",
+          "note": "Lets Eli evaluate whether framing the Akutan gear run as 'sporadic' and 'discrete' rather than part of a rotation is the right way to defuse the plaintiff's strongest fact.",
+          "ts": "2026-09-26T04:49:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_11",
+          "quote": "'the nature element fails independently under Papai: the dock work didn't expose him to the perils of the sea, and one gear run doesn't change that.'",
+          "note": "Lets Eli confirm the nature-element argument under Papai (dock work vs. perils of the sea) is doctrinally sound and independent of the duration argument.",
+          "ts": "2026-09-28T00:01:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Recalculates the 30% duration rule of thumb from the employment dates independently rather than trusting the assistant's arithmetic",
+        "Distinguishes prong one (contribution to vessel's mission) from prong two (duration and nature of connection) when framing the question",
+        "Flags whether the relevant period should be measured from date of hire, date of injury, or some other window",
+        "Distinguishes regular sea-based exposure from a one-off discrete task under Papai",
+        "Tests whether the gear run undermines the 'real change' argument even if it doesn't move the duration percentage",
+        "Argues nature and duration as independently sufficient grounds for failure"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "substantial-connection-duration-calculation",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "reassignment-change-in-status-doctrine",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "jones-act-vs-lhwca-remedy-structure",
+          "kind": "cooccur",
+          "weight": 2
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [
+        {
+          "id": "rec_0850f728",
+          "conceptId": "jones-act-seaman-status-test",
+          "exchangeId": "ex_maritime_10",
+          "ts": "2026-09-26T04:49:51.959Z",
+          "quote": "measure the 30% from April 14 through the June 28 injury, not over his whole employment",
+          "explanation": "This flags the correct window for the duration prong rather than accepting a default whole-employment calculation, and separately treats prong one (essential duties change) versus prong two (duration/nature of connection) as distinct analytical steps.",
+          "status": "confirmed"
+        },
+        {
+          "id": "rec_baf4362c",
+          "conceptId": "jones-act-seaman-status-test",
+          "exchangeId": "ex_maritime_11",
+          "ts": "2026-09-28T00:01:51.959Z",
+          "quote": "the nature element fails independently under Papai: the dock work didn't expose him to the perils of the sea, and one gear run doesn't change that",
+          "explanation": "This distinguishes the nature prong from the duration prong and specifically tests whether the discrete gear run undermines the argument even though it doesn't move the duration percentage, matching the Papai distinction between regular sea-based exposure and a one-off task.",
+          "status": "confirmed"
+        }
+      ],
+      "pinned": true
+    },
+    "substantial-connection-duration-calculation": {
+      "id": "substantial-connection-duration-calculation",
+      "personaId": "maritime",
+      "name": "substantial connection duration calculation",
+      "summary": "The mechanics of computing the duration prong: what time window counts (total employment vs. period before injury), how to treat intermittent stints aboard, and the ~30% threshold from Chandris.",
+      "whyItMatters": "The whole gut-check turns on a specific percentage (54%) computed from a chosen date range; picking the wrong window (e.g., only counting time after the yard period, or excluding the May gear run) could flip the answer.",
+      "state": "noticed",
+      "confidence": "high",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 2.1681585171657507,
+      "timesSeen": 3,
+      "firstSeen": "2026-09-07T12:01:51.959Z",
+      "lastSeen": "2026-09-28T00:01:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_10",
+          "quote": "measure the 30% from April 14 through the June 28 injury, not over his whole employment",
+          "note": "Lets Eli check whether measuring from April 14 rather than total employment is the legally correct window, and whether the 5% figure is calculated on the right denominator and inclusive dates.",
+          "ts": "2026-09-26T04:49:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_11",
+          "quote": "'on that measure it's 4 of 76 days aboard, about 5%, far below the 30% guideline' — precise numbers supplied by the learner, not just accepted from the draft.",
+          "note": "Lets Eli check that '4 of 76 days, about 5%' is the right numerator/denominator once the window is reset to April 14.",
+          "ts": "2026-09-28T00:01:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Asks whether the denominator should be total employment to date of injury or some other period",
+        "Checks whether short stints like the May gear run should count toward the numerator",
+        "Notices if the percentage is sensitive to excluding or including the yard period",
+        "Specifies the correct start date for measuring duration after a mid-employment reassignment",
+        "Checks whether ambiguous days (travel, loading) are being counted consistently with case law, not just generously",
+        "Recomputes the duration percentage correctly when the window boundary changes"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "jones-act-seaman-status-test",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "reassignment-change-in-status-doctrine",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "jones-act-vs-lhwca-remedy-structure",
+          "kind": "cooccur",
+          "weight": 2
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "reassignment-change-in-status-doctrine": {
+      "id": "reassignment-change-in-status-doctrine",
+      "personaId": "maritime",
+      "name": "reassignment/change-in-status doctrine",
+      "summary": "The line of cases under Chandris addressing what happens when a worker's job duties change during employment, and when courts will treat a reassignment as ending seaman status versus a temporary shore stint.",
+      "whyItMatters": "This is the defense's best argument in the memo, and the learner needs to be able to judge whether ten weeks of dock work between seasons is strong enough to argue reassignment or too easily characterized as a gap-filler, in order to direct discovery.",
+      "state": "noticed",
+      "confidence": "high",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 2.6859382875506355,
+      "timesSeen": 4,
+      "firstSeen": "2026-09-07T12:01:51.959Z",
+      "lastSeen": "2026-09-28T00:01:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_04",
+          "quote": "He's barely a seaman anyway.",
+          "note": "Determines whether the dock reassignment fact pattern is strong enough to support a seaman-status summary judgment motion, the strategy the assistant recommends instead of removal.",
+          "ts": "2026-09-13T00:01:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_10",
+          "quote": "tell me whether the reassignment is a real change in his essential duties or whether they can paint it as a temporary shore stint between seasons",
+          "note": "Lets Eli judge whether the assistant's evidence marshaling (letter language, payroll entity, crew list) actually supports 'real change' under the doctrine's standard, rather than just being persuasive-sounding facts.",
+          "ts": "2026-09-26T04:49:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_11",
+          "quote": "Directed the exact structure: 'the April 14 reassignment changed his essential duties... duration element is measured from April 14' and 'Don't argue he was never a seaman; argue he stopped being one.'",
+          "note": "Lets Eli verify that measuring duration from April 14 rather than the whole employment period is the legally correct move, not just a favorable framing.",
+          "ts": "2026-09-28T00:01:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Identifies what discovery would strengthen a reassignment argument (permanent transfer paperwork, B-season staffing plans, pay records)",
+        "Distinguishes a genuine permanent reassignment from a seasonal layover pending the next trip",
+        "Distinguishes a permanent reassignment ending seaman status from a temporary shore stint",
+        "Identifies what documentation (timesheets, crew lists) would resolve the reassignment question",
+        "Identifies what makes a reassignment 'real' under Chandris versus a seasonal lull argument",
+        "Anticipates the seasonal-industry counter-framing and requires evidence of actual duty/supervision change, not just paperwork"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "jones-act-seaman-status-test",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "substantial-connection-duration-calculation",
+          "kind": "cooccur",
+          "weight": 3
+        },
+        {
+          "to": "jones-act-vs-lhwca-remedy-structure",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "removal-jurisdiction-and-the-jones-act-non-remov",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "state-court-adjudication-of-maritime-claims",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "jones-act-vs-lhwca-remedy-structure": {
+      "id": "jones-act-vs-lhwca-remedy-structure",
+      "personaId": "maritime",
+      "name": "Jones Act vs. LHWCA remedy structure",
+      "summary": "The alternative compensation regime (Longshore and Harbor Workers' Compensation Act, possibly state workers' comp) that applies to maritime workers who don't qualify as seamen, and how its remedies compare to a Jones Act negligence claim.",
+      "whyItMatters": "Whether the client is a seaman changes the exposure profile the memo needs to convey to the partner; knowing why LHWCA is 'a much better outcome for the client' from the defense side requires understanding the remedy is capped/no-fault versus a negligence action with broader damages.",
+      "state": "noticed",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 1.5909646096463659,
+      "timesSeen": 3,
+      "firstSeen": "2026-09-07T12:01:51.959Z",
+      "lastSeen": "2026-09-28T00:01:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_11",
+          "quote": "'a dock injury while handling product looks like LHWCA with possible concurrent Alaska comp. Don't commit to which, since the club and Shoreside's carrier are still sorting that out.'",
+          "note": "Lets Eli calibrate the footnote so it flags the LHWCA/state-comp alternative without prematurely committing the client to one carrier's coverage theory.",
+          "ts": "2026-09-28T00:01:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Explains to the partner why non-seaman status is favorable for the defense in terms of remedy scope, not just liability",
+        "Flags whether Alaska workers' comp or LHWCA would actually apply given where the injury occurred",
+        "Notes that defeating seaman status likely triggers an LHWCA claim against Shoreside rather than eliminating the claim",
+        "Identifies the need for a USL&H endorsement check on Shoreside's policy",
+        "Flags LHWCA vs. state comp as unresolved without conceding either applies",
+        "Explains why a footnote hedge protects the client from a later inconsistent-position argument"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "jones-act-seaman-status-test",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "substantial-connection-duration-calculation",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "reassignment-change-in-status-doctrine",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "p-i-club-coverage-scope",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "attorney-conflict-of-interest-in-club-appointed-",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "maintenance-and-cure-obligation": {
+      "id": "maintenance-and-cure-obligation",
+      "personaId": "maritime",
+      "name": "maintenance and cure obligation",
+      "summary": "The no-fault duty owed to an injured seaman to pay daily living costs (maintenance) and medical treatment (cure) until maximum medical improvement, independent of negligence.",
+      "whyItMatters": "Determines whether the client must keep paying at all, and frames why the rate and surgery timing need documented, prompt responses rather than a stall.",
+      "state": "noticed",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 1.5684274237469964,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-07T19:13:51.959Z",
+      "lastSeen": "2026-09-14T04:49:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_01",
+          "quote": "Client has been paying maintenance at $30/day... Do we have to pay this?",
+          "note": "Determines whether the client must keep paying at all, and frames why the rate and surgery timing need documented, prompt responses rather than a stall.",
+          "ts": "2026-09-07T19:13:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_06",
+          "quote": "Kowalski update... Dr. Hsu did the IME last week but hasn't written up causation yet — tracking the claim procedurally shows working familiarity with the M&C process",
+          "note": "Clarifies that even if McCorpen succeeds, it only cuts off maintenance and cure and leaves Jones Act/unseaworthiness exposure intact, which affects the overall exposure memo.",
+          "ts": "2026-09-14T04:49:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Recognizes that the obligation is owed regardless of fault and runs until MMI",
+        "Distinguishes maintenance (living costs) from cure (medical treatment) as separate components needing separate justification",
+        "Flags that stopping payment requires a specific legal basis, not just a demand dispute",
+        "Notes that a successful McCorpen defense doesn't touch Jones Act negligence or unseaworthiness liability",
+        "Recommends continuing payment under reservation pending the ruling"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "maintenance-rate-calculation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "punitive-damages-for-willful-nonpayment-townsend",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "medical-causation-linkage-in-mccorpen-s-connecti",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "mccorpen-defense": {
+      "id": "mccorpen-defense",
+      "personaId": "maritime",
+      "name": "McCorpen defense",
+      "summary": "The three-part test allowing an employer to deny maintenance and cure where a seaman intentionally concealed a material medical condition connected to the current injury.",
+      "whyItMatters": "This is the mechanism that could end the claim entirely if the prior back surgery was concealed, and it dictates the immediate discovery steps (pre-employment forms, prior spine records, deposition testimony).",
+      "state": "practicing",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 3.031390756973232,
+      "timesSeen": 4,
+      "firstSeen": "2026-09-07T19:13:51.959Z",
+      "lastSeen": "2026-09-21T09:37:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_01",
+          "quote": "The port captain mentioned he may have had back surgery before, not sure anyone ever followed up.",
+          "note": "This is the mechanism that could end the claim entirely if the prior back surgery was concealed, and it dictates the immediate discovery steps (pre-employment forms, prior spine records, deposition testimony).",
+          "ts": "2026-09-07T19:13:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_06",
+          "quote": "He lied on the form either way. Isn't the lie the whole point? — treats concealment alone as dispositive, missing that connection is a separate element",
+          "note": "Determines whether the L3-L4 vs. L4-L5 distinction actually defeats the defense, or whether it's a red herring the opposing lawyer is using to distract from the concealment issue.",
+          "ts": "2026-09-14T04:49:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_08",
+          "quote": "Partner approved the McCorpen strategy on Kowalski, and Dr. Hsu's declaration came in. He's solid on the adjacent-segment link.",
+          "note": "Lets the learner judge whether the motion's three-element structure (concealment, materiality, connection) is correctly mapped to the facts and evidence cited, and whether Hsu's adjacent-segment opinion actually satisfies the connection element.",
+          "ts": "2026-09-19T07:13:51.959Z"
+        },
+        {
+          "exchangeId": "ex_maritime_09",
+          "quote": "Says the surgery was concealed and ties the declaration to whether the company 'wouldn't have hired him if he'd disclosed the surgery'; accepted partner's edit removing the recoupment section",
+          "note": "Lets the learner judge whether the Nilsen declaration's hiring-practice paragraphs actually establish the materiality element required for McCorpen, and whether the phrasing in paragraph 8 will hold up on cross-examination.",
+          "ts": "2026-09-21T09:37:51.959Z"
+        }
+      ],
+      "rubric": [
+        "States the three McCorpen elements (concealment, materiality to hiring, causal link to current injury) rather than treating prior surgery as automatically disqualifying",
+        "Identifies pre-employment medical questionnaire as the document that establishes concealment",
+        "Notes that partial summary judgment is the procedural vehicle once records confirm concealment",
+        "Recognizes that concealment alone satisfies only one of three elements",
+        "Asks whether an expert can establish the causal link between two different spinal levels rather than assuming the lie ends the analysis",
+        "Flags whether Hsu's declaration actually ties the L3-L4 injury to the concealed L4-L5 condition, not just discusses both"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "maintenance-and-cure-obligation",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "maintenance-rate-calculation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "punitive-damages-for-willful-nonpayment-townsend",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "medical-causation-linkage-in-mccorpen-s-connecti",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "recoupment-of-maintenance-and-cure-payments",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "declaration-drafting-for-summary-judgment",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [
+        {
+          "ts": "2026-09-15T07:21:51.959Z",
+          "mode": "studio",
+          "rung": "modeling",
+          "note": "Closing: I'd say which months count toward the 30% and ask what facts would break the vessel connection before I lead with it."
+        }
+      ],
+      "recognitions": [
+        {
+          "id": "rec_8b9fcdb0",
+          "conceptId": "mccorpen-defense",
+          "exchangeId": "ex_maritime_08",
+          "ts": "2026-09-19T07:13:51.959Z",
+          "quote": "He's solid on the adjacent-segment link. Go ahead and draft the full motion for partial summary judgment on maintenance and cure",
+          "explanation": "This shows recognition that concealment alone is insufficient—the learner specifically confirms the causal-link element via expert declaration before proceeding, and identifies partial summary judgment as the correct procedural vehicle, tracking the full three-part McCorpen analysis rather than treating prior surgery as automatically disqualifying.",
+          "status": "confirmed"
+        }
+      ],
+      "pinned": false
+    },
+    "maintenance-rate-calculation": {
+      "id": "maintenance-rate-calculation",
+      "personaId": "maritime",
+      "name": "maintenance rate calculation",
+      "summary": "How the daily maintenance rate is set and adjusted: it should track the seaman's actual reasonable cost of food and lodging, supported by documentation, rather than a flat historical or demanded figure.",
+      "whyItMatters": "Needed to evaluate whether $30/day is defensibly low or $85/day is defensibly high, and to advise the client on requesting documentation before adjusting the rate.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 3,
+      "signal": 0.84,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-07T19:13:51.959Z",
+      "lastSeen": "2026-09-07T19:13:51.959Z",
+      "evidence": [],
+      "rubric": [
+        "Asks for lease/utility/food documentation before agreeing to a new rate",
+        "Distinguishes a demanded rate from a rate actually supported by cost evidence",
+        "Recommends adjusting prospectively on evidence rather than accepting the demand outright"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "maintenance-and-cure-obligation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "punitive-damages-for-willful-nonpayment-townsend",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "punitive-damages-for-willful-nonpayment-townsend": {
+      "id": "punitive-damages-for-willful-nonpayment-townsend",
+      "personaId": "maritime",
+      "name": "punitive damages for willful nonpayment (Townsend doctrine)",
+      "summary": "Under Atlantic Sounding Co. v. Townsend, a willful or callous failure to pay maintenance and cure can expose the employer to punitive damages and attorney's fees, separate from the underlying Jones Act negligence claim.",
+      "whyItMatters": "Shapes the urgency and tone of the client's response: any delay or unexplained hold on the surgery request could itself become the basis for a punitive claim, regardless of the McCorpen issue's merits.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 0.92,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-07T19:13:51.959Z",
+      "lastSeen": "2026-09-07T19:13:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_01",
+          "quote": "threatening punitive damages",
+          "note": "Shapes the urgency and tone of the client's response: any delay or unexplained hold on the surgery request could itself become the basis for a punitive claim, regardless of the McCorpen issue's merits.",
+          "ts": "2026-09-07T19:13:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Identifies that punitive exposure attaches to the manner of handling the claim, not just its ultimate correctness",
+        "Recommends documented, prompt responses (IME scheduling, reservation of rights) as a defense against a willfulness finding",
+        "Separates this exposure from the compensatory maintenance/cure dispute itself"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "maintenance-and-cure-obligation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "maintenance-rate-calculation",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "unseaworthiness-doctrine": {
+      "id": "unseaworthiness-doctrine",
+      "personaId": "maritime",
+      "name": "unseaworthiness doctrine",
+      "summary": "The owner's absolute, non-delegable duty to furnish a vessel and equipment reasonably fit for their intended use, breached by the condition itself regardless of notice or fault.",
+      "whyItMatters": "Determines whether the memo's claim that 'we should expect to lose this issue' is a sound read of the failed hydraulic hose, and lets Eli judge whether causation and notice were correctly distinguished from the negligence analysis.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 1.6977156969153058,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-09T04:49:51.959Z",
+      "lastSeen": "2026-09-12T07:13:51.959Z",
+      "evidence": [],
+      "rubric": [
+        "Distinguishes unseaworthiness (no notice required) from Jones Act negligence (notice matters) when critiquing the memo",
+        "Can identify whether a specific equipment failure is a 'textbook' unseaworthy condition or a closer call",
+        "Notes that unseaworthiness claims aren't defeated by primary duty or comparative negligence arguments in the same way",
+        "Separately evaluates the crane/hose condition under a no-fault standard from the negligence-based arguments"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "primary-duty-rule",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "comparative-fault-apportionment-in-jones-act-cas",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "primary-duty-rule": {
+      "id": "primary-duty-rule",
+      "personaId": "maritime",
+      "name": "primary duty rule",
+      "summary": "A doctrine barring a seaman from recovering for injuries caused by his own breach of a duty he consciously assumed as part of his job, potentially defeating both negligence and unseaworthiness claims.",
+      "whyItMatters": "This is flagged as the strongest defense in the memo; Eli needs to assess whether it plausibly applies to a chief engineer responsible for the very equipment that failed, and what deposition facts would strengthen or sink it.",
+      "state": "chosen",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1.8577156969153057,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-09T04:49:51.959Z",
+      "lastSeen": "2026-09-12T07:13:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_03",
+          "quote": "I thought that was a captain thing. And how is it different from just arguing comparative fault?",
+          "note": "Determines whether the Harlan memo can rely on primary duty as a complete bar or must be recast as a weaker secondary argument, and lets Eli judge whether the exception for inadequate means (the Aug 4 email/parts delay) defeats it.",
+          "ts": "2026-09-12T07:13:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Asks what job-description or log evidence would establish the seaman 'consciously assumed' the maintenance duty",
+        "Distinguishes primary duty rule from ordinary comparative fault in terms of what each defense can bar",
+        "Recognizes the rule applies by duty assumed, not rank, e.g. applying it to a chief engineer or bosun",
+        "Identifies the three narrow exceptions (uncorrectable condition, following orders, employer failed to supply means) and matches facts against them",
+        "Distinguishes a complete bar from a damages reduction when advising on reserve strategy"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "unseaworthiness-doctrine",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "comparative-fault-apportionment-in-jones-act-cas",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "comparative-fault-apportionment-in-jones-act-cas": {
+      "id": "comparative-fault-apportionment-in-jones-act-cas",
+      "personaId": "maritime",
+      "name": "comparative fault apportionment in Jones Act cases",
+      "summary": "The reduction of a seaman's damages in proportion to his own fault, distinct from doctrines that bar recovery entirely, under the featherweight causation standard for Jones Act negligence.",
+      "whyItMatters": "Needed to evaluate the memo's 25-50% fault estimate and to understand how comparative fault and primary duty rule interact rather than duplicate each other in setting the exposure range.",
+      "state": "noticed",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 1.7090984411620815,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-09T04:49:51.959Z",
+      "lastSeen": "2026-09-12T07:13:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_03",
+          "quote": "how is it different from just arguing comparative fault?",
+          "note": "Is the fallback argument the partner will actually want emphasized at the case meeting once primary duty is shown to be weak on these facts, so Eli needs to frame Harlan's 'monitor' decision and failure to tag out the crane as a reduction argument rather than a bar.",
+          "ts": "2026-09-12T07:13:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Explains why comparative fault only reduces damages while primary duty rule can bar the claim outright",
+        "Can sanity-check a proposed fault percentage against specific facts like the 'monitor' log entry",
+        "States that comparative fault reduces recovery proportionally rather than barring it entirely",
+        "Builds a specific percentage-fault narrative from case facts (weeping fitting, 'monitor' log, no tag-out) rather than treating fault as binary"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "unseaworthiness-doctrine",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "primary-duty-rule",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "exposure-memo-valuation-range-setting": {
+      "id": "exposure-memo-valuation-range-setting",
+      "personaId": "maritime",
+      "name": "exposure memo valuation range-setting",
+      "summary": "The practice of deriving a gross verdict range and settlement reserve from liability strength, defense viability, and damages components (medical, wages, earning capacity, pain and suffering).",
+      "whyItMatters": "Lets Eli check whether the memo's $650K-$1.4M range and $900K reserve are internally consistent with the liability and defense assessments, and what additional facts (wage records, deposition testimony) would move the number.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 3,
+      "signal": 1.3179768587694416,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-09T04:49:51.959Z",
+      "lastSeen": "2026-09-19T07:13:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_02",
+          "quote": "Partner wants liability, defenses, and a range",
+          "note": "Lets Eli check whether the memo's $650K-$1.4M range and $900K reserve are internally consistent with the liability and defense assessments, and what additional facts (wage records, deposition testimony) would move the number.",
+          "ts": "2026-09-09T04:49:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Ties specific damages line items (lost wages, hardware removal surgery) to a numeric range rather than accepting a round figure",
+        "Flags what discovery is still needed before the range can be trusted",
+        "Recalculates settlement reserve after McCorpen success eliminates maintenance and cure exposure",
+        "Separates the effect of McCorpen from any remaining Jones Act negligence or unseaworthiness exposure on Kowalski"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "unseaworthiness-doctrine",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "primary-duty-rule",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "comparative-fault-apportionment-in-jones-act-cas",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "medical-causation-linkage-in-mccorpen-s-connecti",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "recoupment-of-maintenance-and-cure-payments",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "removal-jurisdiction-and-the-jones-act-non-remov": {
+      "id": "removal-jurisdiction-and-the-jones-act-non-remov",
+      "personaId": "maritime",
+      "name": "removal jurisdiction and the Jones Act non-removal bar",
+      "summary": "The rule that Jones Act claims filed in state court cannot be removed to federal court under 28 U.S.C. § 1445(a), with a narrow exception for fraudulently pleaded seaman status, and the interaction with the saving-to-suitors clause for general maritime claims.",
+      "whyItMatters": "Lets you judge whether Claude's advice to not remove is legally sound and whether the fraudulent-pleading exception is worth pursuing given the facts on hand.",
+      "state": "noticed",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-13T00:01:51.959Z",
+      "lastSeen": "2026-09-13T00:01:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_04",
+          "quote": "Can we remove it to the Western District? He's barely a seaman anyway.",
+          "note": "Lets you judge whether Claude's advice to not remove is legally sound and whether the fraudulent-pleading exception is worth pursuing given the facts on hand.",
+          "ts": "2026-09-13T00:01:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Recognizes that Jones Act claims are generally non-removable regardless of forum preference",
+        "Asks specifically about the fraudulent pleading exception standard rather than assuming removal is simply available",
+        "Notes the 30-day removal clock runs from service, not filing"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "reassignment-change-in-status-doctrine",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "state-court-adjudication-of-maritime-claims",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "state-court-adjudication-of-maritime-claims": {
+      "id": "state-court-adjudication-of-maritime-claims",
+      "personaId": "maritime",
+      "name": "state court adjudication of maritime claims",
+      "summary": "The principle that state courts hearing maritime claims under the saving-to-suitors clause apply the same substantive federal maritime law as federal courts, including Chandris seaman-status doctrine, and can host maritime summary judgment practice under state procedural rules.",
+      "whyItMatters": "Lets you evaluate the assistant's claim that staying in King County costs little, since the same law and jury rights apply there as in federal court.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 3,
+      "signal": 0.84,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-13T00:01:51.959Z",
+      "lastSeen": "2026-09-13T00:01:51.959Z",
+      "evidence": [],
+      "rubric": [
+        "Confirms that a state court forum doesn't change the substantive maritime law standard applied",
+        "Recognizes CR 56 as the state-court analog to federal summary judgment for a seaman-status motion"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "removal-jurisdiction-and-the-jones-act-non-remov",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "reassignment-change-in-status-doctrine",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "p-i-club-coverage-scope": {
+      "id": "p-i-club-coverage-scope",
+      "personaId": "maritime",
+      "name": "P&I club coverage scope",
+      "summary": "How a Protection & Indemnity club entry indemnifies the named member for liabilities tied to the entered vessel's operation, and how co-assured status determines whether a related entity's liabilities are covered.",
+      "whyItMatters": "Lets Eli judge whether the club actually responds if Reyes turns out not to be a seaman, by checking who is named on the certificate of entry rather than assuming coverage follows the claim.",
+      "state": "noticed",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-13T09:37:51.959Z",
+      "lastSeen": "2026-09-13T09:37:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_05",
+          "quote": "Asked 'does the P&I entry still respond' and framed the question around whether Shoreside LLC vs. Northern Resolve LLC is the entered member, showing awareness of the entity distinction but not resolving the coverage mechanics himself.",
+          "note": "Lets Eli judge whether the club actually responds if Reyes turns out not to be a seaman, by checking who is named on the certificate of entry rather than assuming coverage follows the claim.",
+          "ts": "2026-09-13T09:37:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Requests the certificate of entry and club rules to identify named co-assureds before answering the handler",
+        "Distinguishes 'member's liability' from 'claim against a related but unentered entity'",
+        "Flags that shoreside employer liability wouldn't be covered unless separately named"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "jones-act-vs-lhwca-remedy-structure",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "attorney-conflict-of-interest-in-club-appointed-",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "attorney-conflict-of-interest-in-club-appointed-": {
+      "id": "attorney-conflict-of-interest-in-club-appointed-",
+      "personaId": "maritime",
+      "name": "attorney conflict of interest in club-appointed defense",
+      "summary": "The tension that arises when defense counsel appointed by a P&I club to defend the member develops an argument (no seaman status) that benefits the member but may shift the loss away from the club, creating divergent interests between the client (member) and the party paying for defense (the club).",
+      "whyItMatters": "Determines whether Eli can answer the claims handler directly or must route the question through the partner and possibly coverage counsel, since the seaman-status defense he's building doubles as an argument against the club's own exposure.",
+      "state": "noticed",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-13T09:37:51.959Z",
+      "lastSeen": "2026-09-13T09:37:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_05",
+          "quote": "Recognized the question came from the club handler and brought it to the assistant before answering, and asked 'is this guy covered or not' rather than issuing a coverage opinion himself.",
+          "note": "Determines whether Eli can answer the claims handler directly or must route the question through the partner and possibly coverage counsel, since the seaman-status defense he's building doubles as an argument against the club's own exposure.",
+          "ts": "2026-09-13T09:37:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Escalates coverage questions from the club to the partner or coverage counsel instead of answering directly",
+        "Identifies the moment interests diverge: when Shoreside's carrier or the club seeks a coverage opinion adverse to the member",
+        "Keeps the seaman-status/coverage-shifting analysis out of discoverable material"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "p-i-club-coverage-scope",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "jones-act-vs-lhwca-remedy-structure",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "medical-causation-linkage-in-mccorpen-s-connecti": {
+      "id": "medical-causation-linkage-in-mccorpen-s-connecti",
+      "personaId": "maritime",
+      "name": "medical causation linkage in McCorpen's connection element",
+      "summary": "How courts assess whether a concealed prior condition is causally/anatomically connected to a new injury, including doctrines like adjacent-segment degeneration that link different but related conditions.",
+      "whyItMatters": "Determines what Dr. Hsu's declaration needs to say to satisfy the connection element and rebut the 'different level' argument.",
+      "state": "noticed",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1.7147051315942572,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-14T04:49:51.959Z",
+      "lastSeen": "2026-09-19T07:13:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_08",
+          "quote": "He's solid on the adjacent-segment link.",
+          "note": "Directly determines whether Dr. Hsu's declaration is strong enough to survive the 'different level' counterargument the draft flags as being addressed head-on in section III.E.",
+          "ts": "2026-09-19T07:13:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Specifies exactly what medical opinion is needed (same body region, probability standard) rather than assuming any medical link suffices",
+        "Distinguishes 'same injury' from 'related/adjacent condition' as the legal standard",
+        "Distinguishes anatomically distinct levels (L4-L5 vs L3-L4) from a legally sufficient causal connection",
+        "Asks whether opposing expert could rebut the adjacent-segment theory with a different-level argument",
+        "Evaluates whether Hsu's opinion meets the connection standard used in this Circuit's McCorpen case law"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "maintenance-and-cure-obligation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "recoupment-of-maintenance-and-cure-payments",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "limitation-of-liability-act-procedure-and-deadli": {
+      "id": "limitation-of-liability-act-procedure-and-deadli",
+      "personaId": "maritime",
+      "name": "Limitation of Liability Act procedure and deadline",
+      "summary": "The shipowner's right to cap liability at post-casualty vessel value plus pending freight, triggered by a six-month filing deadline that runs from when a claimant's writing reveals a reasonable possibility damages will exceed that value.",
+      "whyItMatters": "Lets you verify the October 6 deadline calculation and judge whether the April 6 letter actually started the clock, or whether an earlier writing did.",
+      "state": "noticed",
+      "confidence": "medium",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-16T02:25:51.959Z",
+      "lastSeen": "2026-09-16T02:25:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_07",
+          "quote": "Asked specifically whether there's a deadline problem given the April 6 letter and August filing, showing awareness that timing and the damages statement matter.",
+          "note": "Lets you verify the October 6 deadline calculation and judge whether the April 6 letter actually started the clock, or whether an earlier writing did.",
+          "ts": "2026-09-16T02:25:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Identifies the trigger date as when a writing shows a 'reasonable possibility' of damages exceeding vessel value, not just the date of injury",
+        "Checks for any earlier notice (email, club claim) that could move the six-month clock sooner",
+        "Distinguishes the limitation fund (vessel value + pending freight) from the underlying damages claim"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "privity-or-knowledge-defense-to-limitation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "limitation-fund-valuation-vessel-value-plus-pend",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "single-claimant-stipulation-practice-in-limitati",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "privity-or-knowledge-defense-to-limitation": {
+      "id": "privity-or-knowledge-defense-to-limitation",
+      "personaId": "maritime",
+      "name": "privity or knowledge defense to limitation",
+      "summary": "The rule that limitation is unavailable if the negligence or unseaworthy condition was within the owner's privity or knowledge, imputed through managing officers or employees with authority over the relevant operation.",
+      "whyItMatters": "Lets you assess whether the port engineer's knowledge of the weeping hose defeats limitation, and whether discovery into who actually controlled crane maintenance could revive the defense.",
+      "state": "noticed",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 5,
+      "signal": 1,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-16T02:25:51.959Z",
+      "lastSeen": "2026-09-16T02:25:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_07",
+          "quote": "Did not raise privity/knowledge independently; asked only whether there's a deadline problem and whether filing is worth it, leaving the merits analysis to the assistant.",
+          "note": "Lets you assess whether the port engineer's knowledge of the weeping hose defeats limitation, and whether discovery into who actually controlled crane maintenance could revive the defense.",
+          "ts": "2026-09-16T02:25:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Asks who had authority over crane maintenance versus hose maintenance before conceding privity is fatal",
+        "Frames a discovery request aimed at the master's versus port engineer's purchasing authority",
+        "Distinguishes corporate imputation of a shoreside employee's knowledge from imputation of the vessel's crew"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "limitation-of-liability-act-procedure-and-deadli",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "limitation-fund-valuation-vessel-value-plus-pend",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "single-claimant-stipulation-practice-in-limitati",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "limitation-fund-valuation-vessel-value-plus-pend": {
+      "id": "limitation-fund-valuation-vessel-value-plus-pend",
+      "personaId": "maritime",
+      "name": "limitation fund valuation (vessel value plus pending freight)",
+      "summary": "The fund an owner must post to obtain limitation, calculated as the vessel's value at the end of the voyage in which the casualty occurred plus any pending freight earned on that voyage.",
+      "whyItMatters": "Lets you check whether the surveyor's $1.1M figure and the 'no pending freight' fact were used correctly to size the security Kiska would have to post.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 3,
+      "signal": 0.84,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-16T02:25:51.959Z",
+      "lastSeen": "2026-09-16T02:25:51.959Z",
+      "evidence": [],
+      "rubric": [
+        "Confirms 'end of voyage' timing rather than pre-casualty or replacement value is the valuation point",
+        "Asks whether any freight was earned on the empty return leg before accepting zero pending freight"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "limitation-of-liability-act-procedure-and-deadli",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "privity-or-knowledge-defense-to-limitation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "single-claimant-stipulation-practice-in-limitati",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "single-claimant-stipulation-practice-in-limitati": {
+      "id": "single-claimant-stipulation-practice-in-limitati",
+      "personaId": "maritime",
+      "name": "single-claimant stipulation practice in limitation actions",
+      "summary": "The mechanism by which a sole claimant can stipulate to protect the shipowner's right to limit while allowing the underlying suit to proceed in the claimant's chosen forum, avoiding a separate limitation proceeding.",
+      "whyItMatters": "Lets you weigh whether filing a limitation action actually gains Kiska a forum advantage here, since Harlan's case is already in W.D. Wash.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 2,
+      "signal": 0.76,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-16T02:25:51.959Z",
+      "lastSeen": "2026-09-16T02:25:51.959Z",
+      "evidence": [],
+      "rubric": [
+        "Weighs forum benefit only when the underlying suit is in state court or a different federal district",
+        "Recognizes that stipulation protection can moot the need for a separate limitation filing when there's one claimant"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "limitation-of-liability-act-procedure-and-deadli",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "privity-or-knowledge-defense-to-limitation",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "limitation-fund-valuation-vessel-value-plus-pend",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "recoupment-of-maintenance-and-cure-payments": {
+      "id": "recoupment-of-maintenance-and-cure-payments",
+      "personaId": "maritime",
+      "name": "recoupment of maintenance and cure payments",
+      "summary": "The disputed doctrine over whether an employer who successfully proves McCorpen concealment can recover maintenance and cure already paid, as opposed to merely terminating future payments.",
+      "whyItMatters": "Determines whether the learner should keep, narrow, or cut section III.F given that courts are split and some view recoupment as overreaching, a decision the assistant explicitly deferred to the partner.",
+      "state": "noticed",
+      "confidence": "unknown",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 1.6691504256019638,
+      "timesSeen": 2,
+      "firstSeen": "2026-09-19T07:13:51.959Z",
+      "lastSeen": "2026-09-21T09:37:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_09",
+          "quote": "Reported the partner's reasoning ('cut the recoupment section, said it invites a fight we don't need') without adding independent analysis of the doctrine",
+          "note": "Explains why the partner cut the recoupment section from the MSJ, letting the learner evaluate whether that strategic call (avoiding an unsettled, riskier argument) was sound rather than just accepting it on faith.",
+          "ts": "2026-09-21T09:37:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Cites case law on whether McCorpen supports recoupment versus only prospective denial",
+        "Weighs the strategic risk of including a legally contested claim in a motion otherwise built on solid facts",
+        "Decides whether to file the recoupment argument or hold it in reserve pending a stronger circuit split resolution",
+        "Can explain why recoupment is a weaker, unsettled argument compared to prospective termination of maintenance and cure",
+        "Weighs whether raising recoupment risks an adverse ruling that undermines the stronger termination argument"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 2
+        },
+        {
+          "to": "medical-causation-linkage-in-mccorpen-s-connecti",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "exposure-memo-valuation-range-setting",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "declaration-drafting-for-summary-judgment",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    },
+    "declaration-drafting-for-summary-judgment": {
+      "id": "declaration-drafting-for-summary-judgment",
+      "personaId": "maritime",
+      "name": "declaration drafting for summary judgment",
+      "summary": "The practice of drafting a fact witness declaration to support specific elements of a summary judgment motion, using personal-knowledge statements, authenticated exhibits, and careful phrasing that will survive deposition testing.",
+      "whyItMatters": "Lets the learner check that each paragraph of the Nilsen declaration ties to a specific legal element (authentication, materiality, causation) rather than just reading as narrative, and catch overstated language before it becomes a deposition liability.",
+      "state": "noticed",
+      "confidence": "low",
+      "confidenceSource": "model",
+      "impact": 4,
+      "signal": 0.92,
+      "timesSeen": 1,
+      "firstSeen": "2026-09-21T09:37:51.959Z",
+      "lastSeen": "2026-09-21T09:37:51.959Z",
+      "evidence": [
+        {
+          "exchangeId": "ex_maritime_09",
+          "quote": "Instructed the assistant to 'keep it tight, facts only' but did not specify which elements each paragraph needed to support",
+          "note": "Lets the learner check that each paragraph of the Nilsen declaration ties to a specific legal element (authentication, materiality, causation) rather than just reading as narrative, and catch overstated language before it becomes a deposition liability.",
+          "ts": "2026-09-21T09:37:51.959Z"
+        }
+      ],
+      "rubric": [
+        "Requests that each factual assertion map to an element of the McCorpen test or authentication requirement",
+        "Checks whether declaration language is deposition-safe rather than aspirational",
+        "Identifies bracketed items (policy exhibit, duration as port captain) that must be confirmed before filing"
+      ],
+      "rubricMisses": [],
+      "relations": [
+        {
+          "to": "mccorpen-defense",
+          "kind": "cooccur",
+          "weight": 1
+        },
+        {
+          "to": "recoupment-of-maintenance-and-cure-payments",
+          "kind": "cooccur",
+          "weight": 1
+        }
+      ],
+      "practiceLog": [],
+      "recognitions": [],
+      "pinned": false
+    }
+  },
+  "activeSet": {
+    "conceptIds": [
+      "mccorpen-defense",
+      "primary-duty-rule",
+      "jones-act-seaman-status-test"
+    ],
+    "size": 3,
+    "lastProposal": {
+      "ts": "2026-09-28T14:25:51.959Z",
+      "recommended": [
+        {
+          "conceptId": "mccorpen-defense",
+          "reasoning": "This has come up four times across the concealment files, and the latest work tied the undisclosed surgery to the hiring decision, which is the reliance prong. The connection element and the recoupment question are both still open, so there is room left to practice here."
+        },
+        {
+          "conceptId": "primary-duty-rule",
+          "reasoning": "Your last question here was 'how is it different from just arguing comparative fault?' That distinction decides whether a claim is barred or only reduced, and there has been no practice on it yet. It has gone quiet, but it still ranks above every challenger, and working it would also clear up the comparative-fault question."
+        },
+        {
+          "conceptId": "jones-act-seaman-status-test",
+          "reasoning": "This one is pinned, and it is close to durable. Two confirmed recognitions include an independent Papai nature-element analysis on the dock-worker file. Its low score reflects that progress, not a gap."
+        }
+      ],
+      "swaps": [],
+      "goneQuiet": [
+        "primary-duty-rule"
+      ],
+      "summary": "The recommendation keeps the current set unchanged: McCorpen and the primary duty rule are the two live gaps with the most at stake in defense files, and seaman status is nearly ready to graduate. One thing to weigh is whether to keep seaman status pinned; unpinning it once it goes durable would free a slot for the Jones Act vs. LHWCA remedy structure, which follows directly from the status question you care most about and is the strongest waiting candidate after recoupment."
+    }
+  },
+  "calendar": [
+    {
+      "dayOfWeek": 4,
+      "start": "14:00",
+      "durationMin": 30,
+      "conceptId": "mccorpen-defense"
+    }
+  ],
+  "nudges": [
+    {
+      "id": "nudge_bcd65d89",
+      "kind": "prune-proposal",
+      "ts": "2026-09-28T14:25:51.959Z",
+      "reason": "The recommendation keeps the current set unchanged: McCorpen and the primary duty rule are the two live gaps with the most at stake in defense files, and seaman status is nearly ready to graduate. One thing to weigh is whether to keep seaman status pinned; unpinning it once it goes durable would free a slot for the Jones Act vs. LHWCA remedy structure, which follows directly from the status question you care most about and is the strongest waiting candidate after recoupment."
+    }
+  ],
+  "beats": [],
+  "studioSessions": [
+    {
+      "id": "studio_90d2fe3b",
+      "conceptId": "mccorpen-defense",
+      "rung": "modeling",
+      "entry": "scheduled",
+      "startedAt": "2026-09-15T06:49:51.959Z",
+      "materialExchangeId": "ex_maritime_06",
+      "workSummary": "Seeded session; work summary not retained.",
+      "messages": [],
+      "endedAt": "2026-09-15T07:21:51.959Z",
+      "closingStatement": "I'd say which months count toward the 30% and ask what facts would break the vessel connection before I lead with it."
+    }
+  ],
+  "ui": {
+    "graphCollapsed": false,
+    "mode": "work"
+  }
+}

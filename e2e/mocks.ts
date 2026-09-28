@@ -11,7 +11,10 @@ type HarvestBody = {
   index: { id: string; name: string }[];
 };
 
-type RecognizeBody = { message: string; concepts: { id: string; name: string }[] };
+type RecognizeBody = {
+  message: string;
+  concepts: { id: string; name: string; recognitions: { ts: string; status: string }[] }[];
+};
 
 type PruneBody = {
   state: {
@@ -89,7 +92,13 @@ export async function mockClaudeRoutes(page: Page) {
 
   await page.route("**/api/recognize", (route) => {
     const body = route.request().postDataJSON() as RecognizeBody;
-    const first = body.concepts[0];
+    // The pipeline spaces recognitions 24h apart per concept, so pick an
+    // active concept the seed hasn't recognized recently.
+    const dayAgo = Date.now() - 24 * 3_600_000;
+    const first =
+      body.concepts.find(
+        (c) => !c.recognitions.some((r) => r.status !== "rejected" && Date.parse(r.ts) > dayAgo),
+      ) ?? body.concepts[0];
     if (!first || !body.message.toLowerCase().includes(MOCK.recognizePhrase)) {
       return json(route, { proposals: [] });
     }

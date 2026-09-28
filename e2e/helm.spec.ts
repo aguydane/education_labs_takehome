@@ -53,7 +53,7 @@ test.describe("Helm", () => {
     await open(page);
     await send(page, "Why did you pick a composite index over two single ones?");
     await expect(page.getByText(MOCK.chatReply)).toBeVisible();
-    const offer = page.getByTestId(/^beat-offer-/).last();
+    const offer = page.getByTestId(/^beat-offer-nudge_/).last();
     await expect(offer).toBeVisible();
     await offer.getByTestId("beat-offer-take").click();
     const overlay = page.getByTestId("beat-overlay");
@@ -80,7 +80,7 @@ test.describe("Helm", () => {
   test("a sharpened prompt earns a recognition the learner confirms", async ({ page }) => {
     await open(page);
     await send(page, `Add a ${MOCK.recognizePhrase} on status where it is not null and check the planner uses it.`);
-    const card = page.getByTestId(/^recognition-/).filter({ hasText: "Evidence" }).last();
+    const card = page.getByTestId(/^recognition-rec_/).last();
     await expect(card).toBeVisible();
     await expect(card).toContainText("evidence you understand");
     await card.getByTestId("recognition-confirm").click();
@@ -90,7 +90,7 @@ test.describe("Helm", () => {
   test("a rejected recognition offers the three reasons", async ({ page }) => {
     await open(page);
     await send(page, `Use a ${MOCK.recognizePhrase} here.`);
-    const card = page.getByTestId(/^recognition-/).filter({ hasText: "Evidence" }).last();
+    const card = page.getByTestId(/^recognition-rec_/).last();
     await expect(card).toBeVisible();
     await card.getByTestId("recognition-reject").click();
     await expect(card.getByTestId("recognition-reason-copied")).toBeVisible();
@@ -99,14 +99,14 @@ test.describe("Helm", () => {
     await card.getByTestId("recognition-reason-copied").click();
     await expect(card).toBeHidden();
     // "I copied a pattern" routes back into harvest as a Beat offer.
-    await expect(page.getByTestId(/^beat-offer-/).last()).toBeVisible();
+    await expect(page.getByTestId(/^beat-offer-nudge_/).last()).toBeVisible();
   });
 
   test("kicking off long work offers Studio for the wait", async ({ page }) => {
     await open(page);
     await page.getByTestId("work-longtask").click();
     await expect(page.getByTestId("longtask-strip")).toBeVisible();
-    const offer = page.getByTestId(/^studio-offer-/).last();
+    const offer = page.getByTestId(/^studio-offer-nudge_/).last();
     await expect(offer).toBeVisible();
     await offer.getByTestId("studio-offer-book").click();
 

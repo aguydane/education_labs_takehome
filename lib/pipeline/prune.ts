@@ -108,6 +108,7 @@ Rules:
 - Rank by steering value: impact × (1 − confidence) × recent signal. The numbers are provided; explain the ranking in words a person would find useful ("this has decided whether an output was right four times in two weeks, and nothing you've written suggests you'd catch a wrong answer"), never by quoting the formula.
 - The active set is sticky on purpose. Prefer keeping current active concepts. Propose at most ONE swap, and only when the challenger clearly dominates the concept it would replace. Put swaps in "swaps" and reflect them in "recommended".
 - Pinned concepts stay in the recommendation no matter their score.
+- An active concept with high confidence and confirmed recognitions is close to graduating to durable. Its low score is success, not a reason to swap it out; keep it and say it is nearly durable, unless a challenger clearly dominates AND the learner has nothing left to practice there.
 - Never recommend concepts whose state is delegated, durable, or dormant.
 - Reasoning per concept: 1–2 sentences, specific to this learner's work and interests. Neutral tone. No praise, no "you should".
 - summary: two sentences on the overall shape of the recommendation and the one thing the learner might want to weigh.`;
@@ -115,7 +116,13 @@ Rules:
 export function buildPrunePrompt(state: LearnerState, now = nowIso()): { system: string; user: string } {
   const p = state.persona;
   const active = state.activeSet.conceptIds;
-  const candidates = rankCandidates(state, now).slice(0, 12);
+  // The active set is always in front of the model, whatever its score.
+  const ranked = rankCandidates(state, now);
+  const activeConcepts = active.map((id) => state.concepts[id]).filter((c): c is Concept => !!c);
+  const candidates = [
+    ...activeConcepts,
+    ...ranked.filter((c) => !active.includes(c.id)).slice(0, 12),
+  ];
   const quiet = new Set(goneQuiet(state, now));
 
   const row = (c: Concept) => {
