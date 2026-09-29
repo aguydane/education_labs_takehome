@@ -14,6 +14,8 @@ The question, then, is how to keep developing mastery while working in an accele
 
 Two design requirements follow, and they became the product's two halves. It has to make stepping back to learn feel legitimate inside a working day, since over the long run productivity rises once that feels safe; that half is Beat and Studio. And it has to show you that learning is already happening through the act of doing, even mid-sprint; that half is Harvest and Recognize, whose job is to notice that learning and hand it back.
 
+Against Option B's own terms: domain expertise develops on the learner's real material rather than a curriculum; AI-assisted work becomes a learning opportunity at exactly the moments a learner would otherwise wait or wonder why; understanding deepens through the same conversations that get the work done; and the measure of growth is what the learner can now specify and judge, not what they completed.
+
 ## 2. What I built
 
 Helm is a web app (Next.js on Vercel, Claude API on the server) that runs a four-step loop alongside ordinary work with Claude. It ships with two seeded people, Maya, a backend engineer, and Eli, a maritime defense associate working Dutch Harbor files, each with three weeks of history. Onboarding is a scripted walkthrough on the real app rather than a tutorial.
@@ -30,7 +32,17 @@ Helm is a web app (Next.js on Vercel, Claude API on the server) that runs a four
 
 The map doubles as a journal: notes on ideas and on the connections between them, Claude's speculation on why two ideas keep meeting in the learner's work, and a history of Studio sessions that can be reopened.
 
-## 3. Design decisions and trade-offs
+**A day with it.** Maya asks Claude why it chose full jitter for a retry backoff. Chips appear under the reply; one offers a beat, and three minutes later she has answered a question about when jitter matters. She kicks off a backfill that will run for most of an hour; Helm offers Studio on the idea the backfill touches, saves where she was, and coaches her through her own migration from last week at whatever rung she wants. Back at work, she writes a retry policy precisely enough that Helm recognizes the idea in her words and asks whether that was really her. Nothing in the day was a lesson.
+
+**How it's built.** The pipeline is a set of pure functions over a transcript store (harvest, prune, recognize, practice, triggers, graph) behind a storage interface with a browser implementation; the Claude calls are seven route handlers; the UI is three panels and two modes. The seeded histories were not written by hand: synthetic work transcripts were replayed through the real pipeline, so what reviewers see on first load is what the system produces. A Playwright suite walks the whole loop with the Claude routes mocked, and every build was also verified live against the real model.
+
+## 3. Who it's for, and how it generalizes
+
+The brief asks for people who already use Claude and want more from it, not first-time users, and Helm assumes ongoing work: it has nothing to say to an empty history. Within that, it doesn't know or care what the work is. The concept space isn't a taxonomy; it's harvested from the learner's own exchanges and named the way a practitioner in that field would name it. The same prompts, with no domain configuration, produced *composite index design* and *idempotency in job processing* for a backend engineer and *the Chandris connection test* and *the McCorpen defense* for a maritime associate. That is why the second seeded person comes from an unrelated field: Eli is the generalization test.
+
+Skill level is handled per idea rather than per user. Harvest estimates confidence from wording and the learner overrides it; the Studio rung starts from that estimate and moves; "keep delegating" lets an expert clear away what they don't need. A senior engineer and a junior associate use the same product and see different maps. Students and professionals differ mainly in where the protected time comes from: for a professional it's a calendar block and the wait on an agent; for a student it's study time already on the calendar, which is where the strip would point. What doesn't generalize yet is the social part. Helm is built for one learner, and the settings where learning is most social, a team, a cohort, a firm's associates, would need the map to be shareable.
+
+## 4. Design decisions and trade-offs
 
 Each of the following is a feature as it exists, the reason it exists that way, and what it costs.
 
@@ -56,7 +68,7 @@ Each of the following is a feature as it exists, the reason it exists that way, 
 
 **What was cut.** Time tracking became a single "learning budget" number; a scheduler became a calendar strip, which points at the belief that a knowledge worker's calendar is where psychological safety for learning would actually be created; a memory system became a JSON blob behind a storage interface. Integration with an existing Claude product was deliberately deferred in favor of building the concept where it was cheapest to build.
 
-## 4. Agency
+## 5. Agency
 
 The rule throughout is *Claude observes and proposes; you judge.* Claude coined the phrase during the design conversation; I kept it because it matched what I already believed. A model can process written language at a speed and capacity I can't. What I can do is judge whether an observation or a proposal matches my experience and my motivations.
 
@@ -64,7 +76,7 @@ The rule is real in specific places. Harvest records nothing hidden and puts a c
 
 It is weaker elsewhere. Helm decides what counts as an idea and how to name it; the learner can correct confidence but not the carving-up. Trigger moments are the product's, and a quiet interruption is still an interruption. A recognition confirmed out of politeness teaches the wrong thing. And the whole system is a dyad, with no one else in the loop to disagree with either party.
 
-## 5. Learning principles
+## 6. Learning principles
 
 One tension shaped the product more than any other: learning integrated with the work versus learning set aside from it. Self-determination theory cuts across both. The learner has to be the one choosing when to step out, or the stepping out becomes one more thing being done to them.
 
@@ -72,7 +84,7 @@ Helm interleaves the two. Studio is the set-aside time, and I value that kind of
 
 The specific mechanisms, each with its tension: **self-determination theory** (Deci & Ryan): autonomy through picking, pinning, delegating, and moving the rung; competence shown as evidence, never reward; and because surveillance undermines intrinsic motivation and Harvest is surveillance, it reads only the learner's words and hides nothing. **Scaffolding with fading** (Wood, Bruner & Ross; van de Pol et al.): the rung ladder is the explicit fading schedule most tools omit; "let me try" exists because of the expertise-reversal effect. **Situated learning** (Lave & Wenger; Brown, Collins & Duguid): the learner's own exchanges as material and the long-task wait as the most situated moment; Studio does decontextualize, and real material is the mitigation. **Retrieval, spacing, and generation** (Roediger & Karpicke; Bjork): recognition is retrieval in the wild, graduation requires confirmations spread over weeks, and working by hand in Studio is generation. **Interleaving**: a few ideas held for weeks, alternating with the work.
 
-## 6. Process, and how I used Claude
+## 7. Process, and how I used Claude
 
 **Timeline.** One evening of design conversation, from a rough notion to a build plan I argued with. An overnight build by Claude Code, one model orchestrating and Opus 5.5 subagents implementing panels against contracts I'd approved. A morning of review rounds, each of which changed the product. Then this document.
 
@@ -80,7 +92,9 @@ The specific mechanisms, each with its tension: **self-determination theory** (D
 
 It took me a while to notice that this is Helm's loop. The notes are the harvest; the reflection is the proposal, offered rather than imposed; the reactions are the judgment; the next round is the practice. And reading my own reframe back and finding it better than what I'd said aloud, in my own words, is the recognition. I didn't set out to build the tool I was using to design it.
 
-**Technical choices.** I was deliberately hands-off. The risk was spending the day on integration with an existing Claude product instead of on the idea, so I chose the medium that gets out of the way, the web, where deployment is solved and Claude gets things right the first time. Integration became the voiceover in section 8.
+**Technical choices.** I was deliberately hands-off. The risk was spending the day on integration with an existing Claude product instead of on the idea, so I chose the medium that gets out of the way, the web, where deployment is solved and Claude gets things right the first time. Integration became the voiceover in section 9.
+
+**Verification.** The prototype has an end-to-end suite that walks every step of the loop with the Claude routes mocked, and each change was also exercised live against the real model before deploying. Both mattered. The suite caught regressions in the interface; the live runs caught the places where the model didn't do what the prompt asked, which is where three of the five judgment moments below came from.
 
 **Where my judgment changed the product.** Five moments, findable in the transcripts by the quoted phrase.
 
@@ -92,16 +106,22 @@ It took me a while to notice that this is Helm's loop. The notes are the harvest
 
 Smaller ones followed the same pattern, among them pinning seaman status in Eli's seed so his story would exist, and discovering that Opus 5.5's thinking was consuming Studio's token budget and truncating replies. Claude proposed; I judged.
 
-## 7. Measuring success
+## 8. Measuring success
 
 Not throughput; the product exists to relieve that pressure. Leading indicators, all observable in the product: recognitions confirmed per week and the confirmed-to-rejected ratio, which is the precision of the learner model, with the rejection reasons saying which way it errs; offers taken when made, by trigger; Studio sessions closed with a statement rather than abandoned; the language gap between early and late prompts on an active idea; notes written. The one to watch hardest is Beat offers dismissed: a rising rate is the earliest sign the product has become another thing nagging you. Lagging: ideas graduating to durable and staying there, and whether learners report that the time felt safe to spend.
 
-## 8. Scaling, and where this lives in Claude products
+## 9. Scaling, and where this lives in Claude products
 
-The pipeline is pure functions over a transcript store behind a storage interface; the chat UI is one transcript source and the seed generator is another. In production the learner model is one row per person, fed by every Claude surface. Harvest and Recognize run online per exchange against a compact projection of that model, the concept index, a few thousand cacheable tokens; decay, graduation, consolidation, and Prune run nightly through the Batch API. Per-exchange cost is bounded by the exchange and the index, not by history.
+**From the browser to a database.** The prototype keeps the whole learner state in the browser, one key per persona, because that gives every reviewer a private sandbox with nothing to provision. Everything that reads or writes state goes through a `Store` interface with three responsibilities: hand back the state, apply a pure transition and persist the result, and expose the concept index. The browser implementation is fifty lines; a Postgres implementation is the same three methods against one row per learner, JSONB for the state or normalized tables for concepts, exchanges, and events if the map needs querying. The pipeline doesn't change, and neither do the prompts, because both were written against the projection rather than the store. Seeds carry a content hash as their version so a stale client replaces itself; the same mechanism would handle schema migrations.
 
-Three landing spots. **Claude Code** already knows, through hooks, when an exchange lands and when a long agent run starts, which makes Harvest a hook and the long-task trigger a real signal. **Claude.ai projects** are a natural Studio surface, with the project's own conversations as material. The **desktop app's notifications** are where an offer or a recognition would arrive without interrupting anything. The map and journal would be the cross-surface view: the same row, wherever you are.
+**Session N+1.** In production the learner model is one row per person, fed by every Claude surface. Harvest and Recognize run online per exchange against a compact projection of that row, the concept index, a few thousand cacheable tokens; decay, graduation, consolidation, and Prune run nightly through the Batch API. Per-exchange cost is bounded by the exchange and the index, not by history, and the index is capped by pruning and dormancy. Nothing re-reads the transcript except point lookups for evidence and Studio material.
 
-## 9. Limitations
+**Cost.** Per active learner per working day: ten to forty exchanges, each a Sonnet harvest and a Sonnet recognize on a cached system prompt, a cent or two in total; a Beat or a Studio session on Opus when taken, a few cents each; the nightly batch at half price. Tens of cents per learner per day, dominated by the sessions the learner chose to have.
+
+**Privacy.** The model keeps concept names, short evidence quotes from the learner's own words, notes the learner wrote, and whatever transcript retention the host product already has. Harvest reads nothing the learner can't see. Deleting an idea deletes its evidence; delegating one ends its offers.
+
+**Three landing spots.** **Claude Code** already knows, through hooks, when an exchange lands and when a long agent run starts, which makes Harvest a hook and the long-task trigger a real signal. **Claude.ai projects** are a natural Studio surface, with the project's own conversations as material. The **desktop app's notifications** are where an offer or a recognition would arrive without interrupting anything. The map and journal would be the cross-surface view: the same row, wherever you are.
+
+## 10. Limitations
 
 Recognition depends on the model's reading of the learner's wording; it proposes rarely and asks, but a confirmed false positive teaches the wrong thing, and the one-per-day spacing rule is a guess. The seeds are synthetic and the maritime law is illustrative. The calendar is a strip, state lives in the browser, and Beat and Studio replies take ten to fifteen seconds to start. And Helm is a dyad: the obvious next step from the learning literature is other people, a community of practice around the map, and the design has no answer for that yet.
