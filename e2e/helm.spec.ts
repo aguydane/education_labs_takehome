@@ -86,6 +86,22 @@ test.describe("Helm", () => {
     await expect(card).toBeHidden();
   });
 
+  test("the walkthrough can run as Eli", async ({ page }) => {
+    await open(page);
+    await page.getByTestId("header-walkthrough").click();
+    const card = page.getByTestId("tour-card");
+    await expect(card).toHaveAttribute("data-step", "welcome");
+    await card.getByTestId("tour-start-maritime").click();
+    await expect(card).toHaveAttribute("data-step", "send-why");
+    await expect(card).toContainText("as Eli");
+    await expect(card).toContainText("McCorpen");
+    await expect(page.getByTestId("persona-maritime")).toHaveAttribute("aria-selected", "true");
+    await card.getByTestId("tour-send").click();
+    await expect(card).toHaveAttribute("data-step", "chips");
+    await card.getByTestId("tour-skip").click();
+    await expect(card).toBeHidden();
+  });
+
   test("loads a seeded persona with history and a map", async ({ page }) => {
     await open(page);
     const exchanges = page.locator('[data-testid^="exchange-"]');

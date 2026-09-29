@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLearner } from "@/lib/learner-context";
-import { TOUR_STEPS, type TourCtx } from "@/lib/tour";
+import { tourSteps, type TourCtx } from "@/lib/tour";
 import { tourStore, useTour } from "@/lib/tour-store";
+import { PERSONAS } from "@/lib/personas";
+import type { PersonaId } from "@/lib/types";
 
 const CARD_W = 360;
 const PAD = 8;
@@ -48,8 +50,10 @@ export default function Tour() {
     [learner.state, learner.beat, learner.studio, learner.busy, tour.startedAt, tick],
   );
 
-  const step = TOUR_STEPS[tour.stepIndex];
-  const isLast = tour.stepIndex === TOUR_STEPS.length - 1;
+  const steps = useMemo(() => tourSteps(tour.personaId), [tour.personaId]);
+  const step = steps[tour.stepIndex];
+  const isLast = tour.stepIndex === steps.length - 1;
+  const first = PERSONAS[tour.personaId].name.split(" ")[0];
 
   // Skip steps whose skipWhen says so; auto-advance on advanceWhen.
   useEffect(() => {
@@ -76,10 +80,13 @@ export default function Tour() {
     anchorEl.scrollIntoView?.({ block: "nearest", inline: "nearest", behavior: "smooth" });
   }, [anchorEl, step]);
 
-  const begin = useCallback(() => {
-    learner.actions.startFresh("backend");
-    tourStore.begin();
-  }, [learner.actions]);
+  const begin = useCallback(
+    (personaId: PersonaId) => {
+      learner.actions.startFresh(personaId);
+      tourStore.begin(personaId);
+    },
+    [learner.actions],
+  );
 
   const sendScript = useCallback(
     (text: string) => {
@@ -168,7 +175,7 @@ export default function Tour() {
       >
         <div className="flex items-baseline gap-2">
           <span className="text-[11px] uppercase tracking-wide text-ink-2">
-            {tour.stepIndex === 0 ? "Walkthrough" : `Step ${tour.stepIndex} of ${TOUR_STEPS.length - 1}`}
+            {tour.stepIndex === 0 ? "Walkthrough" : `Step ${tour.stepIndex} of ${steps.length - 1} · as ${first}`}
           </span>
           <button
             type="button"
@@ -186,7 +193,7 @@ export default function Tour() {
 
         {step.script ? (
           <div className="mt-3 rounded-md border border-rule bg-panel-2 p-3">
-            <p className="text-xs text-ink-2">Maya&apos;s message</p>
+            <p className="text-xs text-ink-2">{first}&apos;s message</p>
             <p className="mt-1 text-ink">{step.script.text}</p>
             <div className="mt-2 flex items-center gap-3">
               <button
@@ -212,17 +219,35 @@ export default function Tour() {
           </p>
         ) : null}
 
-        {showNext ? (
+        {tour.stepIndex === 0 ? (
+          <div className="mt-3 flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => begin("maritime")}
+              className="rounded-md border border-rule px-3 py-1.5 text-xs font-medium text-ink hover:bg-panel-2"
+              data-testid="tour-start-maritime"
+            >
+              Start as Eli
+            </button>
+            <button
+              type="button"
+              onClick={() => begin("backend")}
+              className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+              data-testid="tour-start"
+            >
+              Start as Maya
+            </button>
+          </div>
+        ) : showNext ? (
           <div className="mt-3 flex justify-end">
             <button
               type="button"
               onClick={() => {
-                if (tour.stepIndex === 0) begin();
-                else if (isLast) tourStore.finish();
+                if (isLast) tourStore.finish();
                 else tourStore.next();
               }}
               className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
-              data-testid={tour.stepIndex === 0 ? "tour-start" : isLast ? "tour-finish" : "tour-next"}
+              data-testid={isLast ? "tour-finish" : "tour-next"}
             >
               {step.nextLabel ?? "Next"}
             </button>

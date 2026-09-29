@@ -11,6 +11,8 @@ export type TourState = {
   stepIndex: number;
   /** ISO time the learner pressed Start; steps compare exchange timestamps to it. */
   startedAt: string | null;
+  /** Whose seed the walkthrough runs on. */
+  personaId: "backend" | "maritime";
   /** The learner finished or skipped it at least once. */
   done: boolean;
 };
@@ -27,7 +29,7 @@ function read(): TourState {
   return DEFAULT;
 }
 
-const DEFAULT: TourState = { active: false, stepIndex: 0, startedAt: null, done: false };
+const DEFAULT: TourState = { active: false, stepIndex: 0, startedAt: null, personaId: "backend", done: false };
 
 let state: TourState = typeof window === "undefined" ? DEFAULT : read();
 const listeners = new Set<() => void>();
@@ -50,11 +52,12 @@ export const tourStore = {
   },
   /** Open the welcome card (step 0). */
   open: () => set({ ...state, active: true, stepIndex: 0 }),
-  /** The learner pressed Start on the welcome card. */
-  begin: () => set({ ...state, active: true, stepIndex: 1, startedAt: new Date().toISOString() }),
+  /** The learner pressed Start on the welcome card, as one of the two people. */
+  begin: (personaId: TourState["personaId"]) =>
+    set({ ...state, active: true, stepIndex: 1, startedAt: new Date().toISOString(), personaId }),
   next: () => set({ ...state, stepIndex: state.stepIndex + 1 }),
   goTo: (i: number) => set({ ...state, stepIndex: i }),
-  finish: () => set({ active: false, stepIndex: 0, startedAt: null, done: true }),
+  finish: () => set({ ...state, active: false, stepIndex: 0, startedAt: null, done: true }),
 };
 
 /** First visit: the welcome card shows by itself. */

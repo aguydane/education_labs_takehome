@@ -1,6 +1,6 @@
 import type { BeatUI, Busy, StudioUI } from "./learner-context";
 import { pendingNudges } from "./pipeline/triggers";
-import type { Exchange, LearnerState, Recognition } from "./types";
+import type { Exchange, LearnerState, PersonaId, Recognition } from "./types";
 
 /**
  * The walkthrough script. It runs on the real app with the real seed:
@@ -79,14 +79,57 @@ function activeStudioSession(c: TourCtx) {
   return c.state.studioSessions.find((s) => s.id === id);
 }
 
+// ---- per-persona voice ------------------------------------------------------
+
+type Voice = {
+  first: string;
+  they: string;
+  their: string;
+  intro: string;
+  whyText: string;
+  longTask: string;
+  recognizeLead: string;
+  recognizeText: string;
+};
+
+const VOICES: Record<PersonaId, Voice> = {
+  backend: {
+    first: "Maya",
+    they: "she",
+    their: "her",
+    intro: "a backend engineer with three weeks of history here",
+    whyText:
+      "Why did you add full jitter to the webhook retry backoff instead of plain exponential? I thought exponential already spread the retries out.",
+    longTask: "Maya is about to kick off a backfill that runs for most of an hour.",
+    recognizeLead: "Maya's next message specifies retries precisely, the way someone who understands backoff would.",
+    recognizeText:
+      "For the carrier webhook retries: cap at 5 attempts with full jitter on a 30 s ceiling, honor Retry-After when FedEx sends one, and set pg-boss retryLimit to 0 so exactly one layer owns retries. Write the handler change.",
+  },
+  maritime: {
+    first: "Eli",
+    they: "he",
+    their: "his",
+    intro: "a second-year maritime defense associate with three weeks of Dutch Harbor files here",
+    whyText:
+      "Why do we lead with the McCorpen defense on Kowalski instead of just contesting causation on the surgery? If the fusion was coming anyway, isn't causation the cleaner argument?",
+    longTask: "Eli is about to send Claude off to draft a full summary-judgment motion with record cites.",
+    recognizeLead:
+      "Eli's next message scopes the primary duty rule the way someone who understands its limits would, instead of asking whether it applies.",
+    recognizeText:
+      "For the Kowalski deck-hazard claim, argue the primary duty rule only as to the tie-down protocol he wrote and was responsible for enforcing, not the wet-deck condition generally; concede comparative fault on the lighting, and cite the rule's limits so we don't overclaim. Draft that section.",
+  },
+};
+
 // ---- the script -------------------------------------------------------------
 
-export const TOUR_STEPS: TourStep[] = [
+export function tourSteps(personaId: PersonaId): TourStep[] {
+  const v = VOICES[personaId];
+  return [
   {
     id: "welcome",
     title: "Welcome to Helm",
     body:
-      "Claude does the work. You keep the understanding. The best way to see what that means is to do one full loop, for real, as Maya, a backend engineer with three weeks of history here. It takes about eight minutes and every step happens in the actual app. Start restores Maya's seed so the steps line up.",
+      "Claude does the work. You keep the understanding. The best way to see what that means is to do one full loop, for real, as one of the two people seeded here: Maya, a backend engineer, or Eli, a maritime defense associate working Dutch Harbor files. It takes about eight minutes and every step happens in the actual app. Starting restores that person's seed so the steps line up.",
     manual: true,
     nextLabel: "Start",
   },
@@ -94,11 +137,9 @@ export const TOUR_STEPS: TourStep[] = [
     id: "send-why",
     title: "Work like normal, and ask why",
     body:
-      "Helm sits alongside ordinary work. Send Maya's next message; it happens to be a why-question about something Claude did last week. A question like that is a bid for understanding, and Helm treats it differently from a request to get something done.",
+      `Helm sits alongside ordinary work. Send ${v.first}'s next message; it happens to be a why-question about something Claude did last week. A question like that is a bid for understanding, and Helm treats it differently from a request to get something done.`,
     anchor: (c) => c.dom('[data-testid="work-composer"]'),
-    script: {
-      text: "Why did you add full jitter to the webhook retry backoff instead of plain exponential? I thought exponential already spread the retries out.",
-    },
+    script: { text: v.whyText },
     advanceWhen: (c) => exchangesSince(c).some((e) => e.harvest),
     waiting: "Claude replies, then Helm reads the exchange (about 10–20 seconds).",
   },
@@ -133,7 +174,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "map",
     title: "Prune: your map",
     body:
-      "Close the beat (Back to work). On the right is every idea Maya's work has surfaced: hollow rings are just noticed, filled ones are ideas she decided about, thick rings are the two or three she's practicing now. Lines join ideas that came up in the same exchange. Press Prune to ask Claude what the active set should be.",
+      `Close the beat (Back to work). On the right is every idea ${v.first}'s work has surfaced: hollow rings are just noticed, filled ones are ideas ${v.they} decided about, thick rings are the two or three ${v.they}'s practicing now. Lines join ideas that came up in the same exchange. Press Prune to ask Claude what the active set should be.`,
     anchor: (c) => c.dom('[data-testid="prune-button"]') ?? c.dom('[data-testid="graph-canvas"]'),
     advanceWhen: (c) => !!c.state.activeSet.lastProposal && c.state.activeSet.lastProposal.ts >= c.startedAt,
     waiting: "Press Prune (Claude takes about 15 seconds).",
@@ -154,7 +195,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "long-task",
     title: "The best moment for Studio",
     body:
-      "Maya is about to kick off a backfill that runs for most of an hour. While it runs, nothing is waiting on her. Helm treats that wait as the best possible moment for dedicated time on one idea. Kick it off.",
+      `${v.longTask} While it runs, nothing is waiting on ${v.their === "his" ? "him" : "her"}. Helm treats that wait as the best possible moment for dedicated time on one idea. Kick it off.`,
     anchor: (c) => c.dom('[data-testid="work-longtask"]'),
     advanceWhen: (c) => !!c.state.longTask || exchangesSince(c).some((e) => e.longTask),
     waiting: "Press Kick off long task.",
@@ -177,7 +218,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "studio",
     title: "Studio: protected time on one idea",
     body:
-      "Studio works on Maya's own past exchange, not a textbook example. The rung sets how much Claude does: modeling (Claude does it and narrates, you predict), coaching (you do it, Claude asks first), fading (you work, Claude is available). More help drops a rung; Let me try raises one. The \"where you were\" card is your work, saved, so leaving it is safe. Reply to Claude once.",
+      `Studio works on ${v.first}'s own past exchange, not a textbook example. The rung sets how much Claude does: modeling (Claude does it and narrates, you predict), coaching (you do it, Claude asks first), fading (you work, Claude is available). More help drops a rung; Let me try raises one. The "where you were" card is your work, saved, so leaving it is safe. Reply to Claude once.`,
     anchor: (c) => c.dom('[data-testid="studio-rung"]'),
     advanceWhen: (c) => {
       const s = activeStudioSession(c);
@@ -198,11 +239,9 @@ export const TOUR_STEPS: TourStep[] = [
     id: "recognize",
     title: "Recognize: evidence in your own words",
     body:
-      "Helm never quizzes. It watches for your own wording showing an active idea in use: a constraint you specified, a correction you made. Maya's next message specifies retries precisely, the way someone who understands backoff would. Send it.",
+      `Helm never quizzes. It watches for your own wording showing an active idea in use: a constraint you specified, a correction you made. ${v.recognizeLead} Send it.`,
     anchor: (c) => c.dom('[data-testid="work-composer"]'),
-    script: {
-      text: "For the carrier webhook retries: cap at 5 attempts with full jitter on a 30 s ceiling, honor Retry-After when FedEx sends one, and set pg-boss retryLimit to 0 so exactly one layer owns retries. Write the handler change.",
-    },
+    script: { text: v.recognizeText },
     advanceWhen: (c) => recognitionsSince(c).some((r) => r.status === "proposed"),
     waiting: "Helm reads your message as Claude replies (a few seconds).",
     fallbackWhen: (c) => {
@@ -226,9 +265,10 @@ export const TOUR_STEPS: TourStep[] = [
     id: "done",
     title: "That's the loop",
     body:
-      "Harvest, prune, practice, recognize, all inside the work. The rule everywhere: Helm observes and proposes; you judge. Every panel has small ? hints, Eli in the header is a second person to explore as (maritime law, Dutch Harbor), and Reset restores a seed. Walkthrough in the header runs this again.",
+      `Harvest, prune, practice, recognize, all inside the work. The rule everywhere: Helm observes and proposes; you judge. Every panel has small ? hints, ${personaId === "backend" ? "Eli in the header is a second person to explore as (maritime law, Dutch Harbor)" : "Maya in the header is a second person to explore as (backend engineering)"}, and Reset restores a seed. Walkthrough in the header runs this again, as either of them.`,
     anchor: (c) => c.dom('[data-testid="active-set-strip"]'),
     manual: true,
     nextLabel: "Finish",
   },
-];
+  ];
+}
