@@ -11,6 +11,7 @@
  *   npx tsx scripts/generate-seeds.ts maritime        # one persona
  *   npx tsx scripts/generate-seeds.ts backend --reprune   # redo only the final proposal
  *   npx tsx scripts/generate-seeds.ts --fill-studio       # give seeded Studio sessions a real thread
+ *   npx tsx scripts/generate-seeds.ts --fill-summaries    # and a real "where you were" card
  *   npx tsx scripts/generate-seeds.ts --clean-evidence    # drop quotes that aren't the learner's words
  */
 
@@ -168,7 +169,7 @@ async function generate(pid: PersonaId) {
             conceptId: ids[0],
             entry: "scheduled",
             materialExchangeId: pickMaterial(s, ids[0])?.id,
-            workSummary: "Seeded session; work summary not retained.",
+            workSummary: PLACEHOLDER_SUMMARY,
           },
           studioAt,
         );
@@ -252,6 +253,24 @@ async function fillStudio(pid: PersonaId) {
   console.log(`  wrote seeds/${pid}.json`);
 }
 
+const PLACEHOLDER_SUMMARY = "Seeded session; work summary not retained.";
+
+/** Give seeded Studio sessions a real "where you were" card from the work before them. */
+async function fillSummaries(pid: PersonaId) {
+  const { summarizeCall } = await import("@/lib/server/calls");
+  const state = JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState;
+  let sessions = state.studioSessions;
+  for (const session of state.studioSessions) {
+    if (session.workSummary && session.workSummary !== PLACEHOLDER_SUMMARY) continue;
+    const before = state.exchanges.filter((e) => e.kind === "work" && e.ts < session.startedAt);
+    const workSummary = await summarizeCall(before);
+    sessions = sessions.map((s) => (s.id === session.id ? { ...s, workSummary } : s));
+    console.log(`=== ${pid}: ${session.id} where-you-were →\n${workSummary}`);
+  }
+  writeSeed(pid, { ...state, studioSessions: sessions });
+  console.log(`  wrote seeds/${pid}.json`);
+}
+
 /** Drop evidence quotes that aren't the learner's own words (same check as applyHarvest). */
 function cleanEvidence(pid: PersonaId) {
   const state = JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState;
@@ -292,6 +311,7 @@ async function main() {
   const flagReprune = args.includes("--reprune");
   const flagClean = args.includes("--clean-evidence");
   const flagStudio = args.includes("--fill-studio");
+  const flagSummaries = args.includes("--fill-summaries");
   const flagRestamp = args.includes("--restamp");
   const only = args.find((a) => !a.startsWith("--")) as PersonaId | undefined;
   for (const pid of PERSONA_IDS) {
@@ -300,6 +320,7 @@ async function main() {
       const st = writeSeed(pid, JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState);
       console.log(`=== ${pid}: seed version ${st.seedVersion}`);
     } else if (flagClean) cleanEvidence(pid);
+    else if (flagSummaries) await fillSummaries(pid);
     else if (flagStudio) await fillStudio(pid);
     else if (flagReprune) await reprune(pid);
     else await generate(pid);

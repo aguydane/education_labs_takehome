@@ -7,7 +7,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { client, MODELS } from "@/lib/claude";
 import { buildHarvestPrompt, HarvestSchema, type HarvestOutput } from "@/lib/pipeline/harvest";
-import { buildStudioSystem, STUDIO_OPENING_USER } from "@/lib/pipeline/practice";
+import { buildStudioSystem, buildSummarizePrompt, STUDIO_OPENING_USER } from "@/lib/pipeline/practice";
 import { buildPrunePrompt, PruneSchema, type PruneOutput } from "@/lib/pipeline/prune";
 import { buildRecognizePrompt, RecognizeSchema, type RecognizeOutput } from "@/lib/pipeline/recognize";
 import type {
@@ -54,6 +54,25 @@ export async function recognizeCall(
     output_config: { effort: "low", format: zodOutputFormat(RecognizeSchema) },
   });
   return response.parsed_output ?? { proposals: [] };
+}
+
+/** The "where you were" card: three lines over the most recent work exchanges. */
+export async function summarizeCall(exchanges: Exchange[]): Promise<string> {
+  const recent = exchanges.filter((e) => e.kind === "work").slice(-6);
+  const { system, user } = buildSummarizePrompt(recent);
+  const response = await client.messages.create({
+    model: MODELS.background,
+    max_tokens: 400,
+    system,
+    messages: [{ role: "user", content: user }],
+    thinking: { type: "disabled" },
+    output_config: { effort: "low" },
+  });
+  return response.content
+    .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
+    .map((b) => b.text)
+    .join("")
+    .trim();
 }
 
 /** One Studio turn, non-streaming (the route streams; the seed generator doesn't need to). */

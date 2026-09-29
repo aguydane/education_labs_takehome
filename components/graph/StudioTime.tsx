@@ -105,11 +105,23 @@ export default function StudioTime({
                       selected ? "bg-accent-soft" : "hover:bg-panel-2"
                     }`}
                   >
-                    <span className="block text-ink-2">
+                    <span className="flex flex-wrap items-center gap-x-1 text-ink-2">
                       <span className="tabular-nums">{fmtDate(s.startedAt)}</span> ·{" "}
                       <span className="font-medium text-ink">{name}</span> · {ENTRY_WORDS[s.entry]} · {s.rung}
-                      {resumed > 0 ? ` · resumed ×${resumed}` : ""}
-                      {!s.endedAt ? " · open" : ""}
+                      {resumed > 0 ? (
+                        <span
+                          data-testid="history-revisited"
+                          title={`Reopened ${resumed} time${resumed === 1 ? "" : "s"} to dig in further`}
+                          className={`ml-1 rounded-full px-1.5 py-px text-[10px] font-medium ${
+                            resumed >= 2 ? "bg-accent text-white" : "bg-accent-soft text-accent-ink"
+                          }`}
+                        >
+                          revisited{resumed >= 2 ? ` ×${resumed}` : ""}
+                        </span>
+                      ) : null}
+                      {!s.endedAt ? (
+                        <span className="ml-1 rounded-full border border-rule px-1.5 py-px text-[10px]">open</span>
+                      ) : null}
                     </span>
                     <span className={`mt-0.5 block line-clamp-2 ${s.closingStatement ? "text-ink" : "text-ink-2"}`}>
                       {s.closingStatement ? `“${s.closingStatement}”` : "no closing statement"}

@@ -280,8 +280,9 @@ export function endStudio(
   return {
     ...state,
     concepts,
+    // A resumed session that is left without a new closing sentence keeps its old one.
     studioSessions: state.studioSessions.map((s) =>
-      s.id === sessionId ? { ...s, endedAt: now, closingStatement } : s,
+      s.id === sessionId ? { ...s, endedAt: now, closingStatement: closingStatement ?? s.closingStatement } : s,
     ),
     ui: { ...state.ui, mode: "work", activeStudioId: undefined },
   };

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "seedVersion": "12e882a297",
+  "seedVersion": "2df0579f20",
   "persona": {
     "id": "maritime",
     "name": "Eli Brandt",
@@ -2016,7 +2016,7 @@
       "entry": "scheduled",
       "startedAt": "2026-09-15T06:49:51.959Z",
       "materialExchangeId": "ex_maritime_06",
-      "workSummary": "Seeded session; work summary not retained.",
+      "workSummary": "Working on: Whether McCorpen bars maintenance and cure for Kowalski given his concealed 2021 back surgery, since his lawyer argues the current L3-L4 herniation is a different level than the prior L4-L5 discectomy.\n\nCurrent status: Concealment (Question 14, checked NO) and materiality (port captain to confirm) are supportable; the open issue is the causal-link element, pending Dr. Hsu's causation write-up from last week's IME.\n\nNext: Get Dr. Hsu's causation opinion on whether the L4-L5 discectomy and L3-L4 herniation are medically connected (adjacent-level degeneration or independent), then confirm materiality with the port captain.",
       "messages": [
         {
           "role": "assistant",

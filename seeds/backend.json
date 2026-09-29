@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "seedVersion": "70ef646d96",
+  "seedVersion": "2bcbebb3b8",
   "persona": {
     "id": "backend",
     "name": "Maya Okafor",
@@ -2320,7 +2320,7 @@
       "entry": "scheduled",
       "startedAt": "2026-09-16T03:06:33.525Z",
       "materialExchangeId": "ex_backend_03",
-      "workSummary": "Seeded session; work summary not retained.",
+      "workSummary": "Running the delivered_at backfill across prod shards (ap-southeast → eu-central → us-west → us-east), pre-check/run/post-check per shard with replica lag monitoring.\nStaging validated clean (1.2M rows, ~4 min, no lag); app has been writing delivered_at for new events since Tuesday; prod run just started on ap-southeast.\nConfirm ap-southeast's post-check count (missing should be 0), then proceed to eu-central.",
       "messages": [
         {
           "role": "assistant",
