@@ -8,7 +8,9 @@ import styles from "./graph.module.css";
 import { CloseIcon } from "./icons";
 import { HINTS } from "./hints";
 import ShowInChat from "./ShowInChat";
+import { notesOf } from "@/lib/pipeline/notes";
 import Connections from "./Connections";
+import Notes from "./Notes";
 import { BTN, BTN_ON, ICON_BTN, STATE_LABEL, fmtDate } from "./shared";
 import StateDot from "./StateDot";
 
@@ -212,6 +214,13 @@ export default function ConceptDetail({
         </div>
 
         <Connections conceptId={c.id} onSelectConcept={onSelectConcept} />
+
+        <Notes
+          testPrefix="detail"
+          notes={notesOf(c)}
+          onAdd={(text) => actions.addConceptNote(c.id, text)}
+          onRemove={(noteId) => actions.removeConceptNote(c.id, noteId)}
+        />
 
         <Section title="In your words" count={evidence.length}>
           {evidence.length === 0 ? (

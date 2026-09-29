@@ -9,6 +9,7 @@ import CalendarStrip from "./CalendarStrip";
 import { useNow } from "./clock";
 import ConceptDetail from "./ConceptDetail";
 import EdgeDetail from "./EdgeDetail";
+import SessionViewer from "./SessionViewer";
 import { useRecognitionFlashes } from "./flashes";
 import GraphCanvas from "./GraphCanvas";
 import { HINTS } from "./hints";
@@ -20,7 +21,11 @@ import PrunePanel from "./PrunePanel";
 import Rail from "./Rail";
 import { ICON_BTN, edgeKey, graphFor } from "./shared";
 
-type Selection = { type: "node"; id: string } | { type: "edge"; key: string } | null;
+type Selection =
+  | { type: "node"; id: string }
+  | { type: "edge"; key: string }
+  | { type: "session"; id: string }
+  | null;
 
 /**
  * The graph panel: the learner's map of what their work has surfaced, where
@@ -40,6 +45,7 @@ export default function GraphPanel() {
   const panelRef = useRef<HTMLDivElement>(null);
   const selectNode = useCallback((id: string | null) => setSelection(id ? { type: "node", id } : null), []);
   const selectEdge = useCallback((key: string) => setSelection({ type: "edge", key }), []);
+  const selectSession = useCallback((id: string) => setSelection({ type: "session", id }), []);
   const clearSelection = useCallback(() => setSelection(null), []);
   const [played, setPlayed] = useState<Readonly<Record<string, true>>>({});
   const flashes = useRecognitionFlashes(state, now);
@@ -55,6 +61,13 @@ export default function GraphPanel() {
   const selected = selection?.type === "node" && concepts[selection.id] ? selection.id : null;
   const selectedEdge =
     selection?.type === "edge" ? (graph.edges.find((e) => edgeKey(e) === selection.key) ?? null) : null;
+  const selectedSession =
+    selection?.type === "session" && state.studioSessions.some((x) => x.id === selection.id) ? selection.id : null;
+  const noteCounts = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const c of Object.values(concepts)) if (c.notes?.length) out[c.id] = c.notes.length;
+    return out;
+  }, [concepts]);
 
   const { toggleGraph } = actions;
   const openFromRail = useCallback(
@@ -86,7 +99,9 @@ export default function GraphPanel() {
   useEffect(() => {
     const body = dockBodyRef.current;
     if (!body) return;
-    const card = body.querySelector<HTMLElement>('[data-testid="concept-detail"], [data-testid="edge-detail"]');
+    const card = body.querySelector<HTMLElement>(
+      '[data-testid="concept-detail"], [data-testid="edge-detail"], [data-testid="session-viewer"]',
+    );
     body.scrollTo({ top: focusedNow || !card ? 0 : card.offsetTop });
   }, [focusedNow]);
 
@@ -115,13 +130,15 @@ export default function GraphPanel() {
       Expand
     </button>
   );
-  const expandOn: "node" | "edge" | "prune" | null = selected
+  const expandOn: "node" | "edge" | "session" | "prune" | null = selected
     ? "node"
     : selectedEdge
       ? "edge"
-      : pending
-        ? "prune"
-        : null;
+      : selectedSession
+        ? "session"
+        : pending
+          ? "prune"
+          : null;
 
   // Dock children, keyed so they keep their state when the order changes between layouts.
   const inbox = <Inbox key="inbox" onOpenConcept={selectNode} />;
@@ -152,6 +169,14 @@ export default function GraphPanel() {
       onSelectConcept={selectNode}
       onClose={clearSelection}
       headerAction={expandOn === "edge" ? expand : null}
+    />
+  ) : selectedSession ? (
+    <SessionViewer
+      key={`session-${selectedSession}`}
+      sessionId={selectedSession}
+      onSelectConcept={selectNode}
+      onClose={clearSelection}
+      headerAction={expandOn === "session" ? expand : null}
     />
   ) : null;
   const placeholder =
@@ -195,7 +220,12 @@ export default function GraphPanel() {
           </button>
         </header>
 
-        <CalendarStrip />
+        <CalendarStrip
+          now={now}
+          focused={focused}
+          selectedSessionId={selectedSession}
+          onSelectSession={selectSession}
+        />
 
         <GraphCanvas
           graph={graph}
@@ -204,6 +234,7 @@ export default function GraphPanel() {
           onSelect={selectNode}
           selectedEdgeKey={selectedEdge ? edgeKey(selectedEdge) : null}
           onSelectEdge={selectEdge}
+          noteCounts={noteCounts}
           proposal={pending}
           flashes={flashes}
           played={played}
@@ -213,12 +244,12 @@ export default function GraphPanel() {
         <Legend />
       </div>
 
-      {/* The dock: the selected concept or link, a pending proposal, what's waiting, and the active set.
+      {/* The dock: the selected concept, link, or past session, a pending proposal, what's waiting, and the active set.
           Below the map it is sized to its content up to a cap; as a column it takes the full height. */}
       <div
         data-testid="graph-dock"
         className={`flex flex-col ${
-          focused ? "order-first h-full w-[400px] shrink-0 border-r border-rule" : "max-h-[33%] shrink-0 border-t border-rule"
+          focused ? "order-first h-full w-[400px] shrink-0 border-r border-rule" : "max-h-[30%] shrink-0 border-t border-rule"
         }`}
       >
         {focused ? (

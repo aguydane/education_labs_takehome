@@ -26,6 +26,8 @@ type Props = {
   layout: LayoutStore;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  /** How many journal notes each concept carries (for the small tick and the tooltip). */
+  noteCounts: Readonly<Record<string, number>>;
   /** Edge selection, mutually exclusive with a selected node (the parent enforces it). */
   selectedEdgeKey: string | null;
   onSelectEdge: (key: string) => void;
@@ -70,6 +72,7 @@ function GraphCanvas({
   onSelect,
   selectedEdgeKey,
   onSelectEdge,
+  noteCounts,
   proposal,
   flashes,
   played,
@@ -432,7 +435,17 @@ function GraphCanvas({
                   strokeWidth={HOLLOW[n.state] ? 1.5 : 1}
                 />
                 {n.pinned ? (
-                  <circle cx={r * 0.72} cy={-r * 0.72} r={2.6} fill="var(--ink)" stroke="var(--panel)" strokeWidth={1} />
+                  <circle cx={-r * 0.72} cy={-r * 0.72} r={2.6} fill="var(--ink)" stroke="var(--panel)" strokeWidth={1} />
+                ) : null}
+                {noteCounts[n.id] ? (
+                  // A small tick off the top-right of the circle: this idea has notes.
+                  <path
+                    d={`M ${r * 0.71 + 1.5} ${-r * 0.71 - 1.5} l 4 -4`}
+                    stroke="var(--ink-2)"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
                 ) : null}
                 {delegated ? (
                   <line
@@ -491,6 +504,7 @@ function GraphCanvas({
           w={w}
           h={h}
           reasoning={hovered.recommended ? reasoning.get(hovered.id) : undefined}
+          notes={noteCounts[hovered.id] ?? 0}
         />
       ) : null}
     </div>
@@ -505,8 +519,10 @@ function NodeTooltip({
   w,
   h,
   reasoning,
+  notes,
 }: {
   node: GraphNode;
+  notes: number;
   x: number;
   y: number;
   r: number;
@@ -527,7 +543,7 @@ function NodeTooltip({
       style={{ left, top, width, maxWidth: width }}
     >
       <div className="font-medium text-ink">{node.name}</div>
-      <div className="mt-0.5 flex items-center gap-1.5 text-ink-2">
+      <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-ink-2">
         <StateDot state={node.state} />
         {STATE_LABEL[node.state]}
         <span aria-hidden>·</span>
@@ -535,6 +551,12 @@ function NodeTooltip({
         {node.pinned ? (
           <>
             <span aria-hidden>·</span>pinned
+          </>
+        ) : null}
+        {notes > 0 ? (
+          <>
+            <span aria-hidden>·</span>
+            {notes} note{notes === 1 ? "" : "s"}
           </>
         ) : null}
       </div>

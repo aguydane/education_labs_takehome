@@ -1,21 +1,42 @@
 "use client";
 
+import { useState } from "react";
 import { useLearner } from "@/lib/learner-context";
+import { upcomingBlocks } from "@/lib/pipeline/calendar";
 import Hint from "@/components/ui/Hint";
 import { Spinner } from "./icons";
+import StudioTime from "./StudioTime";
 import { HINTS, HINT_OPENS_LEFT } from "./hints";
 import { BTN, DAY_LONG, DAY_SHORT, blockRange } from "./shared";
 
 const WEEKDAYS = [1, 2, 3, 4, 5];
 
-/** The learning budget and the week's Studio block(s), as colleagues would see them. */
-export default function CalendarStrip() {
+/**
+ * The learning budget, the week's Studio block(s) as colleagues would see
+ * them, and (on demand) upcoming studio time and the history of sessions.
+ */
+export default function CalendarStrip({
+  now,
+  focused,
+  selectedSessionId,
+  onSelectSession,
+}: {
+  now: number;
+  /** In the column layout there is room to show studio time by default. */
+  focused: boolean;
+  selectedSessionId: string | null;
+  onSelectSession: (id: string) => void;
+}) {
   const { state, busy, studio, actions } = useLearner();
+  const [openPref, setOpenPref] = useState<boolean | null>(null);
+  const open = openPref ?? focused;
   const blocks = state.calendar;
-  const first = blocks[0];
+  const upcoming = upcomingBlocks(state, new Date(now));
+  const first = upcoming[0]?.block;
   const fallback = state.activeSet.conceptIds.find((cid) => !!state.concepts[cid]);
   const conceptFor = (conceptId?: string) => state.concepts[conceptId ?? fallback ?? ""];
   const target = first ? conceptFor(first.conceptId) : undefined;
+  const sessions = state.studioSessions.length;
   const entering = busy.summarize || !!studio?.entering;
   const inStudio = state.ui.mode === "studio";
 
@@ -39,7 +60,7 @@ export default function CalendarStrip() {
               onClick={() => {
                 if (target) void actions.enterStudio({ conceptId: target.id, entry: "scheduled" });
               }}
-              title="Simulate the block arriving: save where you were, then enter Studio"
+              title="Simulate your soonest block arriving: save where you were, then enter Studio"
             >
               {entering ? (
                 <>
@@ -104,6 +125,29 @@ export default function CalendarStrip() {
             .map((b) => `${DAY_SHORT[b.dayOfWeek]} ${blockRange(b)}`)
             .join(", ")}
         </p>
+      ) : null}
+
+      <div className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-2">
+        <span className="font-medium text-ink">Studio time</span>
+        <Hint text={HINTS.studioTime} label="About studio time" />
+        <span className="min-w-0 flex-1 truncate">
+          {upcoming[0]
+            ? `next ${new Date(upcoming[0].at).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}`
+            : "nothing scheduled"}
+          {` · ${sessions} past session${sessions === 1 ? "" : "s"}`}
+        </span>
+        <button
+          type="button"
+          data-testid="calendar-studio-toggle"
+          aria-expanded={open}
+          onClick={() => setOpenPref(!open)}
+          className="shrink-0 rounded px-1.5 py-0.5 text-ink-2 underline-offset-2 hover:text-ink hover:underline"
+        >
+          {open ? "Hide" : "Upcoming & history"}
+        </button>
+      </div>
+      {open ? (
+        <StudioTime now={now} selectedSessionId={selectedSessionId} onSelectSession={onSelectSession} />
       ) : null}
     </section>
   );

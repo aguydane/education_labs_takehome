@@ -26,6 +26,8 @@ The first visit opens the **walkthrough**: a scripted loop on the real app, as M
 
 Switch personas from the header; Reset restores a persona's seed. The graph panel's dock (concept detail, edge card, proposal) can be expanded into a full-height column beside the map when you want to read it alongside the graph.
 
+The map is also a journal. You can write dated notes on any idea or edge; Studio reads your notes on an idea and Prune weighs your latest one. Opening an edge asks Claude for a short, openly speculative take on why those two ideas keep meeting in your work (cached on the edge). The Studio section of the panel lists upcoming blocks with real dates (schedule more from there) and every past session, which you can reopen and continue.
+
 State lives in your browser (one key per persona), so every visitor gets their own sandbox.
 
 ## Run it locally

@@ -46,6 +46,12 @@ export async function mockClaudeRoutes(page: Page) {
   await page.route("**/api/chat", (route) => text(route, MOCK.chatReply));
   await page.route("**/api/beat", (route) => text(route, MOCK.beatText));
   await page.route("**/api/summarize", (route) => json(route, { summary: MOCK.summary }));
+  await page.route("**/api/edge", (route) => {
+    const body = route.request().postDataJSON() as { a: { name: string }; b: { name: string } };
+    return json(route, {
+      insight: `My guess: ${body.a.name} and ${body.b.name} keep meeting because one decides whether the other's output is right.`,
+    });
+  });
 
   await page.route("**/api/studio", (route) => {
     // The route adds the session-start user turn itself, so any user message

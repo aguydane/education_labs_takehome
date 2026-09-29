@@ -5,10 +5,14 @@ import { useLearner } from "@/lib/learner-context";
 import type { GraphEdge } from "@/lib/pipeline/graph";
 import { sharedExchanges } from "@/lib/pipeline/relations";
 import styles from "./graph.module.css";
-import { CloseIcon } from "./icons";
+import Hint from "@/components/ui/Hint";
+import { findRelation } from "@/lib/pipeline/notes";
+import { HINTS } from "./hints";
+import { CloseIcon, Spinner } from "./icons";
+import Notes from "./Notes";
 import ShowInChat from "./ShowInChat";
 import StateDot from "./StateDot";
-import { BTN, ICON_BTN, edgeKindLine, edgeSentence, exchangesLabel, fmtDate } from "./shared";
+import { BTN, ICON_BTN, edgeKey, edgeKindLine, edgeSentence, exchangesLabel, fmtDate } from "./shared";
 
 const EXCERPT = 90;
 
@@ -34,8 +38,23 @@ export default function EdgeDetail({
   /** Optional control shown in the header row (the dock's "Expand"). */
   headerAction?: ReactNode;
 }) {
-  const { state, actions } = useLearner();
+  const { state, busy, actions } = useLearner();
   const rootRef = useRef<HTMLElement>(null);
+  const askedRef = useRef(false);
+
+  const found = findRelation(state, edge.source, edge.target, edge.kind);
+  const insight = found?.rel.insight;
+  const notes = found?.rel.notes ?? [];
+  const hasRelation = !!found;
+  const thinking = busy.edges.includes(edgeKey(edge));
+  const { explainEdge } = actions;
+
+  // Ask Claude once per opening when the link has no insight yet.
+  useEffect(() => {
+    if (askedRef.current || insight || !hasRelation) return;
+    askedRef.current = true;
+    void explainEdge(edge.source, edge.target, edge.kind);
+  }, [insight, hasRelation, explainEdge, edge.source, edge.target, edge.kind]);
 
   // Bring the card into view inside the dock when it opens.
   useEffect(() => {
@@ -89,7 +108,36 @@ export default function EdgeDetail({
         </button>
       </header>
 
-      <div className="space-y-3 px-4 py-3">
+      <div className="space-y-4 px-4 py-3">
+        <section data-testid="edge-insight">
+          <h4 className="flex items-center gap-1.5 text-xs font-medium text-ink-2">
+            Why these meet
+            <Hint text={HINTS.edgeInsight} label="About this speculation" />
+          </h4>
+          {thinking ? (
+            <p className="mt-1.5 flex items-center gap-2 text-sm text-ink-2">
+              <Spinner /> Claude is thinking about this link…
+            </p>
+          ) : insight ? (
+            <p className="mt-1.5 text-sm leading-relaxed text-ink">{insight.text}</p>
+          ) : (
+            <p className="mt-1.5 text-sm text-ink-2">No read on this link yet.</p>
+          )}
+          {!thinking ? (
+            <p className="mt-1 text-xs text-ink-2">
+              {insight ? `${fmtDate(insight.ts)} · ` : ""}
+              <button
+                type="button"
+                data-testid="edge-rethink"
+                onClick={() => void explainEdge(edge.source, edge.target, edge.kind)}
+                className="underline decoration-dotted underline-offset-2 hover:text-ink"
+              >
+                {insight ? "Rethink" : "Ask Claude"}
+              </button>
+            </p>
+          ) : null}
+        </section>
+
         <p className="text-sm text-ink">{edgeSentence(edge, name)}.</p>
 
         {edge.kind === "cooccur" ? (
@@ -119,6 +167,13 @@ export default function EdgeDetail({
             </p>
           </section>
         ) : null}
+
+        <Notes
+          testPrefix="edge"
+          notes={notes}
+          onAdd={(text) => actions.addRelationNote(edge.source, edge.target, edge.kind, text)}
+          onRemove={(noteId) => actions.removeRelationNote(edge.source, edge.target, edge.kind, noteId)}
+        />
 
         {drawn ? (
           <button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useLearner } from "@/lib/learner-context";
+import { upcomingBlocks } from "@/lib/pipeline/calendar";
 import { pendingNudges } from "@/lib/pipeline/triggers";
 import { recentlyRecognized, type Flashes } from "./flashes";
 import { ChevronLeft, InboxIcon, StudioIcon } from "./icons";
@@ -32,7 +33,7 @@ export default function Rail({
 }) {
   const { state, studio, actions } = useLearner();
   const waiting = pendingNudges(state).length;
-  const next = state.calendar[0];
+  const next = upcomingBlocks(state, new Date(now))[0]?.block;
   const activeIds = state.activeSet.conceptIds.filter((cid) => !!state.concepts[cid]);
   const first = activeIds[0];
   const studioBlocked = state.ui.mode === "studio" || !!studio?.entering;

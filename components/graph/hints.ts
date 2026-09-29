@@ -15,6 +15,11 @@ export const HINTS = {
   connections:
     "Lines from your work join ideas that came up in the same exchange. You can add your own: related, or one that needs another first.",
   inbox: "Offers Helm has raised: a beat, studio time, or an idea that's gone quiet. Nothing here interrupts you; it waits.",
+  edgeInsight:
+    "Claude's guess at why these two ideas keep meeting in your work and what understanding one does for judging the other. It's speculation; your notes below are the record.",
+  notes: "Your own words about this idea, over time. Studio reads them, and Prune weighs your latest one.",
+  studioTime:
+    "Studio time is protected time on one idea. Upcoming blocks are on your calendar (colleagues see Busy); history is every session, and you can reopen one to dig further.",
 } as const;
 
 /** For a Hint near the right edge of the panel: open its tooltip leftward so it isn't clipped. */

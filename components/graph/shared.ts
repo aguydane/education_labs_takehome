@@ -6,7 +6,7 @@
 import { deriveGraph, type Graph } from "@/lib/pipeline/graph";
 import { PERSONAS } from "@/lib/personas";
 import { createInitialState } from "@/lib/state";
-import type { CalendarBlock, Concept, ConceptState, LearnerState, RelationKind } from "@/lib/types";
+import type { CalendarBlock, Concept, ConceptState, LearnerState, RelationKind, StudioEntry } from "@/lib/types";
 
 export const STATE_ORDER: ConceptState[] = ["noticed", "chosen", "practicing", "durable", "delegated", "dormant"];
 
@@ -176,6 +176,14 @@ export function graphFor(
 ): Graph {
   return deriveGraph({ ...SHELL, concepts, activeSet }, new Date(minute * 60_000).toISOString());
 }
+
+// ---- Studio ----------------------------------------------------------------
+
+export const ENTRY_WORDS: Record<StudioEntry, string> = {
+  scheduled: "scheduled",
+  opportunistic: "while a task ran",
+  manual: "from the map",
+};
 
 // ---- Styles ----------------------------------------------------------------
 

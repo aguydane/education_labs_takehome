@@ -9,10 +9,13 @@ import { MOCK, mockClaudeRoutes } from "./mocks";
 async function open(page: Page, persona: "backend" | "maritime" = "backend") {
   await mockClaudeRoutes(page);
   await page.addInitScript((p) => {
-    // Fresh seed every test: drop persisted state, pin the persona, skip the intro.
+    // Fresh seed once per test (contexts are per test, so sessionStorage is too):
+    // drop persisted state, pin the persona, skip the walkthrough. Reloads keep state.
+    if (window.sessionStorage.getItem("helm:test-cleared")) return;
     window.localStorage.clear();
     window.localStorage.setItem("helm:persona", p);
     window.localStorage.setItem("helm:tour", JSON.stringify({ done: true }));
+    window.sessionStorage.setItem("helm:test-cleared", "1");
   }, persona);
   await page.goto("/");
   await expect(page.getByTestId("work-panel")).toBeVisible();
@@ -254,6 +257,60 @@ test.describe("Helm", () => {
     await expect(page.locator(`[data-testid="graph-node-${targetId}"]`)).toBeVisible();
     await detail.getByTestId("detail-connections").getByRole("button", { name: /remove/i }).first().click();
     await expect(detail.getByTestId("detail-connections")).not.toContainText("you drew");
+  });
+
+  test("the learner can journal on an idea and Studio sees it", async ({ page }) => {
+    await open(page);
+    await page.locator('[data-testid^="graph-node-"]').first().click();
+    const detail = page.getByTestId("concept-detail");
+    await detail.getByTestId("detail-note-input").fill("I keep confusing this with the sort column rule.");
+    await detail.getByTestId("detail-note-add").click();
+    const note = detail.getByTestId(/^detail-note-note_/).first();
+    await expect(note).toContainText("confusing this");
+    // The note is part of the concept, so it survives a reload.
+    await page.reload();
+    await page.locator('[data-testid^="graph-node-"]').first().click();
+    await expect(page.getByTestId("concept-detail")).toContainText("confusing this");
+    await page.getByTestId("concept-detail").getByTestId("detail-note-remove").first().click();
+    await expect(page.getByTestId("concept-detail")).not.toContainText("confusing this");
+  });
+
+  test("an edge card explains why two ideas meet and takes notes", async ({ page }) => {
+    await open(page);
+    await page.locator('[data-testid^="graph-edge-"]').first().dispatchEvent("click");
+    const edge = page.getByTestId("edge-detail");
+    await expect(edge).toBeVisible();
+    await expect(edge).toContainText("My guess:");
+    await edge.getByTestId("edge-note-input").fill("These two are really the same decision.");
+    await edge.getByTestId("edge-note-add").click();
+    await expect(edge.getByTestId(/^edge-note-note_/).first()).toContainText("same decision");
+  });
+
+  test("studio time can be scheduled, listed, and past sessions reopened", async ({ page }) => {
+    await open(page);
+    // The seed has one block and one past session. The list is behind a toggle below the map.
+    await page.getByTestId("calendar-studio-toggle").click();
+    await expect(page.getByTestId("calendar-strip")).toContainText(/Upcoming/i);
+    await page.getByTestId("calendar-add").click();
+    await page.getByTestId("calendar-add-day").selectOption({ index: 2 });
+    await page.getByTestId("calendar-add-time").fill("09:30");
+    await page.getByTestId("calendar-add-submit").click();
+    expect(await page.locator('[data-testid^="calendar-remove-"]').count()).toBeGreaterThanOrEqual(2);
+
+    const history = page.locator('[data-testid^="history-studio_"]').first();
+    await expect(history).toBeVisible();
+    await history.click();
+    const viewer = page.getByTestId("session-viewer");
+    await expect(viewer).toBeVisible();
+    await viewer.getByTestId("session-resume").click();
+    const studio = page.getByTestId("studio-view");
+    await expect(studio).toBeVisible();
+    await studio.getByTestId("studio-composer").fill("Picking this back up: what would I check first?");
+    await studio.getByTestId("studio-send").click();
+    await expect(studio.getByTestId("studio-messages")).toContainText(MOCK.studioReply);
+    await studio.getByTestId("studio-back").click();
+    await studio.getByTestId("studio-leave").click();
+    await expect(page.getByTestId("work-panel")).toBeVisible();
   });
 
   test("the dock can expand into a full-height column beside the map", async ({ page }) => {
