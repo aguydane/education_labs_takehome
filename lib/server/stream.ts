@@ -14,6 +14,8 @@ export function textStreamResponse(stream: MessageStream): Response {
         const final = await stream.finalMessage();
         if (final.stop_reason === "refusal") {
           controller.enqueue(encoder.encode("\n\n[Claude declined to continue this response.]"));
+        } else if (final.stop_reason === "max_tokens") {
+          controller.enqueue(encoder.encode("\n\n[Claude ran out of room here. Ask it to continue.]"));
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);

@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     }
     const stream = client.messages.stream({
       model: MODELS.learner,
-      max_tokens: 3000,
+      max_tokens: 8000,
       system: [{ type: "text", text: chatSystem(body.personaId), cache_control: { type: "ephemeral" } }],
       messages,
       output_config: { effort: "medium" },

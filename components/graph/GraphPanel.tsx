@@ -12,7 +12,7 @@ import EdgeDetail from "./EdgeDetail";
 import { useRecognitionFlashes } from "./flashes";
 import GraphCanvas from "./GraphCanvas";
 import { HINTS } from "./hints";
-import { ChevronRight } from "./icons";
+import { ChevronRight, ColumnIcon, DockBelowIcon } from "./icons";
 import Inbox from "./Inbox";
 import { LayoutStore } from "./layout";
 import Legend from "./Legend";
@@ -79,6 +79,17 @@ export default function GraphPanel() {
     return () => window.removeEventListener("keydown", onKey);
   }, [hasSelection, clearSelection]);
 
+  // Switching layouts reorders the dock without remounting it, so bring the
+  // selected card back into view: at the top of the column, or scrolled to under the map.
+  const focusedNow = !!state.ui.dockFocused;
+  const dockBodyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const body = dockBodyRef.current;
+    if (!body) return;
+    const card = body.querySelector<HTMLElement>('[data-testid="concept-detail"], [data-testid="edge-detail"]');
+    body.scrollTo({ top: focusedNow || !card ? 0 : card.offsetTop });
+  }, [focusedNow]);
+
   if (state.ui.graphCollapsed) {
     return <Rail flashes={flashes} now={now} onOpenConcept={openFromRail} />;
   }
@@ -88,69 +99,146 @@ export default function GraphPanel() {
   const pending = proposal && pruneNudge ? proposal : undefined;
   const total = Object.keys(concepts).length;
 
-  return (
-    <div ref={panelRef} data-testid="graph-panel" className="flex h-full flex-col overflow-y-auto">
-      <header className="flex h-11 shrink-0 items-center gap-2 border-b border-rule pl-4 pr-2">
-        <h2 className="text-sm font-semibold text-ink">Your map</h2>
-        <Hint text={HINTS.map} label="About your map" />
-        <span className="text-xs text-ink-2">
-          {total} concept{total === 1 ? "" : "s"}
-        </span>
-        <button
-          type="button"
-          data-testid="graph-toggle"
-          onClick={toggleGraph}
-          aria-label="Collapse your map to the rail"
-          aria-expanded
-          title="Collapse to the rail"
-          className={`ml-auto ${ICON_BTN}`}
-        >
-          <ChevronRight />
-        </button>
-      </header>
+  const focused = focusedNow;
+  const { setDockFocused } = actions;
 
-      <CalendarStrip />
+  // Exactly one "Expand" control, on the card that heads the dock.
+  const expand = focused ? null : (
+    <button
+      type="button"
+      data-testid="dock-focus"
+      onClick={() => setDockFocused(true)}
+      title="Open this as a column beside the map"
+      className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs text-ink-2 transition-colors hover:bg-panel-2 hover:text-ink"
+    >
+      <ColumnIcon className="h-3.5 w-3.5" />
+      Expand
+    </button>
+  );
+  const expandOn: "node" | "edge" | "prune" | null = selected
+    ? "node"
+    : selectedEdge
+      ? "edge"
+      : pending
+        ? "prune"
+        : null;
 
-      <GraphCanvas
-        graph={graph}
-        layout={layout}
-        selectedId={selected}
-        onSelect={selectNode}
-        selectedEdgeKey={selectedEdge ? edgeKey(selectedEdge) : null}
-        onSelectEdge={selectEdge}
+  // Dock children, keyed so they keep their state when the order changes between layouts.
+  const inbox = <Inbox key="inbox" onOpenConcept={selectNode} />;
+  const activeStrip = <ActiveSetStrip key="active" selectedId={selected} onOpenConcept={selectNode} />;
+  const prunePanel =
+    pending && pruneNudge ? (
+      <PrunePanel
+        key={`prune-${pending.ts}`}
         proposal={pending}
-        flashes={flashes}
-        played={played}
-        onFlashDone={markPlayed}
+        nudge={pruneNudge}
         now={now}
+        onOpenConcept={selectNode}
+        headerAction={expandOn === "prune" ? expand : null}
       />
-      <Legend />
+    ) : null;
+  const selectionCard = selected ? (
+    <ConceptDetail
+      key={`node-${selected}`}
+      conceptId={selected}
+      onSelectConcept={selectNode}
+      onClose={clearSelection}
+      headerAction={expandOn === "node" ? expand : null}
+    />
+  ) : selectedEdge ? (
+    <EdgeDetail
+      key={`edge-${edgeKey(selectedEdge)}`}
+      edge={selectedEdge}
+      onSelectConcept={selectNode}
+      onClose={clearSelection}
+      headerAction={expandOn === "edge" ? expand : null}
+    />
+  ) : null;
+  const placeholder =
+    focused && !selectionCard && !prunePanel ? (
+      <p key="placeholder" className="px-4 py-10 text-center text-sm text-ink-2">
+        Select an idea or a line on the map.
+      </p>
+    ) : null;
 
-      {/* The dock: what's waiting, the active set, a pending proposal, and the selected concept or link.
-          Sized to its content up to a cap and scrolling inside, so the map keeps the room. */}
-      <div className="relative max-h-[33%] shrink-0 overflow-y-auto border-t border-rule">
-        <Inbox onOpenConcept={selectNode} />
-        <ActiveSetStrip selectedId={selected} onOpenConcept={selectNode} />
-        {pending && pruneNudge ? (
-          <PrunePanel
-            key={pending.ts}
-            proposal={pending}
-            nudge={pruneNudge}
-            now={now}
-            onOpenConcept={selectNode}
-          />
+  // Under the map: the small things first, the card last. As a column: the card first.
+  const dockChildren = focused
+    ? [selectionCard, prunePanel, placeholder, inbox, activeStrip]
+    : [inbox, activeStrip, prunePanel, selectionCard];
+
+  // One tree for both layouts (only classes and child order change), so nothing
+  // remounts when the learner switches: checkbox choices and scroll positions survive.
+  return (
+    <div
+      ref={panelRef}
+      data-testid="graph-panel"
+      data-dock={focused ? "column" : "below"}
+      className={`flex h-full ${focused ? "flex-row" : "flex-col overflow-y-auto"}`}
+    >
+      <div className={`flex flex-col ${focused ? "min-w-0 flex-1 overflow-y-auto" : "flex-1"}`}>
+        <header className="flex h-11 shrink-0 items-center gap-2 border-b border-rule pl-4 pr-2">
+          <h2 className="text-sm font-semibold text-ink">Your map</h2>
+          <Hint text={HINTS.map} label="About your map" />
+          <span className="text-xs text-ink-2">
+            {total} concept{total === 1 ? "" : "s"}
+          </span>
+          <button
+            type="button"
+            data-testid="graph-toggle"
+            onClick={toggleGraph}
+            aria-label="Collapse your map to the rail"
+            aria-expanded
+            title="Collapse to the rail"
+            className={`ml-auto ${ICON_BTN}`}
+          >
+            <ChevronRight />
+          </button>
+        </header>
+
+        <CalendarStrip />
+
+        <GraphCanvas
+          graph={graph}
+          layout={layout}
+          selectedId={selected}
+          onSelect={selectNode}
+          selectedEdgeKey={selectedEdge ? edgeKey(selectedEdge) : null}
+          onSelectEdge={selectEdge}
+          proposal={pending}
+          flashes={flashes}
+          played={played}
+          onFlashDone={markPlayed}
+          now={now}
+        />
+        <Legend />
+      </div>
+
+      {/* The dock: the selected concept or link, a pending proposal, what's waiting, and the active set.
+          Below the map it is sized to its content up to a cap; as a column it takes the full height. */}
+      <div
+        data-testid="graph-dock"
+        className={`flex flex-col ${
+          focused ? "order-first h-full w-[400px] shrink-0 border-r border-rule" : "max-h-[33%] shrink-0 border-t border-rule"
+        }`}
+      >
+        {focused ? (
+          <div className="flex h-11 shrink-0 items-center justify-between gap-2 border-b border-rule pl-4 pr-2">
+            <span className="text-xs text-ink-2">Details</span>
+            <button
+              type="button"
+              data-testid="dock-unfocus"
+              onClick={() => setDockFocused(false)}
+              title="Put these details back under the map"
+              className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-ink-2 transition-colors hover:bg-panel-2 hover:text-ink"
+            >
+              <DockBelowIcon className="h-3.5 w-3.5" />
+              Dock below map
+            </button>
+          </div>
         ) : null}
-        {selected ? (
-          <ConceptDetail key={selected} conceptId={selected} onSelectConcept={selectNode} onClose={clearSelection} />
-        ) : null}
-        {selectedEdge ? (
-          <EdgeDetail
-            key={edgeKey(selectedEdge)}
-            edge={selectedEdge}
-            onSelectConcept={selectNode}
-            onClose={clearSelection}
-          />
-        ) : null}
+        <div ref={dockBodyRef} className="relative min-h-0 flex-1 overflow-y-auto">
+          {dockChildren}
+        </div>
       </div>
     </div>
   );

@@ -50,7 +50,8 @@ export async function pruneCall(state: LearnerState, now?: string): Promise<Prun
   const { system, user } = buildPrunePrompt(state, now);
   const response = await client.messages.parse({
     model: MODELS.learner,
-    max_tokens: 3000,
+    // Thinking counts against the cap; a truncated JSON body is unparseable.
+    max_tokens: 8000,
     system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: user }],
     output_config: { effort: "high", format: zodOutputFormat(PruneSchema) },

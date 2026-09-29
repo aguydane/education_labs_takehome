@@ -36,6 +36,7 @@ function Empty({ children }: { children: ReactNode }) {
 
 /** Everything Helm has recorded about one concept, and the learner's controls over it. */
 export default function ConceptDetail({
+  headerAction,
   conceptId,
   onSelectConcept,
   onClose,
@@ -43,6 +44,8 @@ export default function ConceptDetail({
   conceptId: string;
   onSelectConcept: (id: string) => void;
   onClose: () => void;
+  /** Optional control shown in the header row (the dock's "Expand"). */
+  headerAction?: ReactNode;
 }) {
   const { state, studio, actions } = useLearner();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -100,6 +103,7 @@ export default function ConceptDetail({
             {c.pinned ? <span className="rounded-full bg-panel-2 px-2 py-0.5 text-ink-2">pinned</span> : null}
           </div>
         </div>
+        {headerAction}
         <button type="button" data-testid="detail-close" onClick={onClose} aria-label="Close" title="Close" className={ICON_BTN}>
           <CloseIcon />
         </button>

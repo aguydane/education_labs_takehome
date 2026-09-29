@@ -32,7 +32,9 @@ export async function POST(req: Request) {
 
     const stream = client.messages.stream({
       model: MODELS.learner,
-      max_tokens: 1500,
+      // Opus 5.5 thinks before it writes and the thinking counts against
+      // max_tokens, so the cap has to leave room for both.
+      max_tokens: 8000,
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages,
       output_config: { effort: "high" },

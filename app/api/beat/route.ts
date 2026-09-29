@@ -20,7 +20,8 @@ export async function POST(req: Request) {
     const { system, user } = buildBeatPrompt(body.concept, body.exchange, persona);
     const stream = client.messages.stream({
       model: MODELS.learner,
-      max_tokens: 600,
+      // The beat itself is ≤200 words; the rest of the cap is for thinking.
+      max_tokens: 3000,
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: user }],
       output_config: { effort: "low" },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useLearner } from "@/lib/learner-context";
 import Hint from "@/components/ui/Hint";
 import type { Nudge, PruneProposal } from "@/lib/types";
@@ -13,6 +13,7 @@ import StateDot from "./StateDot";
  * Keyed by proposal timestamp by the parent, so a new proposal resets the choice.
  */
 export default function PrunePanel({
+  headerAction,
   proposal,
   nudge,
   now,
@@ -22,6 +23,8 @@ export default function PrunePanel({
   nudge: Nudge;
   now: number;
   onOpenConcept: (id: string) => void;
+  /** Optional control shown in the header row (the dock's "Expand"). */
+  headerAction?: ReactNode;
 }) {
   const { state, actions } = useLearner();
   const { size } = state.activeSet;
@@ -49,12 +52,13 @@ export default function PrunePanel({
 
   return (
     <section data-testid="prune-panel" className="border-t border-rule bg-panel-2 px-4 py-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="flex items-center gap-1.5 text-xs font-medium text-ink">
+      <div className="flex items-center gap-3">
+        <h3 className="flex flex-1 items-center gap-1.5 text-xs font-medium text-ink">
           Proposed active set
           <Hint text={HINTS.proposal} label="About this proposal" />
         </h3>
         <span className="text-xs text-ink-2">{ago(proposal.ts, now)}</span>
+        {headerAction}
       </div>
       {proposal.summary ? (
         <div className="mt-1">

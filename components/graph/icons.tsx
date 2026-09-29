@@ -47,6 +47,26 @@ export function StudioIcon({ className = "h-4 w-4" }: IconProps) {
   );
 }
 
+/** A panel with a side column: open the dock as a column beside the map. */
+export function ColumnIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="4" width="14" height="12" rx="1.5" />
+      <path d="M8.5 4v12" />
+    </svg>
+  );
+}
+
+/** A panel with a bottom strip: put the dock back under the map. */
+export function DockBelowIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="4" width="14" height="12" rx="1.5" />
+      <path d="M3 11.5h14" />
+    </svg>
+  );
+}
+
 export function CloseIcon({ className = "h-4 w-4" }: IconProps) {
   return (
     <svg {...base} className={className}>

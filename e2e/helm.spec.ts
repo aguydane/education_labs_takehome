@@ -240,6 +240,22 @@ test.describe("Helm", () => {
     await expect(detail.getByTestId("detail-connections")).not.toContainText("you drew");
   });
 
+  test("the dock can expand into a full-height column beside the map", async ({ page }) => {
+    await open(page);
+    await page.locator('[data-testid^="graph-node-"]').first().click();
+    const detail = page.getByTestId("concept-detail");
+    await expect(detail).toBeVisible();
+    await page.getByTestId("dock-focus").click();
+    await expect(page.getByTestId("graph-region")).toHaveAttribute("data-focused", "true");
+    await expect(detail).toBeVisible();
+    await expect(page.getByTestId("graph-canvas")).toBeVisible();
+    // The column is the learner's layout choice: closing the detail keeps it.
+    await detail.getByTestId("detail-close").click();
+    await expect(page.getByTestId("graph-region")).toHaveAttribute("data-focused", "true");
+    await page.getByTestId("dock-unfocus").click();
+    await expect(page.getByTestId("graph-region")).toHaveAttribute("data-focused", "false");
+  });
+
   test("the page itself never scrolls", async ({ page }) => {
     await open(page);
     await page.setViewportSize({ width: 1000, height: 560 });

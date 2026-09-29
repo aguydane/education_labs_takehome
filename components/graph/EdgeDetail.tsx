@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useLearner } from "@/lib/learner-context";
 import type { GraphEdge } from "@/lib/pipeline/graph";
 import { sharedExchanges } from "@/lib/pipeline/relations";
@@ -23,6 +23,7 @@ function excerpt(text: string): string {
  * concepts came up; links the learner drew can be removed.
  */
 export default function EdgeDetail({
+  headerAction,
   edge,
   onSelectConcept,
   onClose,
@@ -30,6 +31,8 @@ export default function EdgeDetail({
   edge: GraphEdge;
   onSelectConcept: (id: string) => void;
   onClose: () => void;
+  /** Optional control shown in the header row (the dock's "Expand"). */
+  headerAction?: ReactNode;
 }) {
   const { state, actions } = useLearner();
   const rootRef = useRef<HTMLElement>(null);
@@ -80,6 +83,7 @@ export default function EdgeDetail({
           </div>
           <p className="mt-1 px-1 text-xs text-ink-2">{edgeKindLine(edge)}</p>
         </div>
+        {headerAction}
         <button type="button" data-testid="edge-close" onClick={onClose} aria-label="Close" title="Close" className={ICON_BTN}>
           <CloseIcon />
         </button>
