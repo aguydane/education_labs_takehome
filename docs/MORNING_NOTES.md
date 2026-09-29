@@ -9,7 +9,10 @@ Written at the end of the overnight build, 2026-09-28. Read this first.
 - **Edges:** every edge so far was a co-occurrence edge from harvest (two ideas in the same exchange; weight = number of exchanges). Now: hover shows why two ideas are joined, click opens an edge card listing the shared exchanges, and the concept detail has a Connections section where you can draw *related* or *prerequisite* links (and remove the ones you drew). `lib/pipeline/relations.ts`.
 - **Evidence is checked:** you caught harvest quoting Claude's reply as "from what you wrote". The prompt now says verbatim-from-the-learner only, and `lib/pipeline/evidence.ts` checks it mechanically: a quote not found in the learner's message is dropped along with the confidence estimate that leaned on it. Ran the same check over the seeds (`npm run seeds -- --clean-evidence`): 7 backend and 11 maritime quotes were dropped (mostly paraphrases like "asked to 'write the migration'…").
 - **Links back to the chat:** "Show in chat" on chip popovers, on evidence rows in the concept detail, and on edge-card exchanges scrolls the chat to the exchange and underlines the quoted words.
-- **In-place explanations:** a "How Helm works" overlay (opens on first visit, then from the header) and small "?" hints on every panel section, using one shared `Hint` component.
+- **In-place explanations:** small "?" hints on every panel section, using one shared `Hint` component.
+- **Walkthrough instead of a static intro (your call):** `lib/tour.ts` is the script (13 steps), `components/Tour.tsx` the engine. It spotlights live elements, offers "Send this" for the two scripted messages, and advances on real state (harvest attached, Beat answered, proposal returned, Studio mode, recognition proposed). It restores Maya's seed on Start so the steps line up, resumes across reloads, and has fallbacks for the two steps that depend on the model's judgment (a Studio offer, a recognition). Verified live through the Beat step and end to end under mocks (the e2e test walks all 13 steps).
+- **Dock as a third column:** `ui.dockFocused` + an Expand control on the dock; the aside widens to 70% and the dock content gets full height beside the map.
+- **Tooltip on recommended nodes** shows Claude's full proposal reasoning with a label, instead of three clamped lines.
 
 ## Where things stand
 

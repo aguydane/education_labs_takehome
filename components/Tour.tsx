@@ -66,7 +66,8 @@ export default function Tour() {
   }, [ctx, step, tour.active, isLast]);
 
   // Bring the anchor into view when a step starts.
-  const anchorEl = tour.active && step?.anchor ? step.anchor(ctx) : null;
+  const anchor = tour.active && step?.anchor ? step.anchor(ctx) : null;
+  const anchorEl = anchor instanceof Element ? anchor : null;
   const scrolledFor = useRef<string | null>(null);
   useEffect(() => {
     if (!anchorEl || !step) return;
@@ -89,7 +90,7 @@ export default function Tour() {
 
   if (!tour.active || !step) return null;
 
-  const rawRect = anchorEl?.getBoundingClientRect() ?? null;
+  const rawRect = anchor instanceof Element ? anchor.getBoundingClientRect() : anchor;
   const vw = typeof window === "undefined" ? 1200 : window.innerWidth;
   const vh = typeof window === "undefined" ? 800 : window.innerHeight;
   // An anchor scrolled out of view gets no spotlight; the card centers instead.

@@ -20,12 +20,14 @@ export type TourCtx = {
   domAll: (selector: string) => Element[];
 };
 
+export type TourAnchor = Element | DOMRect | null;
+
 export type TourStep = {
   id: string;
   title: string;
   body: string;
-  /** The element to spotlight. Undefined centers the card with no spotlight. */
-  anchor?: (c: TourCtx) => Element | null;
+  /** The element (or a rect covering several) to spotlight. Undefined centers the card. */
+  anchor?: (c: TourCtx) => TourAnchor;
   /** A message the learner can send with one click. */
   script?: { text: string };
   /** Auto-advance once this is true. */
@@ -56,10 +58,20 @@ function last<T>(xs: T[]): T | undefined {
   return xs[xs.length - 1];
 }
 
-function lastChipRow(c: TourCtx): Element | null {
-  const chips = c.domAll('[data-testid^="concept-chip-"]');
-  const el = last(chips);
-  return el?.parentElement ?? null;
+/** The chips under the newest reply, as one rect. */
+function lastChipRow(c: TourCtx): TourAnchor {
+  const newest = last(exchangesSince(c));
+  const scope = newest ? c.dom(`[data-testid="exchange-${newest.id}"]`) : null;
+  const chips = scope
+    ? Array.from(scope.querySelectorAll('[data-testid^="concept-chip-"]'))
+    : c.domAll('[data-testid^="concept-chip-"]').slice(-4);
+  if (chips.length === 0) return null;
+  const rects = chips.map((el) => el.getBoundingClientRect());
+  const left = Math.min(...rects.map((r) => r.left));
+  const top = Math.min(...rects.map((r) => r.top));
+  const right = Math.max(...rects.map((r) => r.right));
+  const bottom = Math.max(...rects.map((r) => r.bottom));
+  return new DOMRect(left, top, right - left, bottom - top);
 }
 
 function activeStudioSession(c: TourCtx) {
@@ -104,7 +116,7 @@ export const TOUR_STEPS: TourStep[] = [
     title: "What a chip holds",
     body:
       "\"Why it matters here\" is what the idea lets you judge or specify in this exchange, not what you lack. \"From what you wrote\" is the evidence, your words only, with a link back to them. The three buttons overrule Helm: I know this, I don't, or keep delegating, which is a fine answer for most ideas. Now take the beat: from the offer under the reply, or from the button right here.",
-    anchor: (c) => c.dom('[data-testid="chip-popover"]') ?? lastChipRow(c),
+    anchor: (c) => (c.dom('[data-testid="chip-popover"]') as TourAnchor) ?? lastChipRow(c),
     advanceWhen: (c) => c.beat !== null,
     waiting: "Click Take a beat.",
   },

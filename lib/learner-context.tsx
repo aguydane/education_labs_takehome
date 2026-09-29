@@ -137,6 +137,8 @@ export type LearnerActions = {
   /** Nudges and layout. */
   dismissNudge: (nudgeId: string) => void;
   toggleGraph: () => void;
+  /** Dock as a full-height column beside the map (true) or below it (false). */
+  setDockFocused: (focused: boolean) => void;
 };
 
 export type LearnerContextValue = {
@@ -623,6 +625,10 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     () => update((s) => ({ ...s, ui: { ...s.ui, graphCollapsed: !s.ui.graphCollapsed } })),
     [update],
   );
+  const setDockFocused = useCallback(
+    (focused: boolean) => update((s) => ({ ...s, ui: { ...s.ui, dockFocused: focused } })),
+    [update],
+  );
   const finishTask = useCallback(() => update((s) => finishLongTask(s)), [update]);
 
   const actions = useMemo<LearnerActions>(
@@ -651,6 +657,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       revealExchange,
       dismissNudge,
       toggleGraph,
+      setDockFocused,
     }),
     [
       switchPersona,
@@ -677,6 +684,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       revealExchange,
       dismissNudge,
       toggleGraph,
+      setDockFocused,
     ],
   );
 

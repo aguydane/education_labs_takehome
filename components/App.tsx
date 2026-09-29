@@ -21,6 +21,7 @@ export default function App() {
 function Shell() {
   const { state, beat } = useLearner();
   const collapsed = state.ui.graphCollapsed;
+  const focused = !collapsed && !!state.ui.dockFocused;
   const inStudio = state.ui.mode === "studio";
 
   // First visit: the walkthrough's welcome card opens by itself.
@@ -38,9 +39,14 @@ function Shell() {
         </main>
         <aside
           className={`shrink-0 border-l border-rule bg-panel transition-[width] duration-200 ${
-            collapsed ? "w-[72px]" : "w-[44%] max-w-[600px] min-w-[360px]"
+            collapsed
+              ? "w-[72px]"
+              : focused
+                ? "w-[70%] max-w-[1040px] min-w-[760px]"
+                : "w-[44%] max-w-[600px] min-w-[360px]"
           }`}
           data-testid="graph-region"
+          data-focused={focused ? "true" : "false"}
         >
           <GraphPanel />
         </aside>

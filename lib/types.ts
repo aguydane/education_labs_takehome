@@ -263,6 +263,11 @@ export type LearnerState = {
     graphCollapsed: boolean;
     mode: "work" | "studio";
     activeStudioId?: string;
+    /**
+     * The graph panel's dock (concept detail, edge card, proposal) opens as
+     * a full-height column beside the map instead of below it.
+     */
+    dockFocused?: boolean;
   };
 };
 

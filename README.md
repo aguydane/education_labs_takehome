@@ -22,7 +22,9 @@ Two seeded personas ship mid-story, so the loop is visible in the first minute:
 - **Maya Okafor**, backend engineer at a logistics SaaS (Postgres, queues, migrations).
 - **Eli Brandt**, second-year associate at a Seattle admiralty firm defending vessel owners and P&I clubs in the Bering Sea fishing fleet, mostly out of Dutch Harbor. The legal content is illustrative, not verified.
 
-Suggested walk: send a work message and watch the chips arrive; ask a "why" question and take the Beat it offers; open Prune and read the reasoning; kick off the long task and book Studio for the wait; then write a sharper prompt on an active concept and confirm the recognition. Switch personas from the header; Reset restores a persona's seed. "How Helm works" in the header explains the parts, and every panel carries small "?" hints in place.
+The first visit opens the **walkthrough**: a scripted loop on the real app, as Maya. Each step spotlights a live element, hands you the exact message to send when one is needed, and advances only when the real thing has happened (chips arrive, the Beat opens, the proposal returns, Studio starts, a recognition fires). It's about eight minutes, resumes across reloads, and can be restarted from the header. There is no separate tutorial: the onboarding is the product being used. Every panel also carries small "?" hints in place.
+
+Switch personas from the header; Reset restores a persona's seed. The graph panel's dock (concept detail, edge card, proposal) can be expanded into a full-height column beside the map when you want to read it alongside the graph.
 
 State lives in your browser (one key per persona), so every visitor gets their own sandbox.
 
