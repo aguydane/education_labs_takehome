@@ -19,28 +19,17 @@ Helm is a web app (Next.js on Vercel, Claude API on the server) that runs a four
 ```mermaid
 flowchart LR
     W([Ordinary work with Claude]) -->|every exchange| H
-
-    H["**Harvest**<br/>the ideas underneath a reply,<br/>and how sure Helm is you have them<br/><i>from your words only</i>"]
-    P["**Prune**<br/>a proposed active set of 2–3 ideas,<br/>with reasoning"]
-    R["**Recognize**<br/>your own wording shows<br/>an idea in use"]
-
-    subgraph PR["**Practice**"]
-        direction TB
-        B["Beat<br/>2–5 min aside inside the work"]
-        S["Studio<br/>protected time on your own past exchange<br/>modeling → coaching → fading"]
-    end
-
-    H -->|chips: I know this · I don't · keep delegating| P
-    P -->|you accept, untick, or keep the set| PR
-    PR -->|closing sentence: what would you now specify differently?| R
-    R -->|confirm, or reject with a reason| H
-
-    R -.->|confirmations over weeks| D([durable])
-
+    H["Harvest<br/>the ideas underneath a reply, and how sure<br/>Helm is you have them, <i>from your words only</i>"]
+    P["Prune<br/>a proposed active set of 2–3 ideas,<br/>with reasoning"]
+    X["Practice<br/>Beat: a 2–5 minute aside inside the work<br/>Studio: protected time on your own past exchange,<br/>modeling → coaching → fading"]
+    R["Recognize<br/>your own wording shows an idea in use;<br/>Helm quotes it and asks"]
+    H -->|"chips: I know this · I don't · keep delegating"| P
+    P -->|"you accept, untick, or keep the set"| X
+    X -->|"closing sentence: what would you<br/>now specify differently?"| R
+    R -->|"confirm, or reject with a reason"| H
+    R -.->|"confirmations over weeks"| D([durable])
     classDef step fill:#dcecec,stroke:#1f6f73,color:#0f4a4f
-    classDef mode fill:#ffffff,stroke:#1f6f73,color:#1b211f
-    class H,P,R step
-    class B,S mode
+    class H,P,X,R step
 ```
 
 *Claude observes and proposes at every arrow; the learner judges at every arrow.*
