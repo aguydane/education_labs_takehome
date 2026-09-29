@@ -12,7 +12,7 @@ async function open(page: Page, persona: "backend" | "maritime" = "backend") {
     // Fresh seed every test: drop persisted state, pin the persona, skip the intro.
     window.localStorage.clear();
     window.localStorage.setItem("helm:persona", p);
-    window.localStorage.setItem("helm:intro-seen", "1");
+    window.localStorage.setItem("helm:tour", JSON.stringify({ done: true }));
   }, persona);
   await page.goto("/");
   await expect(page.getByTestId("work-panel")).toBeVisible();
@@ -26,9 +26,9 @@ async function send(page: Page, message: string) {
 }
 
 test.describe("Helm", () => {
-  test("explains itself on the first visit and from the header afterwards", async ({ page }) => {
+  test("the walkthrough runs the whole loop on the real app", async ({ page }) => {
     await mockClaudeRoutes(page);
-    // Clear once for a first visit; the reload below must keep the "seen" flag.
+    // A first visit: nothing in storage. Only clear once so reloads keep progress.
     await page.addInitScript(() => {
       if (!window.sessionStorage.getItem("helm:test-cleared")) {
         window.localStorage.clear();
@@ -36,18 +36,54 @@ test.describe("Helm", () => {
       }
     });
     await page.goto("/");
-    const intro = page.getByTestId("intro-overlay");
-    await expect(intro).toBeVisible();
-    await expect(intro).toContainText("Harvest");
-    await intro.getByTestId("intro-start").click();
-    await expect(intro).toBeHidden();
+    const card = page.getByTestId("tour-card");
+    const atStep = async (id: string) => expect(card).toHaveAttribute("data-step", id);
+
+    await atStep("welcome");
+    await card.getByTestId("tour-start").click();
+
+    await atStep("send-why");
+    await card.getByTestId("tour-send").click();
+    await atStep("chips");
+    await page.locator('[data-testid^="concept-chip-"]').last().click();
+    await atStep("popover");
+    await page.getByTestId("chip-beat").click();
+    await atStep("beat");
+    await page.getByTestId("beat-answer").fill("I'd move the range column last.");
+    await page.getByTestId("beat-reply").click();
+    await atStep("map");
+    await page.getByTestId("beat-close").click();
+    await page.getByTestId("prune-button").click();
+    await atStep("proposal");
+    await page.getByTestId("prune-accept").click();
+    await atStep("long-task");
+    await page.getByTestId("work-longtask").click();
+    await atStep("studio-offer");
+    await page.getByTestId("studio-offer-book").click();
+    await atStep("studio");
+    await page.getByTestId("studio-composer").fill("carrier_id and status, then created_at for the sort.");
+    await page.getByTestId("studio-send").click();
+    await atStep("studio-close");
+    await page.getByTestId("studio-back").click();
+    await page.getByTestId("studio-closing-input").fill("I'd say which columns the index has to cover.");
+    await page.getByTestId("studio-closing-submit").click();
+    await atStep("recognize");
+    // "or write your own": a message the mocked recognizer treats as evidence.
+    await send(page, `Add a ${MOCK.recognizePhrase} on status where it is not null and check the planner uses it.`);
+    await atStep("confirm");
+    await page.getByTestId("recognition-confirm").click();
+    await atStep("done");
+    await card.getByTestId("tour-finish").click();
+    await expect(card).toBeHidden();
+
+    // Finished stays finished across a reload; the header can start it again.
     await page.reload();
     await expect(page.getByTestId("work-panel")).toBeVisible();
-    await expect(page.getByTestId("intro-overlay")).toBeHidden();
-    await page.getByTestId("header-how").click();
-    await expect(page.getByTestId("intro-overlay")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("intro-overlay")).toBeHidden();
+    await expect(card).toBeHidden();
+    await page.getByTestId("header-walkthrough").click();
+    await atStep("welcome");
+    await card.getByTestId("tour-skip").click();
+    await expect(card).toBeHidden();
   });
 
   test("loads a seeded persona with history and a map", async ({ page }) => {

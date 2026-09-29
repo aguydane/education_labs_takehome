@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useEffect } from "react";
 import Header from "@/components/Header";
-import IntroOverlay, { introSeen, markIntroSeen } from "@/components/Intro";
+import Tour from "@/components/Tour";
 import GraphPanel from "@/components/graph/GraphPanel";
 import BeatOverlay from "@/components/modes/BeatOverlay";
 import StudioView from "@/components/modes/StudioView";
 import WorkPanel from "@/components/work/WorkPanel";
 import { LearnerProvider, useLearner } from "@/lib/learner-context";
+import { shouldAutoOpen, tourStore } from "@/lib/tour-store";
 
 export default function App() {
   return (
@@ -21,17 +22,15 @@ function Shell() {
   const { state, beat } = useLearner();
   const collapsed = state.ui.graphCollapsed;
   const inStudio = state.ui.mode === "studio";
-  // "How Helm works" opens by itself on the first visit, then from the header.
-  const [introOpen, setIntroOpen] = useState(() => !introSeen());
-  const closeIntro = useCallback(() => {
-    markIntroSeen();
-    setIntroOpen(false);
+
+  // First visit: the walkthrough's welcome card opens by itself.
+  useEffect(() => {
+    if (shouldAutoOpen()) tourStore.open();
   }, []);
 
   return (
     <div className="relative flex h-dvh flex-col overflow-clip bg-bg text-ink">
-      <Header onHelp={() => setIntroOpen(true)} />
-      <IntroOverlay open={introOpen} onClose={closeIntro} />
+      <Header onHelp={() => tourStore.open()} />
       <div className="flex min-h-0 flex-1">
         <main className="relative flex min-w-0 flex-1 flex-col" data-testid="main-region">
           {inStudio ? <StudioView /> : <WorkPanel />}
@@ -46,6 +45,7 @@ function Shell() {
           <GraphPanel />
         </aside>
       </div>
+      <Tour />
     </div>
   );
 }

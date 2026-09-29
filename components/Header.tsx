@@ -51,10 +51,10 @@ export default function Header({ onHelp }: { onHelp?: () => void }) {
         <button
           onClick={onHelp}
           className="text-xs text-ink-2 hover:text-ink"
-          title="What Helm does and what the parts mean"
-          data-testid="header-how"
+          title="Do one full loop, step by step, in the real app"
+          data-testid="header-walkthrough"
         >
-          How Helm works
+          Walkthrough
         </button>
 
         <button

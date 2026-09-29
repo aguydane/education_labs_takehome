@@ -514,14 +514,17 @@ function NodeTooltip({
   h: number;
   reasoning?: string;
 }) {
-  const right = x + r + 12 + TOOLTIP_W <= w - 4;
-  const left = right ? x + r + 12 : Math.max(4, x - r - 12 - TOOLTIP_W);
-  const top = Math.max(4, Math.min(y - 14, h - (reasoning ? 116 : 60)));
+  // Recommended nodes carry Claude's full reasoning from the pending proposal;
+  // give that a wider box and never truncate it.
+  const width = reasoning ? 300 : TOOLTIP_W;
+  const right = x + r + 12 + width <= w - 4;
+  const left = right ? x + r + 12 : Math.max(4, x - r - 12 - width);
+  const top = Math.max(4, Math.min(y - 14, h - (reasoning ? 200 : 60)));
   return (
     <div
       role="tooltip"
       className="pointer-events-none absolute z-10 rounded-md border border-rule bg-panel px-2.5 py-1.5 text-xs shadow-sm"
-      style={{ left, top, maxWidth: TOOLTIP_W }}
+      style={{ left, top, width, maxWidth: width }}
     >
       <div className="font-medium text-ink">{node.name}</div>
       <div className="mt-0.5 flex items-center gap-1.5 text-ink-2">
@@ -535,7 +538,13 @@ function NodeTooltip({
           </>
         ) : null}
       </div>
-      {reasoning ? <p className="mt-1 line-clamp-3 text-ink-2">{reasoning}</p> : null}
+      {reasoning ? (
+        <div className="mt-1.5 border-t border-rule pt-1.5">
+          <p className="text-[11px] uppercase tracking-wide text-ink-2">Why Claude proposes it</p>
+          <p className="mt-0.5 text-ink">{reasoning}</p>
+          <p className="mt-1 text-ink-2">Accept or change the set in the proposal below the map.</p>
+        </div>
+      ) : null}
     </div>
   );
 }

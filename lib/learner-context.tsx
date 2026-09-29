@@ -97,6 +97,8 @@ export type Busy = {
 export type LearnerActions = {
   switchPersona: (personaId: PersonaId) => void;
   resetPersona: () => void;
+  /** Switch to a persona AND restore its seed (the walkthrough starts from here). */
+  startFresh: (personaId: PersonaId) => void;
   update: (fn: (s: LearnerState) => LearnerState) => void;
 
   /** Send a work message. Streams the reply, then harvests and recognizes in the background. */
@@ -590,6 +592,20 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     setStore(new BrowserStore(loadSeed(personaId)));
   }, [personaId]);
 
+  const startFresh = useCallback((p: PersonaId) => {
+    try {
+      localStorage.setItem(PERSONA_KEY, p);
+    } catch {
+      // ignore
+    }
+    BrowserStore.clear(p);
+    abortRef.current?.abort();
+    setBeat(null);
+    setStudio(null);
+    setPersonaId(p);
+    setStore(new BrowserStore(loadSeed(p)));
+  }, []);
+
   const addRelation = useCallback(
     (from: string, to: string, kind: "related" | "prereq") => update((s) => addRelationFn(s, from, to, kind)),
     [update],
@@ -613,6 +629,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     () => ({
       switchPersona,
       resetPersona,
+      startFresh,
       update,
       sendWork: (text) => sendWork(text),
       kickOffLongTask,
@@ -638,6 +655,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     [
       switchPersona,
       resetPersona,
+      startFresh,
       update,
       sendWork,
       kickOffLongTask,
