@@ -12,6 +12,7 @@ import type {
   Exchange,
   LearnerState,
   PersonaId,
+  RelationKind,
   Rung,
   StudioMessage,
 } from "./types";
@@ -101,7 +102,11 @@ export const api = {
     material: { user: string; assistant: string; ts: string } | undefined,
     messages: StudioMessage[],
     onDelta: (delta: string, full: string) => void,
-  ) => streamText("/api/studio", { personaId, concept, rung, material, messages }, onDelta),
+    resumed = false,
+  ) => streamText("/api/studio", { personaId, concept, rung, material, messages, resumed }, onDelta),
 
   summarize: (exchanges: Exchange[]) => postJson<{ summary: string }>("/api/summarize", { exchanges }),
+
+  edge: (personaId: PersonaId, a: Concept, b: Concept, kind: RelationKind, shared: Exchange[]) =>
+    postJson<{ insight: string }>("/api/edge", { personaId, a, b, kind, shared }),
 };

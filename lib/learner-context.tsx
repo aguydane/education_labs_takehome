@@ -45,7 +45,23 @@ import {
   judgeRecognition as judgeRecognitionFn,
   type RecognitionDecision,
 } from "./pipeline/recognize";
-import { addRelation as addRelationFn, removeRelation as removeRelationFn } from "./pipeline/relations";
+import {
+  addCalendarBlock as addCalendarBlockFn,
+  removeCalendarBlock as removeCalendarBlockFn,
+  resumeStudio as resumeStudioFn,
+} from "./pipeline/calendar";
+import {
+  addConceptNote as addConceptNoteFn,
+  addRelationNote as addRelationNoteFn,
+  removeConceptNote as removeConceptNoteFn,
+  removeRelationNote as removeRelationNoteFn,
+  setRelationInsight,
+} from "./pipeline/notes";
+import {
+  addRelation as addRelationFn,
+  removeRelation as removeRelationFn,
+  sharedExchanges,
+} from "./pipeline/relations";
 import {
   dismissNudge as dismissNudgeFn,
   finishLongTask,
@@ -92,6 +108,8 @@ export type Busy = {
   recognize: number;
   prune: boolean;
   summarize: boolean;
+  /** Edge keys ("a|b|kind") whose insight is being fetched. */
+  edges: string[];
 };
 
 export type LearnerActions = {
@@ -133,6 +151,20 @@ export type LearnerActions = {
 
   /** Scroll the work chat to an exchange and flash it (evidence links, edge cards). */
   revealExchange: (exchangeId: string) => void;
+
+  /** The learner's journal: notes on ideas and edges. */
+  addConceptNote: (conceptId: string, text: string) => void;
+  removeConceptNote: (conceptId: string, noteId: string) => void;
+  addRelationNote: (a: string, b: string, kind: RelationKind, text: string) => void;
+  removeRelationNote: (a: string, b: string, kind: RelationKind, noteId: string) => void;
+  /** Ask Claude why two ideas meet; cached on the edge. Resolves when stored. */
+  explainEdge: (a: string, b: string, kind: RelationKind) => Promise<void>;
+
+  /** Studio on the calendar. */
+  addCalendarBlock: (block: { dayOfWeek: number; start: string; durationMin: number; conceptId?: string; note?: string }) => void;
+  removeCalendarBlock: (index: number) => void;
+  /** Reopen a past Studio session and continue it. */
+  resumeStudio: (sessionId: string) => void;
 
   /** Nudges and layout. */
   dismissNudge: (nudgeId: string) => void;
@@ -191,7 +223,14 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
   // with ssr: false), so the store can be built during the first render.
   const [personaId, setPersonaId] = useState<PersonaId>(() => readPersona());
   const [store, setStore] = useState<BrowserStore>(() => new BrowserStore(loadSeed(readPersona())));
-  const [busy, setBusy] = useState<Busy>({ chat: false, harvest: 0, recognize: 0, prune: false, summarize: false });
+  const [busy, setBusy] = useState<Busy>({
+    chat: false,
+    harvest: 0,
+    recognize: 0,
+    prune: false,
+    summarize: false,
+    edges: [],
+  });
   const [beat, setBeat] = useState<BeatUI | null>(null);
   // A Studio session that was open when the page last closed resumes as idle.
   const [studio, setStudio] = useState<StudioUI | null>(() => {
@@ -464,6 +503,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
           (_d, full) => {
             if (live()) setStudio((st) => (st ? { ...st, partial: full } : st));
           },
+          (session.resumedAt?.length ?? 0) > 0,
         );
         if (!live()) return;
         store.update((cur) => appendStudioMessage(cur, sessionId, { role: "assistant", content: text }));
@@ -620,6 +660,65 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     (exchangeId: string) => setReveal((r) => ({ exchangeId, nonce: (r?.nonce ?? 0) + 1 })),
     [],
   );
+
+  // ---- Journal, edge insight, calendar ---------------------------------
+
+  const addConceptNote = useCallback(
+    (conceptId: string, text: string) => update((s) => addConceptNoteFn(s, conceptId, text)),
+    [update],
+  );
+  const removeConceptNote = useCallback(
+    (conceptId: string, noteId: string) => update((s) => removeConceptNoteFn(s, conceptId, noteId)),
+    [update],
+  );
+  const addRelationNote = useCallback(
+    (a: string, b: string, kind: RelationKind, text: string) => update((s) => addRelationNoteFn(s, a, b, kind, text)),
+    [update],
+  );
+  const removeRelationNote = useCallback(
+    (a: string, b: string, kind: RelationKind, noteId: string) =>
+      update((s) => removeRelationNoteFn(s, a, b, kind, noteId)),
+    [update],
+  );
+
+  const explainEdge = useCallback(
+    async (a: string, b: string, kind: RelationKind) => {
+      const key = `${a}|${b}|${kind}`;
+      const s = store.getState();
+      const ca = s.concepts[a];
+      const cb = s.concepts[b];
+      if (!ca || !cb) return;
+      setBusy((x) => (x.edges.includes(key) ? x : { ...x, edges: [...x.edges, key] }));
+      try {
+        const shared = kind === "cooccur" ? sharedExchanges(s, a, b) : [];
+        const { insight } = await api.edge(s.persona.id, ca, cb, kind, shared);
+        if (insight) store.update((cur) => setRelationInsight(cur, a, b, kind, insight));
+      } catch (err) {
+        console.error("edge insight failed", err);
+      } finally {
+        setBusy((x) => ({ ...x, edges: x.edges.filter((k) => k !== key) }));
+      }
+    },
+    [store],
+  );
+
+  const addCalendarBlock = useCallback(
+    (block: { dayOfWeek: number; start: string; durationMin: number; conceptId?: string; note?: string }) =>
+      update((s) => addCalendarBlockFn(s, block)),
+    [update],
+  );
+  const removeCalendarBlock = useCallback((index: number) => update((s) => removeCalendarBlockFn(s, index)), [update]);
+
+  const resumeStudio = useCallback(
+    (sessionId: string) => {
+      const s = store.getState();
+      if (!s.studioSessions.some((x) => x.id === sessionId)) return;
+      studioGenRef.current += 1;
+      store.update((cur) => resumeStudioFn(cur, sessionId));
+      setStudio({ sessionId, streaming: false, partial: "", entering: false });
+    },
+    [store],
+  );
   const dismissNudge = useCallback((nudgeId: string) => update((s) => dismissNudgeFn(s, nudgeId)), [update]);
   const toggleGraph = useCallback(
     () => update((s) => ({ ...s, ui: { ...s.ui, graphCollapsed: !s.ui.graphCollapsed } })),
@@ -655,6 +754,14 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       addRelation,
       removeRelation,
       revealExchange,
+      addConceptNote,
+      removeConceptNote,
+      addRelationNote,
+      removeRelationNote,
+      explainEdge,
+      addCalendarBlock,
+      removeCalendarBlock,
+      resumeStudio,
       dismissNudge,
       toggleGraph,
       setDockFocused,
@@ -682,6 +789,14 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       addRelation,
       removeRelation,
       revealExchange,
+      addConceptNote,
+      removeConceptNote,
+      addRelationNote,
+      removeRelationNote,
+      explainEdge,
+      addCalendarBlock,
+      removeCalendarBlock,
+      resumeStudio,
       dismissNudge,
       toggleGraph,
       setDockFocused,

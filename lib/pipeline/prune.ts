@@ -111,6 +111,7 @@ Rules:
 - An active concept with high confidence and confirmed recognitions is close to graduating to durable. Its low score is success, not a reason to swap it out; keep it and say it is nearly durable, unless a challenger clearly dominates AND the learner has nothing left to practice there.
 - Never recommend concepts whose state is delegated, durable, or dormant.
 - Reasoning per concept: 1–2 sentences, specific to this learner's work and interests. Neutral tone. No praise, no "you should".
+- When a candidate carries a learner's note, treat it as their own judgment about the idea and weigh it; quote it back briefly if it changes the reasoning.
 - summary: two sentences on the overall shape of the recommendation and the one thing the learner might want to weigh.`;
 
 export function buildPrunePrompt(state: LearnerState, now = nowIso()): { system: string; user: string } {
@@ -137,6 +138,7 @@ export function buildPrunePrompt(state: LearnerState, now = nowIso()): { system:
       `  impact: ${c.impact}/5 | signal: ${effectiveSignal(c, now).toFixed(2)} | seen ${c.timesSeen}× | score: ${candidateScore(c, now).toFixed(2)}`,
       `  practice sessions: ${c.practiceLog.length} | confirmed recognitions: ${conf} | last activity: ${last ? `${Math.round(daysBetween(last, now))}d ago` : "none"}`,
       c.evidence.length ? `  latest evidence: "${c.evidence[c.evidence.length - 1].quote}"` : "",
+      c.notes?.length ? `  learner's latest note: "${c.notes[c.notes.length - 1].text.slice(0, 200)}"` : "",
     ]
       .filter(Boolean)
       .join("\n");

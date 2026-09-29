@@ -59,6 +59,13 @@ export type Evidence = {
 
 export type RelationKind = "prereq" | "related" | "cooccur";
 
+/** A dated note the learner writes on a concept or an edge: their own journal. */
+export type Note = {
+  id: string;
+  ts: string;
+  text: string;
+};
+
 /**
  * An edge on the map. "cooccur" edges are written by harvest whenever two
  * concepts come up in the same exchange (weight = how many exchanges);
@@ -70,6 +77,10 @@ export type Relation = {
   kind: RelationKind;
   weight: number;
   source?: "harvest" | "learner";
+  /** Claude's short speculation on why these two ideas meet and why that matters. */
+  insight?: { text: string; ts: string };
+  /** The learner's notes on this edge. */
+  notes?: Note[];
 };
 
 export type PracticeEntry = {
@@ -122,6 +133,8 @@ export type Concept = {
   pinned: boolean;
   /** Don't nudge about this concept until this time. */
   dismissedUntil?: string;
+  /** The learner's notes on this idea, newest last. */
+  notes?: Note[];
 };
 
 /** The projection harvest and recognize see instead of the full history. */
@@ -224,15 +237,20 @@ export type StudioSession = {
   messages: StudioMessage[];
   /** "What would you now specify differently?" — the learner's answer. */
   closingStatement?: string;
+  /** Times the learner reopened this session to dig in further. */
+  resumedAt?: string[];
 };
 
 export type CalendarBlock = {
+  id?: string;
   /** 0 = Sunday … 6 = Saturday */
   dayOfWeek: number;
   /** "14:00" */
   start: string;
   durationMin: number;
   conceptId?: string;
+  /** What the learner wants to get out of it. */
+  note?: string;
 };
 
 export type LongTask = {

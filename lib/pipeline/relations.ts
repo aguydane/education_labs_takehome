@@ -1,4 +1,4 @@
-import type { Concept, Exchange, LearnerState, RelationKind } from "@/lib/types";
+import type { Concept, Exchange, LearnerState, Persona, RelationKind } from "@/lib/types";
 
 /**
  * Edges on the map.
@@ -88,4 +88,47 @@ export function sharedExchanges(state: LearnerState, a: string, b: string): Exch
     const ids = conceptIdsInExchange(state, e);
     return ids.has(a) && ids.has(b);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Edge insight: Claude's short speculation on why two ideas meet
+// ---------------------------------------------------------------------------
+
+export const EDGE_INSIGHT_SYSTEM = `You explain one edge on a learner's concept map inside Helm, a learning layer that runs alongside their ordinary work with Claude.
+
+Two ideas are joined, either because they came up in the same exchanges of the learner's real work, or because the learner linked them by hand. In two or three sentences, say why these two ideas keep meeting in THIS learner's work and what understanding one does for judging the other. Be concrete to the exchanges you're shown; if there are none, reason from the two ideas and the learner's role. Speculate openly ("probably", "my guess") when you're inferring. No headings, no bullets, no praise, no "you should". Plain prose, under 80 words.`;
+
+export function buildEdgeInsightPrompt(
+  a: Concept,
+  b: Concept,
+  kind: RelationKind,
+  shared: Exchange[],
+  persona: Persona,
+): { system: string; user: string } {
+  const how =
+    kind === "cooccur"
+      ? `Came up together in ${shared.length} exchange${shared.length === 1 ? "" : "s"} of the learner's work.`
+      : kind === "prereq"
+        ? `The learner marked "${a.name}" as a prerequisite for "${b.name}".`
+        : `The learner linked these as related.`;
+  const ex = shared
+    .slice(-4)
+    .map((e) => `- ${e.ts.slice(0, 10)}: ${e.user.slice(0, 220).replace(/\s+/g, " ")}`)
+    .join("\n");
+  const user = `LEARNER: ${persona.name}, ${persona.role}.
+Work pattern: ${persona.workPattern}
+
+IDEA A: ${a.name}
+${a.summary}
+Why it matters: ${a.whyItMatters}
+
+IDEA B: ${b.name}
+${b.summary}
+Why it matters: ${b.whyItMatters}
+
+HOW THEY'RE JOINED: ${how}
+${ex ? `\nWHAT THE LEARNER WROTE IN THOSE EXCHANGES\n${ex}` : ""}
+
+Why do these two ideas meet in this learner's work, and what does understanding one do for judging the other?`;
+  return { system: EDGE_INSIGHT_SYSTEM, user };
 }

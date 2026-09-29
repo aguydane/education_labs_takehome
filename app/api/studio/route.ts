@@ -13,6 +13,8 @@ type Body = {
   rung: Rung;
   material?: { user: string; assistant: string; ts: string };
   messages: StudioMessage[];
+  /** The learner reopened a past session. */
+  resumed?: boolean;
 };
 
 export async function POST(req: Request) {
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
     const persona = PERSONAS[body.personaId];
     if (!persona) return Response.json({ error: "unknown persona" }, { status: 400 });
 
-    const system = buildStudioSystem(body.concept, body.rung, body.material, persona);
+    const system = buildStudioSystem(body.concept, body.rung, body.material, persona, !!body.resumed);
     const history: Anthropic.MessageParam[] = (body.messages ?? [])
       .filter((m) => m.content.trim().length > 0)
       .map((m) => ({ role: m.role, content: m.content }));

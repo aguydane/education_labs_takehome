@@ -101,6 +101,7 @@ export function buildStudioSystem(
   rung: Rung,
   material: Pick<Exchange, "user" | "assistant" | "ts"> | undefined,
   persona: Persona,
+  resumed = false,
 ): string {
   const materialText = material
     ? `THE LEARNER'S OWN PAST EXCHANGE (the material for this session)
@@ -116,6 +117,13 @@ ${material.assistant}`
     ? `PRACTICE SO FAR: ${concept.practiceLog.map((p) => `${p.mode}/${p.rung} on ${p.ts.slice(0, 10)}`).join("; ")}`
     : "PRACTICE SO FAR: none";
 
+  const notes = (concept.notes ?? []).slice(-5);
+  const journal = notes.length
+    ? `THE LEARNER'S OWN NOTES ON THIS IDEA (their journal; build on it, and refer to it when it's relevant)\n${notes
+        .map((n) => `- ${n.ts.slice(0, 10)}: ${n.text}`)
+        .join("\n")}`
+    : "";
+
   return `${STUDIO_SYSTEM_BASE}
 
 LEARNER: ${persona.name}, ${persona.role}.
@@ -126,9 +134,9 @@ ${concept.summary}
 Why it matters for this learner: ${concept.whyItMatters}
 ${concept.rubric.length ? `What having it looks like:\n${concept.rubric.map((r) => `- ${r}`).join("\n")}` : ""}
 ${history}
-
+${journal ? `\n${journal}\n` : ""}
 ${RUNG_INSTRUCTIONS[rung]}
-
+${resumed ? "\nTHIS SESSION WAS REOPENED after a break to dig in further. Pick up where the thread left off; don't restart from the beginning, and don't ask the closing question again until the learner is done this time.\n" : ""}
 ${materialText}`;
 }
 
