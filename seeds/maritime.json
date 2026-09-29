@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "seedVersion": "7372e949c7",
+  "seedVersion": "12e882a297",
   "persona": {
     "id": "maritime",
     "name": "Eli Brandt",
@@ -1182,7 +1182,7 @@
           "ts": "2026-09-15T07:21:51.959Z",
           "mode": "studio",
           "rung": "modeling",
-          "note": "Closing: I'd say which months count toward the 30% and ask what facts would break the vessel connection before I lead with it."
+          "note": "Closing: I'd name all three McCorpen elements in the prompt and ask for the causal link between the concealed condition and this injury before I let it lead the motion."
         }
       ],
       "recognitions": [
@@ -2017,9 +2017,38 @@
       "startedAt": "2026-09-15T06:49:51.959Z",
       "materialExchangeId": "ex_maritime_06",
       "workSummary": "Seeded session; work summary not retained.",
-      "messages": [],
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "We'll work only on Kowalski. First move: sort what's already in the file against the three elements, so we can see where the gaps are.\n\n**Element 1: intentional concealment.** Question 14 asks directly about back surgery. He checked NO and signed. The 2021 records show an L4-L5 microdiscectomy. That's strong. What would weaken it: evidence he didn't fill out the form himself, didn't read English well, or that someone at hiring told him to skip it. So I'd want to know who handed him the form and whether anyone helped.\n\n**Element 2: materiality.** The question is on the employer's own form, which is good evidence the answer mattered. It's not proof. I'd still want the port captain or hiring manager to say they wouldn't have hired him without clearance.\n\n**Element 3: connection.** Nothing yet. Dr. Hsu did the IME but hasn't written causation. Right now we have a prior L4-L5 surgery and a new L3-L4 herniation, and no one qualified has linked them.\n\nYour turn: which element do you think opposing counsel's \"different level\" argument is aimed at, and why would they pick that one?"
+        },
+        {
+          "role": "user",
+          "content": "Because McCorpen needs the concealed condition to be causally linked to the injury he's claiming now. If the prior injury was at L3-L4 and this one is at L5-S1, the club's IME has to bridge that gap or the third element fails, and the lie on the form doesn't save us."
+        },
+        {
+          "role": "assistant",
+          "content": "Right element. They're aimed at connection because it's the only one still open: the form and signature nearly lock down concealment, and the question on the employer's own form goes a long way on materiality.\n\nOne correction, and it matters: the levels are reversed. The **concealed** surgery was L4-L5 (2021). The **new** injury is L3-L4. No L5-S1 anywhere in this file. The direction counts, because Hsu has to explain how surgery at L4-L5 affected the segment *above* it.\n\n**Next step: what Hsu's declaration must do.**\n\nIt isn't enough for Hsu to describe both levels. The declaration needs one sentence that does the linking work, something like: *to a reasonable degree of medical probability, the 2021 L4-L5 microdiscectomy increased mechanical load on L3-L4 and contributed to the 2026 herniation.* That sentence is element three. Everything else is support.\n\nWhat would change my mind: if Hsu writes that the L3-L4 herniation is ordinary age-related degeneration he'd expect regardless of the prior surgery. Then connection fails, and the lie on Question 14 doesn't save the defense.\n\nWhen Hsu's draft arrives, what's the first thing you'd look for before sending it to the partner?"
+        },
+        {
+          "role": "user",
+          "content": "So the intake question has to be one a reasonable applicant would read as asking about back injuries specifically, and we need the fleet manager's declaration that they would not have hired him. Reliance is its own element; the lie alone isn't enough."
+        },
+        {
+          "role": "assistant",
+          "content": "Two parts of that are right, and one needs adjusting.\n\n**Right:** The question has to be clear enough that a \"no\" is a knowing lie. Question 14 easily clears that: \"back or neck injury, or back surgery\" names exactly what he had. A fleet manager declaration is also worth getting.\n\n**Adjust:** Reliance isn't a separate fourth element. What you're describing *is* element two, materiality. The test is whether the concealed fact would have mattered to the hiring decision. Courts often treat a specific medical question on the employer's own form, related to the physical demands of the job, as enough on its own. The declaration strengthens materiality. It doesn't satisfy an extra requirement.\n\nSo we're still at three elements. One and two are close to done, and three is open.\n\n**Back to the open question.** Hsu's draft arrives. You have two minutes before it goes to the partner. What's the one thing you'd check for first? Hint: think about the difference between a declaration that *discusses* L4-L5 and L3-L4 and one that *links* them."
+        },
+        {
+          "role": "user",
+          "content": "I think I've got it. I'd name all three McCorpen elements in the prompt and ask for the causal link between the concealed condition and this injury before I let it lead the motion."
+        },
+        {
+          "role": "assistant",
+          "content": "That also answers the Hsu question: you'd look for the one sentence that *links* L4-L5 to L3-L4, not a paragraph that discusses both.\n\nBefore we close, state in one sentence what you would now specify differently in a prompt about this kind of work. Make it concrete enough to use on the next file, so it names what counts as the link, not just that one is needed."
+        }
+      ],
       "endedAt": "2026-09-15T07:21:51.959Z",
-      "closingStatement": "I'd say which months count toward the 30% and ask what facts would break the vessel connection before I lead with it."
+      "closingStatement": "I'd name all three McCorpen elements in the prompt and ask for the causal link between the concealed condition and this injury before I let it lead the motion."
     }
   ],
   "ui": {

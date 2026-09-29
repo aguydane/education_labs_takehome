@@ -523,6 +523,12 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       const s = store.getState();
       if (!s.concepts[opts.conceptId]) return;
       if (opts.nudgeId) store.update((cur) => resolveNudge(cur, opts.nudgeId!));
+      // Starting a new session while one is open closes the open one first.
+      if (s.ui.mode === "studio" && s.ui.activeStudioId) {
+        studioGenRef.current += 1;
+        const openId = s.ui.activeStudioId;
+        store.update((cur) => endStudio(cur, openId));
+      }
 
       // The state-save ritual. Skipped when the work is literally running.
       // Studio mode switches on immediately so the "saving where you were"
@@ -714,7 +720,9 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       const s = store.getState();
       if (!s.studioSessions.some((x) => x.id === sessionId)) return;
       studioGenRef.current += 1;
-      store.update((cur) => resumeStudioFn(cur, sessionId));
+      // Reopening a past session while another is open closes the open one first.
+      const openId = s.ui.mode === "studio" ? s.ui.activeStudioId : undefined;
+      store.update((cur) => resumeStudioFn(openId && openId !== sessionId ? endStudio(cur, openId) : cur, sessionId));
       setStudio({ sessionId, streaming: false, partial: "", entering: false });
     },
     [store],

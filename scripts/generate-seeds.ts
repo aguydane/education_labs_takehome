@@ -10,6 +10,8 @@
  *   npx tsx scripts/generate-seeds.ts                 # both personas
  *   npx tsx scripts/generate-seeds.ts maritime        # one persona
  *   npx tsx scripts/generate-seeds.ts backend --reprune   # redo only the final proposal
+ *   npx tsx scripts/generate-seeds.ts --fill-studio       # give seeded Studio sessions a real thread
+ *   npx tsx scripts/generate-seeds.ts --clean-evidence    # drop quotes that aren't the learner's words
  */
 
 import { config } from "dotenv";
@@ -26,7 +28,7 @@ import { applyProposal, pinConcept, setActiveSet, toProposal } from "@/lib/pipel
 import { activeConceptsOf, applyRecognizeResult, judgeRecognition } from "@/lib/pipeline/recognize";
 import { createInitialState } from "@/lib/state";
 import { MemoryStore } from "@/lib/store/memory";
-import type { Exchange, LearnerState, PersonaId } from "@/lib/types";
+import type { Exchange, LearnerState, PersonaId, StudioMessage } from "@/lib/types";
 
 const SCHEMA_VERSION = "seed-schema-1";
 /** Prune (and choose the first active set) after this many exchanges. */
@@ -46,13 +48,31 @@ const CLOSING: Record<PersonaId, string> = {
   backend:
     "I'd say which columns the index has to cover for the actual predicate and ask for the EXPLAIN before trusting it.",
   maritime:
-    "I'd say which months count toward the 30% and ask what facts would break the vessel connection before I lead with it.",
+    "I'd name all three McCorpen elements in the prompt and ask for the causal link between the concealed condition and this injury before I let it lead the motion.",
 };
 
 type TranscriptFile = {
   personaId: PersonaId;
   exchanges: { daysAgo: number; user: string; assistant: string; longTask?: boolean }[];
 };
+
+
+/**
+ * Every write re-stamps the seed version from its content, so a visitor's
+ * stale browser state is replaced whenever the seed changes in any way.
+ */
+function stamp(state: LearnerState): LearnerState {
+  const { seedVersion: _old, ...rest } = state;
+  void _old;
+  const seedVersion = createHash("sha1").update(JSON.stringify(rest)).digest("hex").slice(0, 10);
+  return { ...state, seedVersion };
+}
+
+function writeSeed(pid: PersonaId, state: LearnerState) {
+  const stamped = stamp(state);
+  writeFileSync(`seeds/${pid}.json`, JSON.stringify(stamped, null, 2));
+  return stamped;
+}
 
 function isoAt(now: Date, daysAgo: number, plusMinutes = 0): string {
   return new Date(now.getTime() - daysAgo * 86_400_000 + plusMinutes * 60_000).toISOString();
@@ -172,8 +192,7 @@ async function generate(pid: PersonaId) {
     ui: { graphCollapsed: false, mode: "work" },
   }));
 
-  const state: LearnerState = store.getState();
-  writeFileSync(`seeds/${pid}.json`, JSON.stringify(state, null, 2));
+  const state: LearnerState = writeSeed(pid, store.getState());
 
   const concepts = Object.values(state.concepts);
   console.log(`  concepts: ${concepts.length}`);
@@ -184,6 +203,52 @@ async function generate(pid: PersonaId) {
     );
   }
   console.log(`  proposal: ${state.activeSet.lastProposal?.summary}`);
+  console.log(`  wrote seeds/${pid}.json`);
+}
+
+/**
+ * The learner's side of the seeded Studio session, in each person's voice.
+ * Claude's turns come from the real Studio prompt; the closing sentence is
+ * the session's recorded closing statement.
+ */
+const STUDIO_LEARNER_TURNS: Record<PersonaId, string[]> = {
+  backend: [
+    "Equality first, because the planner can seek straight to carrier_id = 14 and the updated_at range is already sorted inside that slice. If updated_at came first it would have to walk the whole 7-day window across every carrier and filter.",
+    "For the exceptions page the filter is tenant_id plus exception_status IS NOT NULL, sorted by exception_raised_at. So (tenant_id, exception_raised_at DESC) with the status in a partial WHERE, not in the key. And I'd check the plan for a Sort node before believing it.",
+  ],
+  maritime: [
+    "Because McCorpen needs the concealed condition to be causally linked to the injury he's claiming now. If the prior injury was at L3-L4 and this one is at L5-S1, the club's IME has to bridge that gap or the third element fails, and the lie on the form doesn't save us.",
+    "So the intake question has to be one a reasonable applicant would read as asking about back injuries specifically, and we need the fleet manager's declaration that they would not have hired him. Reliance is its own element; the lie alone isn't enough.",
+  ],
+};
+
+/** Fill seeded Studio sessions that have no thread, using the real Studio prompt. */
+async function fillStudio(pid: PersonaId) {
+  const { studioCall } = await import("@/lib/server/calls");
+  const persona = PERSONAS[pid];
+  const state = JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState;
+  let sessions = state.studioSessions;
+  for (const session of state.studioSessions) {
+    if (session.messages.length > 0) continue;
+    const concept = state.concepts[session.conceptId];
+    const material = session.materialExchangeId
+      ? state.exchanges.find((e) => e.id === session.materialExchangeId)
+      : undefined;
+    const learnerTurns = [
+      ...STUDIO_LEARNER_TURNS[pid],
+      `I think I've got it. ${session.closingStatement ?? CLOSING[pid]}`,
+    ];
+    const messages: StudioMessage[] = [];
+    console.log(`=== ${pid}: filling ${session.id} on ${concept.name} (${session.rung})`);
+    for (let i = 0; i <= learnerTurns.length; i++) {
+      const reply = await studioCall(concept, session.rung, material, messages, persona);
+      messages.push({ role: "assistant", content: reply });
+      console.log(`  claude: ${reply.slice(0, 90).replace(/\s+/g, " ")}…`);
+      if (i < learnerTurns.length) messages.push({ role: "user", content: learnerTurns[i] });
+    }
+    sessions = sessions.map((s) => (s.id === session.id ? { ...s, messages } : s));
+  }
+  writeSeed(pid, { ...state, studioSessions: sessions });
   console.log(`  wrote seeds/${pid}.json`);
 }
 
@@ -204,7 +269,7 @@ function cleanEvidence(pid: PersonaId) {
     });
     concepts[c.id] = { ...c, evidence: kept };
   }
-  writeFileSync(`seeds/${pid}.json`, JSON.stringify({ ...state, concepts }, null, 2));
+  writeSeed(pid, { ...state, concepts });
   console.log(`=== ${pid}: dropped ${dropped} evidence quotes that were not the learner's words`);
 }
 
@@ -215,8 +280,7 @@ async function reprune(pid: PersonaId) {
   const now = new Date().toISOString();
   const cleared: LearnerState = { ...state, nudges: state.nudges.filter((n) => n.kind !== "prune-proposal") };
   const out = await pruneCall(cleared, now);
-  const next = applyProposal(cleared, toProposal(out, cleared, now));
-  writeFileSync(`seeds/${pid}.json`, JSON.stringify(next, null, 2));
+  const next = writeSeed(pid, applyProposal(cleared, toProposal(out, cleared, now)));
   console.log(`=== ${pid} repruned`);
   console.log(`  recommended: ${next.activeSet.lastProposal?.recommended.map((r) => r.conceptId).join(", ")}`);
   console.log(`  swaps: ${JSON.stringify(next.activeSet.lastProposal?.swaps)}`);
@@ -227,10 +291,16 @@ async function main() {
   const args = process.argv.slice(2);
   const flagReprune = args.includes("--reprune");
   const flagClean = args.includes("--clean-evidence");
+  const flagStudio = args.includes("--fill-studio");
+  const flagRestamp = args.includes("--restamp");
   const only = args.find((a) => !a.startsWith("--")) as PersonaId | undefined;
   for (const pid of PERSONA_IDS) {
     if (only && only !== pid) continue;
-    if (flagClean) cleanEvidence(pid);
+    if (flagRestamp) {
+      const st = writeSeed(pid, JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState);
+      console.log(`=== ${pid}: seed version ${st.seedVersion}`);
+    } else if (flagClean) cleanEvidence(pid);
+    else if (flagStudio) await fillStudio(pid);
     else if (flagReprune) await reprune(pid);
     else await generate(pid);
   }

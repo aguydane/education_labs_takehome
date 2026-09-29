@@ -43,7 +43,9 @@ export default function SessionViewer({
   const material = session.materialExchangeId
     ? state.exchanges.find((e) => e.id === session.materialExchangeId)
     : undefined;
-  const busyStudio = state.ui.mode === "studio" || !!studio?.entering;
+  const entering = !!studio?.entering;
+  const isOpenNow = state.ui.mode === "studio" && state.ui.activeStudioId === session.id;
+  const anotherOpen = state.ui.mode === "studio" && !isOpenNow;
   const resumed = session.resumedAt?.length ?? 0;
   const thread = session.messages.filter(
     (m, i) => !(i === 0 && m.role === "user" && m.content.trim() === STUDIO_OPENING_USER),
@@ -85,28 +87,40 @@ export default function SessionViewer({
       </header>
 
       <div className="space-y-4 px-4 py-3">
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            data-testid="session-resume"
-            className={BTN_PRIMARY}
-            disabled={busyStudio}
-            title={busyStudio ? "Finish the current Studio session first" : "Reopen this thread in Studio"}
-            onClick={() => actions.resumeStudio(session.id)}
-          >
-            Continue this session
-          </button>
-          {concept ? (
-            <button
-              type="button"
-              data-testid="session-new"
-              className={BTN}
-              disabled={busyStudio}
-              onClick={() => void actions.enterStudio({ conceptId: concept.id, entry: "manual" })}
-            >
-              Book new studio time on this
-            </button>
-          ) : null}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {isOpenNow ? (
+            <p className="text-xs text-ink-2" data-testid="session-open-now">
+              This session is open in Studio right now.
+            </p>
+          ) : (
+            <>
+              <button
+                type="button"
+                data-testid="session-resume"
+                className={BTN_PRIMARY}
+                disabled={entering}
+                title={anotherOpen ? "Closes your open session, then reopens this thread" : "Reopen this thread in Studio"}
+                onClick={() => actions.resumeStudio(session.id)}
+              >
+                Continue this session
+              </button>
+              {concept ? (
+                <button
+                  type="button"
+                  data-testid="session-new"
+                  className={BTN}
+                  disabled={entering}
+                  title={anotherOpen ? "Closes your open session, then starts a new one" : undefined}
+                  onClick={() => void actions.enterStudio({ conceptId: concept.id, entry: "manual" })}
+                >
+                  Book new studio time on this
+                </button>
+              ) : null}
+              {anotherOpen ? (
+                <span className="basis-full text-xs text-ink-2">Your open session will be closed first.</span>
+              ) : null}
+            </>
+          )}
           {material ? (
             <span className="self-center">
               <ShowInChat testId="session-show-in-chat" onClick={() => actions.revealExchange(material.id)} />
