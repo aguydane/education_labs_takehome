@@ -1,9 +1,12 @@
 "use client";
 
 import { useLearner } from "@/lib/learner-context";
+import Hint from "@/components/ui/Hint";
 import { pendingNudges } from "@/lib/pipeline/triggers";
 import type { Nudge } from "@/lib/types";
-import { BTN, stateVar } from "./shared";
+import { HINTS } from "./hints";
+import { BTN } from "./shared";
+import StateDot from "./StateDot";
 
 /**
  * Everything the rail badge counts, except prune proposals (which have their
@@ -58,17 +61,20 @@ export default function Inbox({ onOpenConcept }: { onOpenConcept: (id: string) =
 
   return (
     <section data-testid="graph-inbox" className="border-b border-rule px-4 py-2.5">
-      <h3 className="text-xs text-ink-2">Waiting for you · {items.length}</h3>
+      <h3 className="flex items-center gap-1.5 text-xs text-ink-2">
+        Waiting for you · {items.length}
+        <Hint text={HINTS.inbox} label="About these offers" />
+      </h3>
       <ul className="mt-1.5 space-y-2">
         {items.map((n) => {
           const c = n.conceptId ? state.concepts[n.conceptId] : undefined;
           return (
             <li key={n.id} data-testid={`inbox-item-${n.id}`} className="flex items-start gap-2">
-              <span
-                aria-hidden
-                className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                style={{ background: c ? stateVar(c.state) : "var(--ink-2)" }}
-              />
+              {c ? (
+                <StateDot state={c.state} className="mt-1" />
+              ) : (
+                <span aria-hidden className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-ink-2" />
+              )}
               <div className="min-w-0 flex-1 text-xs">
                 <p className="text-ink">{n.reason}</p>
                 {c ? (

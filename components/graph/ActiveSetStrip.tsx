@@ -1,8 +1,11 @@
 "use client";
 
 import { useLearner } from "@/lib/learner-context";
+import Hint from "@/components/ui/Hint";
 import { Spinner } from "./icons";
-import { BTN, confirmedCount, stateVar } from "./shared";
+import { HINTS, HINT_OPENS_LEFT } from "./hints";
+import { BTN, confirmedCount } from "./shared";
+import StateDot from "./StateDot";
 
 /** The small set the learner is practicing, with the Prune control. */
 export default function ActiveSetStrip({
@@ -20,26 +23,32 @@ export default function ActiveSetStrip({
   return (
     <section data-testid="active-set-strip" className="px-4 py-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-ink-2">
-          <span className="font-medium text-ink">Active set</span> · {ids.length} of {size} active
+        <p className="flex items-center gap-1.5 text-xs text-ink-2">
+          <span>
+            <span className="font-medium text-ink">Active set</span> · {ids.length} of {size} active
+          </span>
+          <Hint text={HINTS.activeSet} label="About the active set" />
         </p>
-        <button
-          type="button"
-          data-testid="prune-button"
-          className={BTN}
-          disabled={busy.prune}
-          aria-busy={busy.prune}
-          onClick={() => void actions.requestPrune()}
-          title="Ask Claude to propose an active set. You decide."
-        >
-          {busy.prune ? (
-            <>
-              <Spinner /> Proposing
-            </>
-          ) : (
-            "Prune"
-          )}
-        </button>
+        <span className="flex items-center gap-1.5">
+          <Hint text={HINTS.prune} label="About Prune" className={HINT_OPENS_LEFT} />
+          <button
+            type="button"
+            data-testid="prune-button"
+            className={BTN}
+            disabled={busy.prune}
+            aria-busy={busy.prune}
+            onClick={() => void actions.requestPrune()}
+            title="Ask Claude to propose an active set. You decide."
+          >
+            {busy.prune ? (
+              <>
+                <Spinner /> Proposing
+              </>
+            ) : (
+              "Prune"
+            )}
+          </button>
+        </span>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {ids.map((cid) => {
@@ -58,7 +67,7 @@ export default function ActiveSetStrip({
                 selected ? "border-accent bg-accent-soft text-accent-ink" : "border-rule bg-panel-2 text-ink hover:border-ink-2"
               }`}
             >
-              <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: stateVar(c.state) }} />
+              <StateDot state={c.state} />
               <span className="truncate">{c.name}</span>
               <span
                 className="shrink-0 rounded-full bg-panel px-1.5 text-[11px] leading-4 text-ink-2 tabular-nums"

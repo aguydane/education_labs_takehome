@@ -1,7 +1,9 @@
 "use client";
 
 import { useLearner } from "@/lib/learner-context";
+import Hint from "@/components/ui/Hint";
 import { Spinner } from "./icons";
+import { HINTS, HINT_OPENS_LEFT } from "./hints";
 import { BTN, DAY_LONG, DAY_SHORT, blockRange } from "./shared";
 
 const WEEKDAYS = [1, 2, 3, 4, 5];
@@ -20,28 +22,34 @@ export default function CalendarStrip() {
   return (
     <section data-testid="calendar-strip" className="shrink-0 border-b border-rule px-4 py-2">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-ink-2">
-          Learning budget <span className="font-medium text-ink tabular-nums">{state.persona.budgetPct}%</span>
+        <p className="flex items-center gap-1.5 text-xs text-ink-2">
+          <span>
+            Learning budget <span className="font-medium text-ink tabular-nums">{state.persona.budgetPct}%</span>
+          </span>
+          <Hint text={HINTS.budget} label="About the learning budget" />
         </p>
         {first ? (
-          <button
-            type="button"
-            data-testid="calendar-jump"
-            className={BTN}
-            disabled={!target || inStudio || entering}
-            onClick={() => {
-              if (target) void actions.enterStudio({ conceptId: target.id, entry: "scheduled" });
-            }}
-            title="Simulate the block arriving: save where you were, then enter Studio"
-          >
-            {entering ? (
-              <>
-                <Spinner /> Saving where you were
-              </>
-            ) : (
-              "Jump to your Studio block"
-            )}
-          </button>
+          <span className="flex items-center gap-1.5">
+            <Hint text={HINTS.studio} label="About Studio blocks" className={HINT_OPENS_LEFT} />
+            <button
+              type="button"
+              data-testid="calendar-jump"
+              className={BTN}
+              disabled={!target || inStudio || entering}
+              onClick={() => {
+                if (target) void actions.enterStudio({ conceptId: target.id, entry: "scheduled" });
+              }}
+              title="Simulate the block arriving: save where you were, then enter Studio"
+            >
+              {entering ? (
+                <>
+                  <Spinner /> Saving where you were
+                </>
+              ) : (
+                "Jump to your Studio block"
+              )}
+            </button>
+          </span>
         ) : null}
       </div>
 

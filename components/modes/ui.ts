@@ -53,6 +53,37 @@ export const ENTRY_LABEL: Record<StudioEntry, string> = {
   manual: "",
 };
 
+export const ENTRY_TITLE: Record<StudioEntry, string> = {
+  scheduled: "Started from your calendar block",
+  opportunistic: "Started while your long task runs; nothing is waiting on you",
+  manual: "Started from the map",
+};
+
+// ---- Explanations (rendered through components/ui/Hint) --------------------
+
+export const HINTS = {
+  beat:
+    "A two-to-five-minute aside inside your work. Claude explains the why behind what it just did, " +
+    "using this exchange, and ends with one question you can answer in a sentence. Leaving is one click at any point.",
+  beatAnswer:
+    "Your one-sentence answer is kept with the idea. It isn't graded; it's the start of you steering this kind of work.",
+  studio:
+    "Protected time on one idea, working on your own past exchange. Your work is saved (the \u201cWhere you were\u201d card) " +
+    "so it's safe to leave it. Close with one sentence about what you'd now specify differently; " +
+    "that sentence is what Helm later recognizes.",
+  rungs:
+    "Modeling: Claude does it and narrates, you predict. Coaching: you do it, Claude asks before it tells. " +
+    "Fading: you work, Claude is available. More help drops a rung; Let me try raises one.",
+  whereYouWere: "Written when you stepped out of your work, so you can come back to it.",
+};
+
+/**
+ * The Beat card sits at the bottom of the main region, so its hints open
+ * upward. Targets the shared Hint's tooltip by role, from its wrapper.
+ */
+export const hintOpensUp =
+  "[&>[role=tooltip]]:top-auto [&>[role=tooltip]]:bottom-full [&>[role=tooltip]]:mt-0 [&>[role=tooltip]]:mb-1";
+
 // ---- Thread helpers -----------------------------------------------------------
 
 const RUNG_NOTE = /^\[Rung change: (more help|let me try)\. Move to (modeling|coaching|fading)\.\]$/i;

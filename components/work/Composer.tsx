@@ -1,7 +1,8 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
-import { BTN_ACCENT, BTN_QUIET } from "./helpers";
+import Hint from "@/components/ui/Hint";
+import { BTN_ACCENT, BTN_QUIET, HINTS, HINT_IN_ROW_ABOVE } from "./helpers";
 
 export default function Composer({
   busy,
@@ -64,21 +65,20 @@ export default function Composer({
           className={`max-h-[8.75rem] min-h-[2.5rem] w-full resize-none overflow-y-auto rounded-lg border border-rule bg-bg px-3 py-2 text-sm leading-5 text-ink placeholder:text-ink-2 outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/30`}
           data-testid="work-composer"
         />
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5">
           <button
             type="button"
             className={BTN_QUIET}
             onClick={onKickOff}
             disabled={busy || longTaskRunning}
-            title={
-              longTaskRunning
-                ? "A long task is already running"
-                : "Send a preset request that starts simulated long-running work"
-            }
+            title={longTaskRunning ? "A long task is already running" : undefined}
             data-testid="work-longtask"
           >
             Kick off long task
           </button>
+          <Hint text={HINTS.longTask} label="What does this do?" className={HINT_IN_ROW_ABOVE} />
+          </span>
           <span className="ml-auto hidden text-xs text-ink-2 md:inline">Enter to send · Shift+Enter for a new line</span>
           <button
             type="submit"

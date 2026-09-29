@@ -1,12 +1,12 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLearner } from "@/lib/learner-context";
 import { pendingNudges } from "@/lib/pipeline/triggers";
 import type { Exchange, Nudge } from "@/lib/types";
 import Composer from "./Composer";
 import ExchangeItem, { type RecognitionEntry } from "./ExchangeItem";
-import { dayKey, dayLabel, useNow } from "./helpers";
+import { FLASH_MS, dayKey, dayLabel, useNow } from "./helpers";
 import LongTaskStrip from "./LongTaskStrip";
 
 const NO_RECOGNITIONS: RecognitionEntry[] = [];
@@ -15,7 +15,7 @@ const NO_OFFERS: Nudge[] = [];
 const STICK_PX = 96;
 
 export default function WorkPanel() {
-  const { state, busy, harvestingIds, streamingExchangeId, actions } = useLearner();
+  const { state, busy, harvestingIds, streamingExchangeId, reveal, actions } = useLearner();
   const now = useNow(60_000);
 
   const work = useMemo(
@@ -104,7 +104,27 @@ export default function WorkPanel() {
     if (stickRef.current) toBottom();
   }, [streamingLen, toBottom]);
 
-  void busy;
+  // ---- Reveal: scroll an exchange into view and flash the learner's message ----
+  // A reveal that predates this mount (e.g. from before a Studio session) is already settled.
+  const [settledNonce, setSettledNonce] = useState<number | null>(() => reveal?.nonce ?? null);
+  const flashing = reveal && reveal.nonce !== settledNonce ? reveal : null;
+
+  useEffect(() => {
+    if (!reveal || reveal.nonce === settledNonce) return;
+    const container = scrollRef.current;
+    const target = container?.querySelector<HTMLElement>(
+      `[data-testid="exchange-${CSS.escape(reveal.exchangeId)}"]`,
+    );
+    if (container && target) {
+      stickRef.current = false;
+      const top =
+        target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - 16;
+      const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      container.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
+    }
+    const t = window.setTimeout(() => setSettledNonce(reveal.nonce), FLASH_MS);
+    return () => window.clearTimeout(t);
+  }, [reveal, settledNonce]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-testid="work-panel">
@@ -127,6 +147,7 @@ export default function WorkPanel() {
                     offers={offersByExchange.get(e.id) ?? NO_OFFERS}
                     streaming={e.id === streamingExchangeId}
                     harvesting={harvestingIds.includes(e.id)}
+                    flashKey={flashing?.exchangeId === e.id ? flashing.nonce : null}
                     actions={actions}
                   />
                 ))}

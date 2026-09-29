@@ -8,8 +8,8 @@ The design rationale lives in [docs/RATIONALE.md](docs/RATIONALE.md); the build 
 
 ## The loop
 
-1. **Harvest.** After every work exchange, a background call identifies the conceptual knowledge needed to understand that exchange and its output, and estimates from the learner's own words how confident we can be they have it. It never interrupts. Everything it records is visible on the concept chips under each message, and "keep delegating this" is one click.
-2. **Prune.** Claude proposes a small active set (three concepts) with plain-language reasoning; the learner decides, on the knowledge graph. The active set is sticky on purpose: slots turn over on graduation or explicit drop, never on novelty.
+1. **Harvest.** After every work exchange, a background call identifies the conceptual knowledge needed to understand that exchange and its output, and estimates from the learner's own words how confident we can be they have it. It never interrupts. Everything it records is visible on the concept chips under each message, and "keep delegating this" is one click. The "from what you wrote" quote on a chip is checked mechanically against the learner's message (`lib/pipeline/evidence.ts`): a quote lifted from Claude's reply is discarded along with the confidence estimate that leaned on it, and every quote links back to its place in the chat.
+2. **Prune.** Claude proposes a small active set (three concepts) with plain-language reasoning; the learner decides, on the knowledge graph. The active set is sticky on purpose: slots turn over on graduation or explicit drop, never on novelty. Edges on the map are co-occurrence (two concepts harvested from the same exchange; thicker means more often) and can be inspected down to the exchanges behind them; the learner can also draw *related* and *prerequisite* edges by hand.
 3. **Practice.** Two modes. **Beat** is a two-to-five-minute aside inside work, triggered by the learner's own bids ("why did you do it that way?") or at pause points. **Studio** is dedicated, calendar-blocked, state-saved time, entered on schedule or opportunistically while long-running agent work is in flight. Studio coaches on the learner's own past exchange, at a rung (modeling → coaching → fading) the learner can move.
 4. **Recognize.** When the learner's own prompts or critiques show a concept in use, Claude proposes a recognition, quoting their words. The learner confirms or rejects with a reason, and each reason routes somewhere useful ("I copied a pattern" is the strongest possible harvest signal).
 
@@ -22,7 +22,7 @@ Two seeded personas ship mid-story, so the loop is visible in the first minute:
 - **Maya Okafor**, backend engineer at a logistics SaaS (Postgres, queues, migrations).
 - **Eli Brandt**, second-year associate at a Seattle admiralty firm defending vessel owners and P&I clubs in the Bering Sea fishing fleet, mostly out of Dutch Harbor. The legal content is illustrative, not verified.
 
-Suggested walk: send a work message and watch the chips arrive; ask a "why" question and take the Beat it offers; open Prune and read the reasoning; kick off the long task and book Studio for the wait; then write a sharper prompt on an active concept and confirm the recognition. Switch personas from the header; Reset restores a persona's seed.
+Suggested walk: send a work message and watch the chips arrive; ask a "why" question and take the Beat it offers; open Prune and read the reasoning; kick off the long task and book Studio for the wait; then write a sharper prompt on an active concept and confirm the recognition. Switch personas from the header; Reset restores a persona's seed. "How Helm works" in the header explains the parts, and every panel carries small "?" hints in place.
 
 State lives in your browser (one key per persona), so every visitor gets their own sandbox.
 

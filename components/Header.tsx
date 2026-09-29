@@ -3,7 +3,7 @@
 import { PERSONAS, PERSONA_IDS } from "@/lib/personas";
 import { useLearner } from "@/lib/learner-context";
 
-export default function Header() {
+export default function Header({ onHelp }: { onHelp?: () => void }) {
   const { state, personaId, busy, actions } = useLearner();
   const working = busy.harvest > 0 || busy.recognize > 0;
 
@@ -47,6 +47,15 @@ export default function Header() {
             );
           })}
         </div>
+
+        <button
+          onClick={onHelp}
+          className="text-xs text-ink-2 hover:text-ink"
+          title="What Helm does and what the parts mean"
+          data-testid="header-how"
+        >
+          How Helm works
+        </button>
 
         <button
           onClick={() => {

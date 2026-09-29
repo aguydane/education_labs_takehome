@@ -841,12 +841,6 @@
           "quote": "not = 'open': the exceptions history page queries resolved ones with the same shape ... the planner can prove status = 'open' implies not null so it'll still match",
           "note": "Lets Maya judge whether one partial index on IS NOT NULL correctly serves both the 'open' and 'resolved' query paths instead of needing two indexes.",
           "ts": "2026-09-26T01:06:33.525Z"
-        },
-        {
-          "exchangeId": "ex_backend_11",
-          "quote": "Adds idx_shipments_tenant_exc_raised on (tenant_id, exception_raised_at DESC) WHERE exception_status IS NOT NULL. Serves both the open-exceptions widget and the exceptions history page.",
-          "note": "Lets you verify that a single partial index correctly serves both the widget query and the history page without redundant indexes.",
-          "ts": "2026-09-27T17:54:33.525Z"
         }
       ],
       "rubric": [
@@ -1276,14 +1270,7 @@
       "timesSeen": 3,
       "firstSeen": "2026-09-07T15:30:33.525Z",
       "lastSeen": "2026-09-20T17:54:33.525Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_backend_09",
-          "quote": "specified both layers precisely: 'in-job: 3 attempts... queue: retryLimit 5 w/ backoff'",
-          "note": "Needed to verify the stated caps (3 in-job retries × 5 queue retries) don't produce excessive total calls per job, and to write an accurate oncall summary of expected behavior.",
-          "ts": "2026-09-20T17:54:33.525Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Calculates total worst-case retry time across both layers before accepting the config",
         "Asks whether in-process retries should be removed since pg-boss already reschedules",
@@ -1390,12 +1377,6 @@
       "firstSeen": "2026-09-08T22:42:33.525Z",
       "lastSeen": "2026-09-15T22:42:33.525Z",
       "evidence": [
-        {
-          "exchangeId": "ex_backend_02",
-          "quote": "asked to 'write the migration' for adding and backfilling a column with no mention of locking, batching, or deploy sequencing concerns",
-          "note": "Determines whether the migration Claude wrote is safe to run against a 40M-row production table or will cause a deploy-blocking lock, and lets Maya judge whether the two-phase (schema + backfill) split and ordering are correct.",
-          "ts": "2026-09-08T22:42:33.525Z"
-        },
         {
           "exchangeId": "ex_backend_07",
           "quote": "the delivered_at backfill ran clean on staging (1.2M shipments, ~4 min, no replica lag)",
@@ -1507,14 +1488,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-12T20:18:33.525Z",
       "lastSeen": "2026-09-12T20:18:33.525Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_backend_04",
-          "quote": "Learner reported the HPA bump and pasted pool config but did not connect the two or compute the ceiling themselves; asked for a fix without diagnosing.",
-          "note": "Lets you predict, before scaling HPA or pool size, whether the sum of connections across all deployments will exceed what Postgres can serve — instead of discovering it via 'too many clients already' in prod.",
-          "ts": "2026-09-12T20:18:33.525Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Multiplies pod replicas by pool max for each deployment and sums against max_connections before scaling",
         "Notices that pg-boss has its own separate pool with its own max, not just the app pool",
@@ -1588,14 +1562,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-12T20:18:33.525Z",
       "lastSeen": "2026-09-12T20:18:33.525Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_backend_04",
-          "quote": "Learner mentioned bumping HPA max from 6 to 12 without noting any expected effect on downstream connections.",
-          "note": "Explains why the load test made things worse rather than better, and lets the learner judge whether the maxReplicas value is safe independent of pool sizing fixes.",
-          "ts": "2026-09-12T20:18:33.525Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Sets or reviews maxReplicas with an explicit calculation of downstream connection/resource limits",
         "Notes that autoscaling on latency can create a feedback loop against a saturated dependency"
@@ -1679,14 +1646,7 @@
       "timesSeen": 2,
       "firstSeen": "2026-09-13T17:54:33.525Z",
       "lastSeen": "2026-09-20T17:54:33.525Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_backend_09",
-          "quote": "describes the exact mechanism (in-job 3 attempts, full jitter, 30s cap, Retry-After + jitter) and interprets the Friday incident as evidence it worked",
-          "note": "Lets Maya confirm the observed result (queue drained in under 10 min, no second 429 wave) is actually explained by jitter rather than coincidence, and judge whether the PR's causal claim is correct.",
-          "ts": "2026-09-20T17:54:33.525Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Can compare full jitter vs equal jitter vs decorrelated jitter tradeoffs",
         "Applies jitter to Retry-After values as well as computed backoff",
@@ -2114,14 +2074,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-20T17:54:33.525Z",
       "lastSeen": "2026-09-20T17:54:33.525Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_backend_09",
-          "quote": "asked for '3-4 line heads-up for #eng-oncall' but didn't specify the threshold itself, leaving it to the assistant",
-          "note": "Directly shapes the oncall message's page/no-page rule, which determines whether oncall gets paged unnecessarily during expected gradual drains or misses a real stuck queue.",
-          "ts": "2026-09-20T17:54:33.525Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Justifies the 15-minute threshold against the observed 10-minute drain time with some margin",
         "Specifies what signal ('carrier's status page shows green') the threshold depends on and its reliability"

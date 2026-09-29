@@ -9,9 +9,10 @@ import { MOCK, mockClaudeRoutes } from "./mocks";
 async function open(page: Page, persona: "backend" | "maritime" = "backend") {
   await mockClaudeRoutes(page);
   await page.addInitScript((p) => {
-    // Fresh seed every test: drop persisted state and pin the persona.
+    // Fresh seed every test: drop persisted state, pin the persona, skip the intro.
     window.localStorage.clear();
     window.localStorage.setItem("helm:persona", p);
+    window.localStorage.setItem("helm:intro-seen", "1");
   }, persona);
   await page.goto("/");
   await expect(page.getByTestId("work-panel")).toBeVisible();
@@ -25,6 +26,30 @@ async function send(page: Page, message: string) {
 }
 
 test.describe("Helm", () => {
+  test("explains itself on the first visit and from the header afterwards", async ({ page }) => {
+    await mockClaudeRoutes(page);
+    // Clear once for a first visit; the reload below must keep the "seen" flag.
+    await page.addInitScript(() => {
+      if (!window.sessionStorage.getItem("helm:test-cleared")) {
+        window.localStorage.clear();
+        window.sessionStorage.setItem("helm:test-cleared", "1");
+      }
+    });
+    await page.goto("/");
+    const intro = page.getByTestId("intro-overlay");
+    await expect(intro).toBeVisible();
+    await expect(intro).toContainText("Harvest");
+    await intro.getByTestId("intro-start").click();
+    await expect(intro).toBeHidden();
+    await page.reload();
+    await expect(page.getByTestId("work-panel")).toBeVisible();
+    await expect(page.getByTestId("intro-overlay")).toBeHidden();
+    await page.getByTestId("header-how").click();
+    await expect(page.getByTestId("intro-overlay")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("intro-overlay")).toBeHidden();
+  });
+
   test("loads a seeded persona with history and a map", async ({ page }) => {
     await open(page);
     const exchanges = page.locator('[data-testid^="exchange-"]');
@@ -158,6 +183,36 @@ test.describe("Helm", () => {
     await expect(detail).toContainText(/high/i);
     await detail.getByTestId("detail-close").click();
     await expect(detail).toBeHidden();
+  });
+
+  test("the learner can draw an edge between two concepts and inspect it", async ({ page }) => {
+    await open(page);
+    await page.locator('[data-testid^="graph-node-"]').first().click();
+    const detail = page.getByTestId("concept-detail");
+    await expect(detail).toBeVisible();
+    await expect(detail.getByTestId("detail-connections")).toBeVisible();
+
+    const target = detail.getByTestId("detail-link-target");
+    await target.selectOption({ index: 1 });
+    const targetId = await target.inputValue();
+    await detail.getByTestId("detail-link-add").click();
+    await expect(detail.getByTestId("detail-connections")).toContainText("you drew");
+
+    // The edge is on the map and can be removed from the connections list.
+    await expect(page.locator(`[data-testid="graph-node-${targetId}"]`)).toBeVisible();
+    await detail.getByTestId("detail-connections").getByRole("button", { name: /remove/i }).first().click();
+    await expect(detail.getByTestId("detail-connections")).not.toContainText("you drew");
+  });
+
+  test("the page itself never scrolls", async ({ page }) => {
+    await open(page);
+    await page.setViewportSize({ width: 1000, height: 560 });
+    await page.evaluate(() => {
+      window.scrollTo(0, 800);
+      (document.querySelector('[data-testid="prune-button"]') as HTMLElement | null)?.focus();
+    });
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(560);
   });
 
   test("switching persona loads a different history; reset restores the seed", async ({ page }) => {

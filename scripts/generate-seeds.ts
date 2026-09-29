@@ -19,6 +19,7 @@ config();
 import { createHash } from "crypto";
 import { readFileSync, writeFileSync } from "fs";
 import { PERSONAS, PERSONA_IDS } from "@/lib/personas";
+import { quoteIsFrom } from "@/lib/pipeline/evidence";
 import { applyHarvest, toHarvestResult } from "@/lib/pipeline/harvest";
 import { endStudio, pickMaterial, startStudio } from "@/lib/pipeline/practice";
 import { applyProposal, pinConcept, setActiveSet, toProposal } from "@/lib/pipeline/prune";
@@ -186,6 +187,27 @@ async function generate(pid: PersonaId) {
   console.log(`  wrote seeds/${pid}.json`);
 }
 
+/** Drop evidence quotes that aren't the learner's own words (same check as applyHarvest). */
+function cleanEvidence(pid: PersonaId) {
+  const state = JSON.parse(readFileSync(`seeds/${pid}.json`, "utf8")) as LearnerState;
+  let dropped = 0;
+  const concepts = { ...state.concepts };
+  for (const c of Object.values(concepts)) {
+    const kept = c.evidence.filter((e) => {
+      const ex = state.exchanges.find((x) => x.id === e.exchangeId);
+      const ok = !ex || quoteIsFrom(ex.user, e.quote);
+      if (!ok) {
+        dropped++;
+        console.log(`  dropped [${c.name}] "${e.quote.slice(0, 70)}"`);
+      }
+      return ok;
+    });
+    concepts[c.id] = { ...c, evidence: kept };
+  }
+  writeFileSync(`seeds/${pid}.json`, JSON.stringify({ ...state, concepts }, null, 2));
+  console.log(`=== ${pid}: dropped ${dropped} evidence quotes that were not the learner's words`);
+}
+
 /** Redo only the final prune on an existing seed (after a prompt change). */
 async function reprune(pid: PersonaId) {
   const { pruneCall } = await import("@/lib/server/calls");
@@ -204,10 +226,12 @@ async function reprune(pid: PersonaId) {
 async function main() {
   const args = process.argv.slice(2);
   const flagReprune = args.includes("--reprune");
+  const flagClean = args.includes("--clean-evidence");
   const only = args.find((a) => !a.startsWith("--")) as PersonaId | undefined;
   for (const pid of PERSONA_IDS) {
     if (only && only !== pid) continue;
-    if (flagReprune) await reprune(pid);
+    if (flagClean) cleanEvidence(pid);
+    else if (flagReprune) await reprune(pid);
     else await generate(pid);
   }
 }

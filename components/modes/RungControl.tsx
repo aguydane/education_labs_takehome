@@ -5,8 +5,9 @@
  * highlighted, and the two controls that move along it.
  */
 
+import Hint from "@/components/ui/Hint";
 import type { Rung } from "@/lib/types";
-import { RUNGS, btnQuiet, rungMeaning } from "./ui";
+import { HINTS, RUNGS, btnQuiet, rungMeaning } from "./ui";
 
 type Props = {
   rung: Rung;
@@ -54,6 +55,7 @@ export default function RungControl({ rung, locked, onMoreHelp, onLetMeTry }: Pr
           );
         })}
       </ol>
+      <Hint text={HINTS.rungs} label="About support levels" className="shrink-0" />
 
       <span className="text-xs text-ink-2">{rungMeaning(rung)}</span>
 

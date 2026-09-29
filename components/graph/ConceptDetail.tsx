@@ -2,10 +2,15 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { useLearner } from "@/lib/learner-context";
+import Hint from "@/components/ui/Hint";
 import type { Recognition } from "@/lib/types";
 import styles from "./graph.module.css";
 import { CloseIcon } from "./icons";
-import { BTN, BTN_ON, ICON_BTN, STATE_LABEL, fmtDate, stateVar } from "./shared";
+import { HINTS } from "./hints";
+import ShowInChat from "./ShowInChat";
+import Connections from "./Connections";
+import { BTN, BTN_ON, ICON_BTN, STATE_LABEL, fmtDate } from "./shared";
+import StateDot from "./StateDot";
 
 const REJECT_LABEL: Record<NonNullable<Recognition["rejectReason"]>, string> = {
   copied: "copied",
@@ -30,7 +35,15 @@ function Empty({ children }: { children: ReactNode }) {
 }
 
 /** Everything Helm has recorded about one concept, and the learner's controls over it. */
-export default function ConceptDetail({ conceptId, onClose }: { conceptId: string; onClose: () => void }) {
+export default function ConceptDetail({
+  conceptId,
+  onSelectConcept,
+  onClose,
+}: {
+  conceptId: string;
+  onSelectConcept: (id: string) => void;
+  onClose: () => void;
+}) {
   const { state, studio, actions } = useLearner();
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +75,8 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
     else if (!activeBlocked) actions.chooseActiveSet([...conceptIds, c.id]);
   };
 
+  // Only offer "Show in chat" for exchanges that are still in the history.
+  const inChat = new Set(state.exchanges.map((x) => x.id));
   const evidence = [...c.evidence].reverse();
   const practice = [...c.practiceLog].reverse();
   const recognitions = [...c.recognitions].reverse();
@@ -78,7 +93,7 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
           <h3 className="text-sm font-semibold text-ink">{c.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-panel-2 px-2 py-0.5 text-ink">
-              <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: stateVar(c.state) }} />
+              <StateDot state={c.state} />
               {STATE_LABEL[c.state]}
             </span>
             {inActive ? <span className="rounded-full bg-accent-soft px-2 py-0.5 text-accent-ink">active</span> : null}
@@ -103,7 +118,10 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
 
         <dl className="grid grid-cols-3 gap-2 text-xs">
           <div className="rounded-md bg-panel-2 px-2.5 py-1.5">
-            <dt className="text-ink-2">Confidence</dt>
+            <dt className="flex items-center gap-1.5 text-ink-2">
+              Confidence
+              <Hint text={HINTS.confidence} label="About confidence" />
+            </dt>
             <dd className="text-ink">
               {c.confidence}
               <span className="text-ink-2">{c.confidenceSource === "learner" ? " · you said" : " · estimated"}</span>
@@ -148,6 +166,7 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
             >
               {delegated ? "Bring back" : "Keep delegating"}
             </button>
+            <Hint text={HINTS.delegate} label="About delegating" className="self-center" />
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
@@ -188,6 +207,8 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
           ) : null}
         </div>
 
+        <Connections conceptId={c.id} onSelectConcept={onSelectConcept} />
+
         <Section title="In your words" count={evidence.length}>
           {evidence.length === 0 ? (
             <Empty>No quotes recorded yet.</Empty>
@@ -199,6 +220,12 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
                   <p className="mt-0.5 pl-3 text-xs text-ink-2">
                     {fmtDate(e.ts)}
                     {e.note ? ` · ${e.note}` : ""}
+                    {inChat.has(e.exchangeId) ? (
+                      <>
+                        {" · "}
+                        <ShowInChat testId="detail-show-in-chat" onClick={() => actions.revealExchange(e.exchangeId)} />
+                      </>
+                    ) : null}
                   </p>
                 </li>
               ))}
@@ -248,6 +275,15 @@ export default function ConceptDetail({ conceptId, onClose }: { conceptId: strin
                       {r.status}
                       {r.status === "rejected" && r.rejectReason ? ` (${REJECT_LABEL[r.rejectReason]})` : ""}
                     </span>
+                    {inChat.has(r.exchangeId) ? (
+                      <>
+                        {" · "}
+                        <ShowInChat
+                          testId="detail-recognition-show-in-chat"
+                          onClick={() => actions.revealExchange(r.exchangeId)}
+                        />
+                      </>
+                    ) : null}
                   </p>
                   <blockquote className="mt-0.5 border-l-2 border-rule pl-2.5 text-sm text-ink">&ldquo;{r.quote}&rdquo;</blockquote>
                 </li>

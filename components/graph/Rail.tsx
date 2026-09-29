@@ -4,7 +4,17 @@ import { useLearner } from "@/lib/learner-context";
 import { pendingNudges } from "@/lib/pipeline/triggers";
 import { recentlyRecognized, type Flashes } from "./flashes";
 import { ChevronLeft, InboxIcon, StudioIcon } from "./icons";
-import { DAY_LONG, ICON_BTN, STATE_LABEL, abbreviate, blockRange, blockShort, stateVar } from "./shared";
+import {
+  DAY_LONG,
+  HOLLOW,
+  ICON_BTN,
+  STATE_LABEL,
+  STATE_OPACITY,
+  abbreviate,
+  blockRange,
+  blockShort,
+  stateVar,
+} from "./shared";
 
 /**
  * The collapsed graph panel. Not a placeholder: it carries what matters while
@@ -57,10 +67,15 @@ export default function Rail({
                 onClick={() => onOpenConcept(cid)}
                 title={c.name}
                 aria-label={`${c.name}, ${STATE_LABEL[c.state].toLowerCase()}. Open in your map.`}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border-2 bg-panel-2 text-[11px] font-semibold tracking-tight text-ink transition-colors hover:bg-accent-soft ${
+                className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-[11px] font-semibold tracking-tight outline-offset-2 outline-rule hover:outline ${
                   pulse ? "helm-pulse" : ""
                 }`}
-                style={{ borderColor: stateVar(c.state) }}
+                // Same encoding as the map: hollow ring while only noticed, filled once decided.
+                style={
+                  HOLLOW[c.state]
+                    ? { borderColor: stateVar(c.state), background: "var(--panel)", color: "var(--ink)", opacity: STATE_OPACITY[c.state] }
+                    : { borderColor: stateVar(c.state), background: stateVar(c.state), color: "var(--panel)", opacity: STATE_OPACITY[c.state] }
+                }
               >
                 {abbreviate(c.name)}
               </button>
@@ -78,7 +93,7 @@ export default function Rail({
           data-testid="rail-inbox"
           onClick={actions.toggleGraph}
           aria-label={`${waiting} waiting. Open your map.`}
-          title={`${waiting} waiting for you`}
+          title="Offers waiting"
           className={`relative ${ICON_BTN}`}
         >
           <InboxIcon />
@@ -108,7 +123,7 @@ export default function Rail({
           onClick={() => {
             if (first) void actions.enterStudio({ conceptId: first, entry: "manual" });
           }}
-          title={first ? `Open Studio on ${state.concepts[first].name}` : "Choose an active set first"}
+          title={first ? "Book studio time on your first active idea" : "Choose an active set first"}
           className="flex w-14 flex-col items-center gap-1 rounded-md py-1.5 text-[10px] text-ink-2 transition-colors hover:bg-panel-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         >
           <StudioIcon className="h-5 w-5" />

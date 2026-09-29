@@ -7,6 +7,7 @@
  */
 
 import { Fragment, useEffect, useId, useRef, useState, type FormEvent } from "react";
+import Hint from "@/components/ui/Hint";
 import { useLearner } from "@/lib/learner-context";
 import type { StudioSession } from "@/lib/types";
 import RungControl from "./RungControl";
@@ -14,6 +15,8 @@ import StudioThread from "./StudioThread";
 import {
   COMPOSER_PLACEHOLDER,
   ENTRY_LABEL,
+  ENTRY_TITLE,
+  HINTS,
   SUMMARY_LABELS,
   btnLink,
   btnPrimary,
@@ -113,10 +116,12 @@ function StudioSessionView({ session }: { session: StudioSession }) {
       <header className="shrink-0 border-b border-rule bg-panel px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="rounded bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent-ink">Studio</span>
+          <Hint text={HINTS.studio} label="About Studio" className="shrink-0" />
           <h2 className="min-w-0 truncate text-sm font-semibold text-ink">{conceptName}</h2>
           {entryLabel ? (
             <span
               data-testid="studio-entry"
+              title={ENTRY_TITLE[session.entry]}
               className="shrink-0 rounded-full border border-rule px-2 py-0.5 text-xs text-ink-2"
             >
               {entryLabel}
@@ -139,7 +144,10 @@ function StudioSessionView({ session }: { session: StudioSession }) {
           <div data-testid="studio-summary" className="mx-auto max-w-3xl rounded-lg border border-rule bg-panel-2 px-4 py-3">
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-ink-2">Where you were</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs font-medium text-ink-2">Where you were</p>
+                  <Hint text={HINTS.whereYouWere} label="About this card" />
+                </div>
                 {saving ? (
                   <p className="mt-1 animate-pulse text-sm text-ink-2">Saving where you were{"…"}</p>
                 ) : lines.length === SUMMARY_LABELS.length ? (

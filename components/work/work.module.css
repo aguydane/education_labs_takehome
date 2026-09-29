@@ -21,3 +21,27 @@
     animation: none;
   }
 }
+
+/* A revealed learner message: a soft highlight that fades back. */
+.flash {
+  animation: flash 1.5s ease-out both;
+}
+
+@keyframes flash {
+  0%,
+  35% {
+    background-color: var(--accent-soft);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  100% {
+    background-color: var(--panel-2);
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation: none;
+    background-color: var(--accent-soft);
+  }
+}

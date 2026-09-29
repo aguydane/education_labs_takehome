@@ -6,7 +6,7 @@
 import { deriveGraph, type Graph } from "@/lib/pipeline/graph";
 import { PERSONAS } from "@/lib/personas";
 import { createInitialState } from "@/lib/state";
-import type { CalendarBlock, Concept, ConceptState, LearnerState } from "@/lib/types";
+import type { CalendarBlock, Concept, ConceptState, LearnerState, RelationKind } from "@/lib/types";
 
 export const STATE_ORDER: ConceptState[] = ["noticed", "chosen", "practicing", "durable", "delegated", "dormant"];
 
@@ -31,6 +31,60 @@ export const STATE_BLURB: Record<ConceptState, string> = {
 
 export function stateVar(s: ConceptState): string {
   return `var(--st-${s})`;
+}
+
+/**
+ * Shape carries state as well as hue: noticed and dormant are hollow rings
+ * (Helm noticed; the learner hasn't decided), the rest are filled.
+ */
+export const HOLLOW: Record<ConceptState, boolean> = {
+  noticed: true,
+  chosen: false,
+  practicing: false,
+  durable: false,
+  delegated: false,
+  dormant: true,
+};
+
+export const STATE_OPACITY: Record<ConceptState, number> = {
+  noticed: 1,
+  chosen: 1,
+  practicing: 1,
+  durable: 1,
+  delegated: 0.55,
+  dormant: 0.45,
+};
+
+// ---- Edges -----------------------------------------------------------------
+
+export type EdgeLike = { source: string; target: string; kind: RelationKind; weight: number; origin: "harvest" | "learner" };
+
+export function edgeKey(e: { source: string; target: string; kind: RelationKind }): string {
+  return `${e.source}|${e.target}|${e.kind}`;
+}
+
+function plural(n: number, word: string): string {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
+}
+
+/** One plain line saying what an edge is. For prereq, `source` is the prerequisite. */
+export function edgeSentence(e: EdgeLike, name: (id: string) => string): string {
+  if (e.kind === "cooccur") return `Came up together in ${plural(Math.round(e.weight), "exchange")}`;
+  if (e.kind === "related") return e.origin === "learner" ? "You linked these as related" : "Linked as related";
+  return e.origin === "learner"
+    ? `You marked ${name(e.source)} as a prerequisite for ${name(e.target)}`
+    : `${name(e.source)} is a prerequisite for ${name(e.target)}`;
+}
+
+/** Kind and origin in plain words, for the edge card. */
+export function edgeKindLine(e: EdgeLike): string {
+  if (e.kind === "cooccur") return "Came up together · Helm drew this from your work";
+  const who = e.origin === "learner" ? "you drew this link" : "drawn by Helm";
+  return e.kind === "related" ? `Related · ${who}` : `Prerequisite · ${who}`;
+}
+
+export function exchangesLabel(n: number): string {
+  return plural(Math.round(n), "exchange");
 }
 
 const STOP = new Set(["a", "an", "and", "of", "the", "for", "to", "in", "on", "vs", "v", "with", "or"]);

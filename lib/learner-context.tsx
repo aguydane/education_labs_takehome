@@ -129,6 +129,9 @@ export type LearnerActions = {
   addRelation: (from: string, to: string, kind: "related" | "prereq") => void;
   removeRelation: (a: string, b: string, kind: RelationKind) => void;
 
+  /** Scroll the work chat to an exchange and flash it (evidence links, edge cards). */
+  revealExchange: (exchangeId: string) => void;
+
   /** Nudges and layout. */
   dismissNudge: (nudgeId: string) => void;
   toggleGraph: () => void;
@@ -144,6 +147,8 @@ export type LearnerContextValue = {
   studio: StudioUI | null;
   /** Exchange currently streaming (assistant text is partial). */
   streamingExchangeId: string | null;
+  /** Last reveal request; the nonce changes on every call so repeats re-trigger. */
+  reveal: { exchangeId: string; nonce: number } | null;
   actions: LearnerActions;
 };
 
@@ -192,6 +197,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       : null;
   });
   const [streamingExchangeId, setStreamingExchangeId] = useState<string | null>(null);
+  const [reveal, setReveal] = useState<{ exchangeId: string; nonce: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   // Bumped whenever a Studio session ends so an in-flight reply can't write into it.
   const studioGenRef = useRef(0);
@@ -592,6 +598,10 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
     (a: string, b: string, kind: RelationKind) => update((s) => removeRelationFn(s, a, b, kind)),
     [update],
   );
+  const revealExchange = useCallback(
+    (exchangeId: string) => setReveal((r) => ({ exchangeId, nonce: (r?.nonce ?? 0) + 1 })),
+    [],
+  );
   const dismissNudge = useCallback((nudgeId: string) => update((s) => dismissNudgeFn(s, nudgeId)), [update]);
   const toggleGraph = useCallback(
     () => update((s) => ({ ...s, ui: { ...s.ui, graphCollapsed: !s.ui.graphCollapsed } })),
@@ -621,6 +631,7 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       leaveStudio,
       addRelation,
       removeRelation,
+      revealExchange,
       dismissNudge,
       toggleGraph,
     }),
@@ -645,13 +656,16 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       leaveStudio,
       addRelation,
       removeRelation,
+      revealExchange,
       dismissNudge,
       toggleGraph,
     ],
   );
 
   return (
-    <Ctx.Provider value={{ state, personaId, busy, harvestingIds, beat, studio, streamingExchangeId, actions }}>
+    <Ctx.Provider
+      value={{ state, personaId, busy, harvestingIds, beat, studio, streamingExchangeId, reveal, actions }}
+    >
       {children}
     </Ctx.Provider>
   );

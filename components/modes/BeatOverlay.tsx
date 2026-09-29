@@ -7,9 +7,10 @@
  */
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import Hint from "@/components/ui/Hint";
 import { useLearner, type BeatUI } from "@/lib/learner-context";
 import Markdown from "./Markdown";
-import { btnLink, btnPrimary, field, focusRing } from "./ui";
+import { HINTS, btnLink, btnPrimary, field, focusRing, hintOpensUp } from "./ui";
 
 export default function BeatOverlay() {
   const { beat } = useLearner();
@@ -35,10 +36,13 @@ function BeatCard({ beat }: { beat: BeatUI }) {
   const savedAnswer = answered ? state.beats.find((b) => b.id === beat.beatId)?.answer : undefined;
   const { closeBeat } = actions;
 
-  // Escape closes the beat from anywhere.
+  // Escape closes the beat from anywhere, unless it is closing something
+  // smaller first (an open hint, for instance).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !e.defaultPrevented) closeBeat();
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (e.target instanceof Element && e.target.closest('[aria-expanded="true"]')) return;
+      closeBeat();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -90,10 +94,11 @@ function BeatCard({ beat }: { beat: BeatUI }) {
       aria-labelledby={titleId}
       data-testid="beat-overlay"
       data-status={beat.status}
-      className="absolute inset-x-4 bottom-4 z-20 mx-auto flex max-h-[calc(100%-2rem)] max-w-2xl flex-col overflow-hidden rounded-xl border border-rule bg-panel shadow-lg outline-none"
+      className="absolute inset-x-4 bottom-4 z-20 mx-auto flex max-h-[calc(100%-2rem)] max-w-2xl flex-col rounded-xl border border-rule bg-panel shadow-lg outline-none"
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-rule px-4 py-2">
         <span className="rounded bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent-ink">Beat</span>
+        <Hint text={HINTS.beat} label="About Beat" className={`shrink-0 ${hintOpensUp}`} />
         <h2 id={titleId} className="min-w-0 truncate text-sm font-medium text-ink">
           {conceptName}
         </h2>
@@ -129,6 +134,7 @@ function BeatCard({ beat }: { beat: BeatUI }) {
           <label htmlFor={`${titleId}-answer`} className="sr-only">
             Your answer, in one sentence
           </label>
+          <Hint text={HINTS.beatAnswer} label="About your answer" className={`shrink-0 ${hintOpensUp}`} />
           <input
             ref={inputRef}
             id={`${titleId}-answer`}

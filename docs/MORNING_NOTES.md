@@ -2,6 +2,15 @@
 
 Written at the end of the overnight build, 2026-09-28. Read this first.
 
+## Round 2 (after your first review, same morning)
+
+- **Page scroll:** the document can't scroll any more (`overflow: clip` on html/body/shell blocks user *and* programmatic scrolling). New e2e test covers it.
+- **State colors:** one hue per state plus a shape difference: noticed and dormant are hollow rings, chosen (teal), practicing (violet), durable (green) are filled, delegated is a warm gray with a strike. Rail chips, active-set chips and the legend swatches use the same drawing.
+- **Edges:** every edge so far was a co-occurrence edge from harvest (two ideas in the same exchange; weight = number of exchanges). Now: hover shows why two ideas are joined, click opens an edge card listing the shared exchanges, and the concept detail has a Connections section where you can draw *related* or *prerequisite* links (and remove the ones you drew). `lib/pipeline/relations.ts`.
+- **Evidence is checked:** you caught harvest quoting Claude's reply as "from what you wrote". The prompt now says verbatim-from-the-learner only, and `lib/pipeline/evidence.ts` checks it mechanically: a quote not found in the learner's message is dropped along with the confidence estimate that leaned on it. Ran the same check over the seeds (`npm run seeds -- --clean-evidence`): 7 backend and 11 maritime quotes were dropped (mostly paraphrases like "asked to 'write the migration'…").
+- **Links back to the chat:** "Show in chat" on chip popovers, on evidence rows in the concept detail, and on edge-card exchanges scrolls the chat to the exchange and underlines the quoted words.
+- **In-place explanations:** a "How Helm works" overlay (opens on first visit, then from the header) and small "?" hints on every panel section, using one shared `Hint` component.
+
 ## Where things stand
 
 **It's deployed and working end to end:** https://educationlabstakehome.vercel.app

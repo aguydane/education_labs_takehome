@@ -18,13 +18,17 @@ import { RECENT_MS } from "./flashes";
 import styles from "./graph.module.css";
 import type { LayoutEdge, LayoutNode, LayoutStore } from "./layout";
 import { placeLabels } from "./labels";
-import { STATE_LABEL, stateVar, truncate } from "./shared";
+import { HOLLOW, STATE_LABEL, STATE_OPACITY, edgeKey, edgeSentence, stateVar, truncate } from "./shared";
+import StateDot from "./StateDot";
 
 type Props = {
   graph: Graph;
   layout: LayoutStore;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  /** Edge selection, mutually exclusive with a selected node (the parent enforces it). */
+  selectedEdgeKey: string | null;
+  onSelectEdge: (key: string) => void;
   /** The pending proposal, if any: drives the dashed "recommended" ring and hover reasoning. */
   proposal?: PruneProposal;
   flashes: Flashes;
@@ -64,6 +68,8 @@ function GraphCanvas({
   layout,
   selectedId,
   onSelect,
+  selectedEdgeKey,
+  onSelectEdge,
   proposal,
   flashes,
   played,
@@ -76,6 +82,7 @@ function GraphCanvas({
   const suppressClickRef = useRef(false);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [hoverEdge, setHoverEdge] = useState<string | null>(null);
   const arrowId = `graph-arrow-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const layoutNodes = useMemo<LayoutNode[]>(
@@ -89,7 +96,7 @@ function GraphCanvas({
     for (const e of graph.edges) max[e.kind] = Math.max(max[e.kind] ?? 0, e.weight);
     return graph.edges.map((e) => {
       const m = max[e.kind] ?? 0;
-      return { ...e, w: m > 0 ? Math.max(0, e.weight) / m : 0.5 };
+      return { ...e, key: edgeKey(e), w: m > 0 ? Math.max(0, e.weight) / m : 0.5 };
     });
   }, [graph.edges]);
 
@@ -235,6 +242,8 @@ function GraphCanvas({
 
   const hovered = !dragId && hoverId ? byId.get(hoverId) : undefined;
   const hoverPos = hovered ? pos[hovered.id] : undefined;
+  const edgeHovered = !dragId && !hovered && hoverEdge ? edges.find((e) => e.key === hoverEdge) : undefined;
+  const nameOf = (id: string) => byId.get(id)?.name ?? id;
 
   return (
     <div
@@ -254,17 +263,19 @@ function GraphCanvas({
             viewBox="0 0 10 10"
             refX="9"
             refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
+            markerWidth="8"
+            markerHeight="8"
+            markerUnits="userSpaceOnUse"
+            orient="auto"
           >
-            <path d="M0,1.5 L9,5 L0,8.5 z" fill="var(--ink-2)" />
+            <path d="M0,1 L10,5 L0,9 z" fill="var(--accent)" />
           </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="transparent" onClick={() => onSelect(null)} />
 
-        <g aria-hidden>
+        {/* Edges. Each has a wide transparent stroke on top of it so it is easy to hover and click. */}
+        <g>
           {edges.map((e) => {
             const a = pos[e.source];
             const b = pos[e.target];
@@ -272,34 +283,61 @@ function GraphCanvas({
             const nb = byId.get(e.target);
             if (!a || !b || !na || !nb) return null;
             const touches = focusId !== null && (e.source === focusId || e.target === focusId);
+            const selected = e.key === selectedEdgeKey;
+            const hot = selected || e.key === hoverEdge;
             const faded = na.state === "dormant" || nb.state === "dormant";
-            let opacity = 0.14 + 0.46 * e.w;
+            const drawn = e.kind !== "cooccur";
+
+            let width = drawn ? 1.5 : 1 + 2 * e.w;
+            let opacity = drawn ? 0.85 : 0.14 + 0.46 * e.w;
             if (faded) opacity *= 0.5;
-            if (touches) opacity = Math.max(opacity, 0.75);
-            // Stop prereq arrows at the target's edge.
+            if (touches) opacity = Math.max(opacity, drawn ? 1 : 0.75);
+            if (hot) {
+              opacity = 1;
+              width += 1.5;
+            }
+            const stroke = drawn ? "var(--accent)" : selected ? "var(--ink)" : "var(--ink-2)";
+
+            // Stop prereq arrows at the edge of the node that needs the prerequisite.
             let x2 = b.x;
             let y2 = b.y;
             if (e.kind === "prereq") {
               const dx = b.x - a.x;
               const dy = b.y - a.y;
               const len = Math.hypot(dx, dy) || 1;
-              const cut = radiusOf(nb) + 3;
+              const cut = radiusOf(nb) + (nb.active ? 6 : 2);
               x2 = b.x - (dx / len) * cut;
               y2 = b.y - (dy / len) * cut;
             }
             return (
-              <line
-                key={`${e.source}|${e.target}|${e.kind}`}
-                x1={a.x}
-                y1={a.y}
-                x2={x2}
-                y2={y2}
-                stroke="var(--ink-2)"
-                strokeWidth={touches ? 1.4 : 1}
-                strokeDasharray={e.kind === "related" ? "4 3" : undefined}
-                markerEnd={e.kind === "prereq" ? `url(#${arrowId})` : undefined}
-                opacity={opacity}
-              />
+              <g key={e.key}>
+                <line
+                  x1={a.x}
+                  y1={a.y}
+                  x2={x2}
+                  y2={y2}
+                  stroke={stroke}
+                  strokeWidth={width}
+                  strokeLinecap="round"
+                  strokeDasharray={e.kind === "related" ? "5 4" : undefined}
+                  markerEnd={e.kind === "prereq" ? `url(#${arrowId})` : undefined}
+                  opacity={opacity}
+                  pointerEvents="none"
+                />
+                <line
+                  data-testid={`graph-edge-${e.source}__${e.target}__${e.kind}`}
+                  x1={a.x}
+                  y1={a.y}
+                  x2={b.x}
+                  y2={b.y}
+                  stroke="transparent"
+                  strokeWidth={12}
+                  style={{ cursor: "pointer" }}
+                  onPointerEnter={() => setHoverEdge(e.key)}
+                  onPointerLeave={() => setHoverEdge((cur) => (cur === e.key ? null : cur))}
+                  onClick={() => onSelectEdge(e.key)}
+                />
+              </g>
             );
           })}
         </g>
@@ -316,7 +354,7 @@ function GraphCanvas({
                 className="text-xs"
                 fill={n.active || n.id === selectedId ? "var(--ink)" : "var(--ink-2)"}
                 fontWeight={n.active || n.id === selectedId ? 500 : 400}
-                opacity={n.state === "delegated" ? 0.45 : 1}
+                opacity={STATE_OPACITY[n.state]}
                 style={{ cursor: dragId === n.id ? "grabbing" : "pointer", touchAction: "none" }}
                 onPointerDown={(e) => onPointerDown(e, n.id)}
                 onPointerMove={onPointerMove}
@@ -336,7 +374,6 @@ function GraphCanvas({
           {geometry.map(({ n, r, p }) => {
             const selected = n.id === selectedId;
             const recommended = n.recommended && !!proposal;
-            const dormant = n.state === "dormant";
             const delegated = n.state === "delegated";
 
             // Rings, inside out: active, recommended, selected, focus.
@@ -361,7 +398,7 @@ function GraphCanvas({
                 data-active={n.active ? "true" : "false"}
                 data-selected={selected ? "true" : "false"}
                 transform={`translate(${p.x},${p.y})`}
-                opacity={dormant ? 0.3 : delegated ? 0.45 : 1}
+                opacity={STATE_OPACITY[n.state]}
                 role="button"
                 tabIndex={0}
                 aria-label={`${n.name}, ${STATE_LABEL[n.state].toLowerCase()}${n.active ? ", active" : ""}`}
@@ -387,12 +424,12 @@ function GraphCanvas({
                   <circle r={recR} fill="none" stroke="var(--accent)" strokeWidth={1.25} strokeDasharray="3 2.5" />
                 ) : null}
                 {n.active ? <circle r={activeR} fill="none" stroke="var(--accent)" strokeWidth={2.5} /> : null}
+                {/* Hollow ring: only noticed so far. Filled: the learner has decided on it. */}
                 <circle
-                  r={r}
-                  fill={stateVar(n.state)}
-                  stroke={n.state === "noticed" && !n.active ? "var(--ink-2)" : "var(--panel)"}
-                  strokeWidth={n.active ? 1.5 : 1}
-                  strokeOpacity={n.state === "noticed" && !n.active ? 0.6 : 1}
+                  r={HOLLOW[n.state] ? r - 0.75 : r}
+                  fill={HOLLOW[n.state] ? "var(--panel)" : stateVar(n.state)}
+                  stroke={HOLLOW[n.state] ? stateVar(n.state) : "var(--panel)"}
+                  strokeWidth={HOLLOW[n.state] ? 1.5 : 1}
                 />
                 {n.pinned ? (
                   <circle cx={r * 0.72} cy={-r * 0.72} r={2.6} fill="var(--ink)" stroke="var(--panel)" strokeWidth={1} />
@@ -430,6 +467,19 @@ function GraphCanvas({
         <div className="absolute inset-0 flex items-center justify-center px-8 text-center text-sm text-ink-2">
           Concepts from your work will appear here as you go.
         </div>
+      ) : null}
+
+      {edgeHovered && pos[edgeHovered.source] && pos[edgeHovered.target] ? (
+        <EdgeTooltip
+          x={(pos[edgeHovered.source].x + pos[edgeHovered.target].x) / 2}
+          y={(pos[edgeHovered.source].y + pos[edgeHovered.target].y) / 2}
+          w={w}
+          h={h}
+          a={nameOf(edgeHovered.source)}
+          b={nameOf(edgeHovered.target)}
+          line={edgeSentence(edgeHovered, nameOf)}
+          arrow={edgeHovered.kind === "prereq"}
+        />
       ) : null}
 
       {hovered && hoverPos ? (
@@ -475,7 +525,7 @@ function NodeTooltip({
     >
       <div className="font-medium text-ink">{node.name}</div>
       <div className="mt-0.5 flex items-center gap-1.5 text-ink-2">
-        <span className="inline-block h-2 w-2 rounded-full" style={{ background: stateVar(node.state) }} />
+        <StateDot state={node.state} />
         {STATE_LABEL[node.state]}
         <span aria-hidden>·</span>
         confidence {node.confidence}
@@ -486,6 +536,41 @@ function NodeTooltip({
         ) : null}
       </div>
       {reasoning ? <p className="mt-1 line-clamp-3 text-ink-2">{reasoning}</p> : null}
+    </div>
+  );
+}
+
+function EdgeTooltip({
+  x,
+  y,
+  w,
+  h,
+  a,
+  b,
+  line,
+  arrow,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  a: string;
+  b: string;
+  line: string;
+  arrow: boolean;
+}) {
+  const left = Math.max(4, Math.min(x + 10, w - TOOLTIP_W - 4));
+  const top = Math.max(4, Math.min(y + 10, h - 64));
+  return (
+    <div
+      role="tooltip"
+      className="pointer-events-none absolute z-10 rounded-md border border-rule bg-panel px-2.5 py-1.5 text-xs shadow-sm"
+      style={{ left, top, maxWidth: TOOLTIP_W }}
+    >
+      <div className="font-medium text-ink">
+        {a} <span className="text-ink-2">{arrow ? "→" : "·"}</span> {b}
+      </div>
+      <div className="mt-0.5 text-ink-2">{line}</div>
     </div>
   );
 }

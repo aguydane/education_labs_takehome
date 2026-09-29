@@ -885,12 +885,6 @@
           "quote": "measure the 30% from April 14 through the June 28 injury, not over his whole employment",
           "note": "Lets Eli check whether measuring from April 14 rather than total employment is the legally correct window, and whether the 5% figure is calculated on the right denominator and inclusive dates.",
           "ts": "2026-09-26T04:49:51.959Z"
-        },
-        {
-          "exchangeId": "ex_maritime_11",
-          "quote": "'on that measure it's 4 of 76 days aboard, about 5%, far below the 30% guideline' — precise numbers supplied by the learner, not just accepted from the draft.",
-          "note": "Lets Eli check that '4 of 76 days, about 5%' is the right numerator/denominator once the window is reset to April 14.",
-          "ts": "2026-09-28T00:01:51.959Z"
         }
       ],
       "rubric": [
@@ -949,12 +943,6 @@
           "quote": "tell me whether the reassignment is a real change in his essential duties or whether they can paint it as a temporary shore stint between seasons",
           "note": "Lets Eli judge whether the assistant's evidence marshaling (letter language, payroll entity, crew list) actually supports 'real change' under the doctrine's standard, rather than just being persuasive-sounding facts.",
           "ts": "2026-09-26T04:49:51.959Z"
-        },
-        {
-          "exchangeId": "ex_maritime_11",
-          "quote": "Directed the exact structure: 'the April 14 reassignment changed his essential duties... duration element is measured from April 14' and 'Don't argue he was never a seaman; argue he stopped being one.'",
-          "note": "Lets Eli verify that measuring duration from April 14 rather than the whole employment period is the legally correct move, not just a favorable framing.",
-          "ts": "2026-09-28T00:01:51.959Z"
         }
       ],
       "rubric": [
@@ -1079,12 +1067,6 @@
           "quote": "Client has been paying maintenance at $30/day... Do we have to pay this?",
           "note": "Determines whether the client must keep paying at all, and frames why the rate and surgery timing need documented, prompt responses rather than a stall.",
           "ts": "2026-09-07T19:13:51.959Z"
-        },
-        {
-          "exchangeId": "ex_maritime_06",
-          "quote": "Kowalski update... Dr. Hsu did the IME last week but hasn't written up causation yet — tracking the claim procedurally shows working familiarity with the M&C process",
-          "note": "Clarifies that even if McCorpen succeeds, it only cuts off maintenance and cure and leaves Jones Act/unseaworthiness exposure intact, which affects the overall exposure memo.",
-          "ts": "2026-09-14T04:49:51.959Z"
         }
       ],
       "rubric": [
@@ -1143,22 +1125,10 @@
           "ts": "2026-09-07T19:13:51.959Z"
         },
         {
-          "exchangeId": "ex_maritime_06",
-          "quote": "He lied on the form either way. Isn't the lie the whole point? — treats concealment alone as dispositive, missing that connection is a separate element",
-          "note": "Determines whether the L3-L4 vs. L4-L5 distinction actually defeats the defense, or whether it's a red herring the opposing lawyer is using to distract from the concealment issue.",
-          "ts": "2026-09-14T04:49:51.959Z"
-        },
-        {
           "exchangeId": "ex_maritime_08",
           "quote": "Partner approved the McCorpen strategy on Kowalski, and Dr. Hsu's declaration came in. He's solid on the adjacent-segment link.",
           "note": "Lets the learner judge whether the motion's three-element structure (concealment, materiality, connection) is correctly mapped to the facts and evidence cited, and whether Hsu's adjacent-segment opinion actually satisfies the connection element.",
           "ts": "2026-09-19T07:13:51.959Z"
-        },
-        {
-          "exchangeId": "ex_maritime_09",
-          "quote": "Says the surgery was concealed and ties the declaration to whether the company 'wouldn't have hired him if he'd disclosed the surgery'; accepted partner's edit removing the recoupment section",
-          "note": "Lets the learner judge whether the Nilsen declaration's hiring-practice paragraphs actually establish the materiality element required for McCorpen, and whether the phrasing in paragraph 8 will hold up on cross-examination.",
-          "ts": "2026-09-21T09:37:51.959Z"
         }
       ],
       "rubric": [
@@ -1622,14 +1592,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-13T09:37:51.959Z",
       "lastSeen": "2026-09-13T09:37:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_05",
-          "quote": "Asked 'does the P&I entry still respond' and framed the question around whether Shoreside LLC vs. Northern Resolve LLC is the entered member, showing awareness of the entity distinction but not resolving the coverage mechanics himself.",
-          "note": "Lets Eli judge whether the club actually responds if Reyes turns out not to be a seaman, by checking who is named on the certificate of entry rather than assuming coverage follows the claim.",
-          "ts": "2026-09-13T09:37:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Requests the certificate of entry and club rules to identify named co-assureds before answering the handler",
         "Distinguishes 'member's liability' from 'claim against a related but unentered entity'",
@@ -1666,14 +1629,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-13T09:37:51.959Z",
       "lastSeen": "2026-09-13T09:37:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_05",
-          "quote": "Recognized the question came from the club handler and brought it to the assistant before answering, and asked 'is this guy covered or not' rather than issuing a coverage opinion himself.",
-          "note": "Determines whether Eli can answer the claims handler directly or must route the question through the partner and possibly coverage counsel, since the seaman-status defense he's building doubles as an argument against the club's own exposure.",
-          "ts": "2026-09-13T09:37:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Escalates coverage questions from the club to the partner or coverage counsel instead of answering directly",
         "Identifies the moment interests diverge: when Shoreside's carrier or the club seeks a coverage opinion adverse to the member",
@@ -1766,14 +1722,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-16T02:25:51.959Z",
       "lastSeen": "2026-09-16T02:25:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_07",
-          "quote": "Asked specifically whether there's a deadline problem given the April 6 letter and August filing, showing awareness that timing and the damages statement matter.",
-          "note": "Lets you verify the October 6 deadline calculation and judge whether the April 6 letter actually started the clock, or whether an earlier writing did.",
-          "ts": "2026-09-16T02:25:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Identifies the trigger date as when a writing shows a 'reasonable possibility' of damages exceeding vessel value, not just the date of injury",
         "Checks for any earlier notice (email, club claim) that could move the six-month clock sooner",
@@ -1815,14 +1764,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-16T02:25:51.959Z",
       "lastSeen": "2026-09-16T02:25:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_07",
-          "quote": "Did not raise privity/knowledge independently; asked only whether there's a deadline problem and whether filing is worth it, leaving the merits analysis to the assistant.",
-          "note": "Lets you assess whether the port engineer's knowledge of the weeping hose defeats limitation, and whether discovery into who actually controlled crane maintenance could revive the defense.",
-          "ts": "2026-09-16T02:25:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Asks who had authority over crane maintenance versus hose maintenance before conceding privity is fatal",
         "Frames a discovery request aimed at the master's versus port engineer's purchasing authority",
@@ -1946,14 +1888,7 @@
       "timesSeen": 2,
       "firstSeen": "2026-09-19T07:13:51.959Z",
       "lastSeen": "2026-09-21T09:37:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_09",
-          "quote": "Reported the partner's reasoning ('cut the recoupment section, said it invites a fight we don't need') without adding independent analysis of the doctrine",
-          "note": "Explains why the partner cut the recoupment section from the MSJ, letting the learner evaluate whether that strategic call (avoiding an unsettled, riskier argument) was sound rather than just accepting it on faith.",
-          "ts": "2026-09-21T09:37:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Cites case law on whether McCorpen supports recoupment versus only prospective denial",
         "Weighs the strategic risk of including a legally contested claim in a motion otherwise built on solid facts",
@@ -2002,14 +1937,7 @@
       "timesSeen": 1,
       "firstSeen": "2026-09-21T09:37:51.959Z",
       "lastSeen": "2026-09-21T09:37:51.959Z",
-      "evidence": [
-        {
-          "exchangeId": "ex_maritime_09",
-          "quote": "Instructed the assistant to 'keep it tight, facts only' but did not specify which elements each paragraph needed to support",
-          "note": "Lets the learner check that each paragraph of the Nilsen declaration ties to a specific legal element (authentication, materiality, causation) rather than just reading as narrative, and catch overstated language before it becomes a deposition liability.",
-          "ts": "2026-09-21T09:37:51.959Z"
-        }
-      ],
+      "evidence": [],
       "rubric": [
         "Requests that each factual assertion map to an element of the McCorpen test or authentication requirement",
         "Checks whether declaration language is deposition-safe rather than aspirational",

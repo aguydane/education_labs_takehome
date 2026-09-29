@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useLearner } from "@/lib/learner-context";
+import Hint from "@/components/ui/Hint";
 import type { Nudge, PruneProposal } from "@/lib/types";
-import { BTN, BTN_PRIMARY, STATE_LABEL, ago, stateVar } from "./shared";
+import { HINTS } from "./hints";
+import { BTN, BTN_PRIMARY, STATE_LABEL, ago } from "./shared";
+import StateDot from "./StateDot";
 
 /**
  * Claude's proposal for the active set. Claude proposes; the learner decides.
@@ -47,7 +50,10 @@ export default function PrunePanel({
   return (
     <section data-testid="prune-panel" className="border-t border-rule bg-panel-2 px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-xs font-medium text-ink">Proposed active set</h3>
+        <h3 className="flex items-center gap-1.5 text-xs font-medium text-ink">
+          Proposed active set
+          <Hint text={HINTS.proposal} label="About this proposal" />
+        </h3>
         <span className="text-xs text-ink-2">{ago(proposal.ts, now)}</span>
       </div>
       {proposal.summary ? (
@@ -108,11 +114,7 @@ export default function PrunePanel({
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                      <span
-                        aria-hidden
-                        className="h-2 w-2 shrink-0 rounded-full"
-                        style={{ background: stateVar(c.state) }}
-                      />
+                      <StateDot state={c.state} />
                       <span className="text-sm text-ink">{c.name}</span>
                       <span className="text-xs text-ink-2">
                         {[reasoning ? "recommended" : null, current ? "active now" : null, c.pinned ? "pinned" : null]

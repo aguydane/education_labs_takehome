@@ -1,8 +1,9 @@
 "use client";
 
+import Hint from "@/components/ui/Hint";
 import type { LearnerActions } from "@/lib/learner-context";
 import type { Concept, Nudge } from "@/lib/types";
-import { BTN_ACCENT, BTN_QUIET_ACCENT, FOCUS } from "./helpers";
+import { BTN_ACCENT, BTN_QUIET_ACCENT, FOCUS, HINTS, HINT_IN_ROW } from "./helpers";
 
 /** Quiet inline row: the learner asked why, or a pause point arrived. */
 export function BeatOffer({
@@ -16,7 +17,7 @@ export function BeatOffer({
 }) {
   return (
     <div
-      className="flex items-center gap-2.5 rounded-md border border-dashed border-rule px-3 py-1.5 text-xs text-ink-2"
+      className="relative flex items-center gap-2.5 rounded-md border border-dashed border-rule px-3 py-1.5 text-xs text-ink-2"
       data-testid={`beat-offer-${nudge.id}`}
     >
       <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
@@ -24,6 +25,7 @@ export function BeatOffer({
         {concept ? <span className="text-ink">{concept.name}. </span> : null}
         {nudge.reason}
       </p>
+      <Hint text={HINTS.beatOffer} label="What is this?" className={HINT_IN_ROW} />
       <button
         type="button"
         className={BTN_QUIET_ACCENT}
@@ -61,8 +63,9 @@ export function StudioOffer({
       className="rounded-lg border border-accent/40 bg-accent-soft px-3.5 py-3"
       data-testid={`studio-offer-${nudge.id}`}
     >
-      <p className="text-xs font-medium text-accent-ink">
+      <p className="relative flex items-center gap-1.5 text-xs font-medium text-accent-ink">
         Studio{concept ? ` · ${concept.name}` : ""}
+        <Hint text={HINTS.studioOffer} label="What is Studio?" className={HINT_IN_ROW} />
       </p>
       <p className="mt-1 text-sm leading-snug text-ink">{nudge.reason}</p>
       <div className="mt-2.5 flex items-center gap-3">

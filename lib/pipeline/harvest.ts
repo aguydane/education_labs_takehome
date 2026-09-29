@@ -2,12 +2,14 @@ import { z } from "zod";
 import type {
   Concept,
   ConceptIndexRow,
+  Confidence,
   Exchange,
   HarvestResult,
   LearnerState,
   Persona,
 } from "@/lib/types";
 import { id, nowIso, slug } from "@/lib/util";
+import { quoteIsFrom } from "./evidence";
 import { clampImpact, decayedTo, effectiveSignal } from "./scoring";
 import { addNudge } from "./triggers";
 
@@ -51,7 +53,7 @@ Principles:
 - Impact (1–5) is the steering value of this concept for THIS learner given their work pattern: how often it decides whether an output is right, and how costly it is to misjudge.
 - Return 1–4 concepts. Fewer, better ones.
 - rubricHints: 1–3 short descriptions of what a prompt, critique, or question would look like if the learner clearly had this concept. Concrete and domain-specific, never generic.
-- evidenceFromUser: the learner's own words (quoted or closely paraphrased) that informed the confidence estimate; an empty string if there were none.
+- evidenceFromUser: the learner's own words that informed the confidence estimate, copied verbatim from the [learner] section. Never quote the [assistant] section; a quote that isn't found in the learner's message is discarded and the confidence with it. If nothing the learner wrote informed the estimate, use an empty string and confidence "unknown".
 - learningBid is true when the learner asked why or how something works, asked for an explanation, or said they wanted to understand — as opposed to asking for a thing to be done. bidConceptName names the concept the bid is about, or null.
 - pausePoint is true when the exchange completes a piece of work: the learner accepted a result, said done / thanks / ship it, or the assistant delivered a finished artifact with nothing pending.
 
@@ -146,14 +148,17 @@ export function applyHarvest(
 ): LearnerState {
   const concepts = { ...state.concepts };
   const touched: string[] = [];
+  const exchange = state.exchanges.find((e) => e.id === exchangeId);
 
   for (const hc of result.concepts) {
     const cid = resolveConceptId(state, hc.name, hc.matchesExistingId);
     const existing = concepts[cid];
-    const evidence =
-      hc.evidenceFromUser.trim().length > 0
-        ? [{ exchangeId, quote: hc.evidenceFromUser.trim(), note: hc.whyItMattersHere, ts: now }]
-        : [];
+    const quote = hc.evidenceFromUser.trim();
+    // Only the learner's own words count. A quote lifted from the assistant's
+    // reply is dropped, and so is the confidence estimate that leaned on it.
+    const fromLearner = quote.length > 0 && (!exchange || quoteIsFrom(exchange.user, quote));
+    const evidence = fromLearner ? [{ exchangeId, quote, note: hc.whyItMattersHere, ts: now }] : [];
+    const learnerConfidence: Confidence = quote.length > 0 && !fromLearner ? "unknown" : hc.learnerConfidence;
 
     if (!existing) {
       concepts[cid] = {
@@ -163,7 +168,7 @@ export function applyHarvest(
         summary: hc.summary,
         whyItMatters: hc.whyItMattersHere,
         state: "noticed",
-        confidence: hc.learnerConfidence,
+        confidence: learnerConfidence,
         confidenceSource: "model",
         impact: hc.impact,
         signal: increment(hc.impact),
@@ -182,9 +187,9 @@ export function applyHarvest(
       const decayed = decayedTo(existing.signal, existing.lastSeen, now);
       const timesSeen = existing.timesSeen + 1;
       const confidence =
-        existing.confidenceSource === "learner" || hc.learnerConfidence === "unknown"
+        existing.confidenceSource === "learner" || learnerConfidence === "unknown"
           ? existing.confidence
-          : hc.learnerConfidence;
+          : learnerConfidence;
       const rubric = Array.from(new Set([...existing.rubric, ...hc.rubricHints])).slice(0, 6);
       concepts[cid] = {
         ...existing,
